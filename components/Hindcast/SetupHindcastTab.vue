@@ -39,9 +39,9 @@
         <h1 class="mb-6 text-3xl font-bold text-center relative">
             Hindcast Configuration Selection
         </h1>
-        <p  v-if="!calibrationRunForHindcast?.hindcast_status || ['Saved','Ready'].includes(calibrationRunForHindcast?.hindcast_status)"
+        <p v-if="!calibrationRunForHindcast?.hindcast_status || ['Saved','Ready'].includes(calibrationRunForHindcast?.hindcast_status)"
             class="prompt-txt mt-2 text-center">
-            Select a configuration, choose a Saved State (or manually set Cold Start Date and Cycle Date), set Advance Interval and Number of Intervals, then click Next.
+            Select a configuration.
         </p>
         <br />
     </div>
@@ -104,7 +104,10 @@
           Hindcast window: {{ hindcastConfiguration.fcst_win }} hour{{ hindcastConfiguration.fcst_win > 1 ? 's' : '' }}
         </li>
       </ul>
-      <div class="text-nowrap flex gap-2 mt-2">
+      <p class="prompt-txt mt-2 text-center">
+        Fill out all the fields below.
+      </p>
+      <div v-show="coldStartRunsForHindcast.length > 0" class="text-nowrap flex gap-2 mt-2">
         <input id="useSavedState_1" type="radio" :value="true" v-model="useSavedState" :disabled="!hindcastConfiguration"/>
         <label for="useSavedState_1" class="mr-6">Use Saved State</label>
         <input id="useSavedState_0" type="radio" :value="false" v-model="useSavedState" :disabled="!hindcastConfiguration"/>
@@ -313,7 +316,11 @@ onMounted(async () => {
         }
         if (hindcastConfiguration.value) {
           getCycleHourList();
-          getColdStartJobsForConfiguration();
+          const response = await getColdStartJobsForConfiguration();
+          coldStartRunsForHindcast.value = response?._data?.cold_start_jobs;
+          if (coldStartRunsForHindcast.value.length === 0) {
+            useSavedState.value = false;
+          }
           getIntervalCycleList();
           if (coldStartJobId.value) {
             useSavedState.value = true;
@@ -355,6 +362,9 @@ watch(hindcastConfiguration, async () => {
     hindcastConfigurationName.value = hindcastConfiguration.value.name;
     const response = await getColdStartJobsForConfiguration();
     coldStartRunsForHindcast.value = response?._data?.cold_start_jobs;
+    if (coldStartRunsForHindcast.value.length === 0) {
+      useSavedState.value = false;
+    }
   } else {
     hindcastConfigurationName.value = '';
     coldStartRunsForHindcast.value = [];
