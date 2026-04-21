@@ -94,7 +94,7 @@
             Forecast Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[3].includes(currentForecastTab) || (calibrationRunForForecast && (!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)) && currentForecastTab <= 5)" data-tab="3"
+          <div v-show="[3].includes(currentForecastTab) || (calibrationRunForForecast && (!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)) && !forecastJobId && currentForecastTab <= 5)" data-tab="3"
             class="tabs prevent-select" @click="tabClicked" aria-label="Setup Forecast Tab"
             title="Setup Forecast Tab">
             Setup Forecast
@@ -144,7 +144,7 @@
             Hindcast Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[3].includes(currentHindcastTab) || (calibrationRunForHindcast && (!calibrationRunForHindcast?.hindcast_status || ['Saved','Ready'].includes(calibrationRunForHindcast?.hindcast_status)) && currentHindcastTab <= 5)" data-tab="3"
+          <div v-show="[3].includes(currentHindcastTab) || (calibrationRunForHindcast && (!calibrationRunForHindcast?.hindcast_status || ['Saved','Ready'].includes(calibrationRunForHindcast?.hindcast_status)) && !hindcastJobId && currentHindcastTab <= 5)" data-tab="3"
             class="tabs prevent-select" @click="tabClicked" aria-label="Setup Hindcast Tab"
             title="Setup Hindcast Tab">
             Setup Hindcast
@@ -216,11 +216,11 @@ const {
 
 const { runStatusTabVisible } = storeToRefs(useEvaluationRunStatusStore());
 
-const { calibrationRunForForecast } = storeToRefs(useForecastStore());
+const { calibrationRunForForecast, forecastJobId } = storeToRefs(useForecastStore());
 
 const { selectedVerificationJob } = storeToRefs(useVerificationStore());
 
-const { calibrationRunForHindcast } = storeToRefs(useHindcastStore());
+const { calibrationRunForHindcast, hindcastJobId } = storeToRefs(useHindcastStore());
 
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());

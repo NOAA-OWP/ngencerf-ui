@@ -78,11 +78,11 @@
                       </span>
 
                       <span v-else>
-                        <Button v-if="!isStartHidden()" class="ngenButtonDiv-green h-8 font-normal" @click="startRun()"
+                        <Button v-if="!runButtonDisabled" class="ngenButtonDiv-green h-8 font-normal" @click="startRun()"
                           title="Run Button" :disabled="runButtonDisabled" aria-label="Run Button">
                           Run
                         </Button>
-                        <Button v-if="!isCancelHidden()" @click="cancelRun()"
+                        <Button v-if="!cancelButtonDisabled" @click="cancelRun()"
                           class="ngenButtonDiv-red h-8 hidden font-normal" title="Cancel Button" aria-label="Cancel Button"
                           :disabled="cancelButtonDisabled">
                           Cancel
@@ -150,8 +150,8 @@ import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
 
-const runButtonDisabled = ref<boolean>(false);
-const cancelButtonDisabled = ref<boolean>(false);
+const runButtonDisabled = ref<boolean>(true);
+const cancelButtonDisabled = ref<boolean>(true);
 
 const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
@@ -187,6 +187,8 @@ onMounted(async () => {
   if (evaluateValidationRunId.value > 0 && evaluateIterationRunId.value === 0) {
     iterationValidationRunId.value = evaluateValidationRunId.value;
     await loadValidationStatusInformation(evaluateValidationRunId.value);
+    runButtonDisabled.value = true;
+    cancelButtonDisabled.value = validationStatus.value === "" || (validationStatus.value !== "" && isValidationRunStopped(validationStatus.value));
     if (iterationValidationRunId.value > 0) {
       populateLogListOptions();
     }
@@ -195,31 +197,13 @@ onMounted(async () => {
     // this condition is specifically use to handle user click on Run/Status tab which can not reset certain value until user land on the tab
     evaluateValidationRunId.value = displayValidationId.value = 0;
     runningTime.value = startTime.value = "";
+    runButtonDisabled.value = false;
+    cancelButtonDisabled.value = true;
   }
-  
-  runButtonDisabled.value = isStartHidden();
-  cancelButtonDisabled.value = isCancelHidden();
 });
-
-const isStartHidden = (): boolean => {
-  let hidden = false;
-  if (validationStatus.value !== "") {
-    hidden = true;
-  }
-  return hidden;
-}
-
-const isCancelHidden = (): boolean => {
-  let hidden = false;
-  if (validationStatus.value === "" || (validationStatus.value !== "" && isValidationRunStopped(validationStatus.value))) {
-    hidden = true;
-  }
-  return hidden;
-}
 
 const startRun = async () => {
   runButtonDisabled.value = true;
-  cancelButtonDisabled.value = false;
   toast.removeAllGroups();
 
   executeIterationValidationRun().then((response) => {
@@ -245,6 +229,7 @@ const startRun = async () => {
 }
 
 watch(validationStatus, async (newStatus, initialStatus) => {
+  cancelButtonDisabled.value = newStatus === "" || (newStatus !== "" && isValidationRunStopped(newStatus));
   if (newStatus !== null && !isValidationRunStopped(newStatus)) {
     if (validationStatusCheckingIntervalId.value) {
       clearInterval(validationStatusCheckingIntervalId.value);
@@ -276,12 +261,18 @@ watch(validationStatus, async (newStatus, initialStatus) => {
 const cancelRun = async () => {
   cancelButtonDisabled.value = true;
   executeCancelIterationValidationRun().then(response => {
-    validationStatus.value = response?._data.status;
-    failureMessages.value = response?._data?.failure_messages ?? undefined;
-    clearInterval(validationStatusCheckingIntervalId.value);
-    clearInterval(validationRunningTimeIntervalId.value);
-    validationStatusCheckingIntervalId.value = undefined;
-    validationRunningTimeIntervalId.value = undefined;
+    if (response.status === 200) {
+      validationStatus.value = response?._data.status;
+      failureMessages.value = response?._data?.failure_messages ?? undefined;
+      clearInterval(validationStatusCheckingIntervalId.value);
+      clearInterval(validationRunningTimeIntervalId.value);
+      validationStatusCheckingIntervalId.value = undefined;
+      validationRunningTimeIntervalId.value = undefined;
+    } else {
+      cancelButtonDisabled.value = false;
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error cancelling Validation run', life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
   })
 }
 
@@ -298,6 +289,8 @@ const navigateToEvaluation = (event: any) => {
 
 onUnmounted(() => {
   runStatusTabVisible.value = false;
+  runButtonDisabled.value = true;
+  cancelButtonDisabled.value = true;
   failureMessages.value = undefined;
   logListOptions.value = [];
   resetUserLogRefs();

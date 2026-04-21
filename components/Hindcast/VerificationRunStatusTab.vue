@@ -53,13 +53,13 @@
               </div>
               <div class="mt-2 mb-2">
                 <!--BUTTONS - START-->
-                <span v-if="hindcastJobId && !verificationJobId && !verificationJobStatus">
+                <span v-if="!runButtonDisabled">
                   <Button class=" ngenButtonDiv-green font-normal" title="Run Button" aria-label="Run Button"
                     @click="startVerificationJob()" :disabled="runButtonDisabled">
                     Run
                   </Button>
                 </span>
-                <span v-if="['Submitted','Running'].includes(verificationJobStatus)">
+                <span v-if="!cancelButtonDisabled">
                   <Button class="col-span-1 ngenButtonDiv-red" title="Cancel Button" aria-label="Cancel Button"
                     @click="stopVerificationJob()" :disabled="cancelButtonDisabled">
                     Cancel
@@ -119,8 +119,8 @@ const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
-const runButtonDisabled = ref<boolean>(false);
-const cancelButtonDisabled = ref<boolean>(false);
+const runButtonDisabled = ref<boolean>(true);
+const cancelButtonDisabled = ref<boolean>(true);
 
 const forecastStore = useForecastStore();
 const hindcastStore = useHindcastStore();
@@ -183,9 +183,10 @@ onMounted(async() => {
   }
 
   runButtonDisabled.value = verificationJobStatus.value && !['Unknown','Ready'].includes(verificationJobStatus.value);
-  cancelButtonDisabled.value = ['Submitted','Running'].includes(verificationJobStatus.value);
+  cancelButtonDisabled.value = !runButtonDisabled.value || !['Submitted','Running'].includes(verificationJobStatus.value);
 
   watch(verificationJobStatus, async (newVerificationJobStatus, oldVerificationJobStatus) => {
+    cancelButtonDisabled.value = !runButtonDisabled.value || !['Submitted','Running'].includes(verificationJobStatus.value);
     if (verificationJobId.value && 
       ( 
         newVerificationJobStatus === 'Running' || 
@@ -203,8 +204,6 @@ onMounted(async() => {
  */
 const startVerificationJob = async () => {
   runButtonDisabled.value = true;
-  cancelButtonDisabled.value = false;
-  verificationJobStatus.value = 'Submitted';
   createAndRunVerificationJob().then((response) => {
     if (response.status >= 200 && response.status < 300) {
       verificationJobId.value = response._data.verification_run_id;
@@ -246,7 +245,6 @@ const startVerificationJob = async () => {
 const stopVerificationJob = async () => {
   cancelButtonDisabled.value = true;
   try {
-    cancelButtonDisabled.value = true;
     const cancelVerificationJobResponse = await cancelVerificationJob();
 
     if (cancelVerificationJobResponse?._data?.status) {
@@ -276,6 +274,8 @@ const goNextTab = () => {
 }
 
 onUnmounted(() => {
+  runButtonDisabled.value = true;
+  cancelButtonDisabled.value = true;
   clearInterval(verificationStatusCheckingInterval.value);
   clearInterval(verificationRunningTimeInterval.value);
   verificationStatusCheckingInterval.value = undefined;

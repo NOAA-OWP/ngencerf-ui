@@ -82,19 +82,19 @@
               </div>
               <div class="mt-2 mb-2">
                 <!--BUTTONS - START-->
-                <span v-if="!hindcastJobStatus || (!coldStartJobStatus && hindcastJobStatus === 'Ready')">
+                <span v-if="!runButtonDisabled && !hindcastJobId">
                   <Button class="ngenButtonDiv ml-6 font-normal px-4" title="Previous Button" aria-label="Previous Button"
                     @click="goToSetupHindcastTab()">
                     Previous
                   </Button>
                 </span>
-                <span v-if="!hindcastJobStatus || hindcastJobStatus === 'Ready'">
+                <span v-if="!runButtonDisabled">
                   <Button class="ngenButtonDiv-green ml-6 font-normal px-4" title="Run Button" aria-label="Run Button"
                     @click="startHindcastRun()" :disabled="runButtonDisabled">
                     Run
                   </Button>
                 </span>
-                <span v-if="['Submitted','Running'].includes(coldStartJobStatus) || ['Submitted','Running'].includes(hindcastJobStatus)">
+                <span v-if="!cancelButtonDisabled">
                   <Button class="ngenButtonDiv-red ml-6 font-normal px-4" title="Cancel Button" aria-label="Cancel Button" 
                     @click="cancelHindcastRun()" :disabled="cancelButtonDisabled">
                     Cancel
@@ -242,8 +242,8 @@ const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
-const runButtonDisabled = ref<boolean>(false);
-const cancelButtonDisabled = ref<boolean>(false);
+const runButtonDisabled = ref<boolean>(true);
+const cancelButtonDisabled = ref<boolean>(true);
 const showMessagesGroup = ref<boolean>(false);
 
 const { fetchUserCalibrationRunData } = useUserDataStore();
@@ -357,9 +357,10 @@ onMounted(async () => {
   }
 
   runButtonDisabled.value = !['Unknown','Ready'].includes(overallColdStartHindcastStatus.value);
-  cancelButtonDisabled.value = !['Submitted','Running'].includes(coldStartJobStatus.value) && !['Submitted','Running'].includes(hindcastJobStatus.value);
+  cancelButtonDisabled.value = !runButtonDisabled.value || (!['Submitted','Running'].includes(coldStartJobStatus.value) && !['Submitted','Running'].includes(hindcastJobStatus.value));
 
   watch(overallColdStartHindcastStatus, (newColdStartHindcastStatus, oldColdStartHindcastStatus) => {
+    cancelButtonDisabled.value = !runButtonDisabled.value || (!['Submitted','Running'].includes(coldStartJobStatus.value) && !['Submitted','Running'].includes(hindcastJobStatus.value));
     if (hindcastJobId.value && 
       ( 
         coldStartJobStatus.value === 'Running' ||
@@ -424,8 +425,6 @@ const createColdStartAndHindcastStatusInterval = () => {
  */
 const startHindcastRun = async () => {
   runButtonDisabled.value = true;
-  cancelButtonDisabled.value  = false;
-  calibrationRunForHindcast.value.hindcast_status = hindcastJobStatus.value = 'Submitted';
   const createAndRunHindcastJobResponse = await createAndRunHindcastJob(
     calibrationRunForHindcast?.value?.calibration_run_id as number, 
     hindcastConfiguration?.value?.name as string,
@@ -528,6 +527,8 @@ const goToSetupHindcastTab = () => {
 
 onUnmounted(() => {
   // make sure page clears all log data when the user leaves
+  runButtonDisabled.value = true;
+  cancelButtonDisabled.value = true;
   logListOptions.value = [];
   hindcastJobStatus.value = undefined;
   coldStartJobStatus.value = undefined;
