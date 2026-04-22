@@ -1,7 +1,20 @@
+############################################################################
+# Change/Verify these values when adopting this Dockerfile into another org:
+#   IMAGE_NAMESPACE
+############################################################################
+
+# Ownership / branding overrides
+ARG IMAGE_NAMESPACE=ngwpc
+############################################################################
+
 ARG BASE_REPO=rockylinux
 ARG BASE_TAG=9.3
 
 FROM ${BASE_REPO}:${BASE_TAG}
+
+# Re-expose args after FROM for the remaining build stage
+# Keeps whatever value was already set
+ARG IMAGE_NAMESPACE
 
 # OCI Metadata Arguments
 ARG BASE_REPO
@@ -17,7 +30,7 @@ ARG IMAGE_REVISION="unknown"
 # OCI Standard Labels
 LABEL org.opencontainers.image.base.name="${BASE_NAME}" \
     org.opencontainers.image.base.digest="${BASE_DIGEST}" \
-    io.ngwpc.image.base.revision="${BASE_REVISION}" \
+    io.${IMAGE_NAMESPACE}.image.base.revision="${BASE_REVISION}" \
     org.opencontainers.image.source="${IMAGE_SOURCE}" \
     org.opencontainers.image.vendor="${IMAGE_VENDOR}" \
     org.opencontainers.image.version="${IMAGE_VERSION}" \
