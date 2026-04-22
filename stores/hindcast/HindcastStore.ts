@@ -262,7 +262,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
         }
         if (isValidDate(submitTimeDate.value)) {
           submitTime.value = formatDateForRunOnString(submitTimeDate.value);
-          if (overallColdStartHindcastStatus.value === 'Done' && getStatusResponse?._data?.run_end) {
+          if (!['Submitted','Running'].includes(hindcastJobStatus.value) && !['Submitted','Running'].includes(coldStartJobStatus.value)) {
             setElapsedTime(getStatusResponse?._data);
           }
         } else {
@@ -294,8 +294,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
         new Date(hindcastJob.run_end as string)
       ));
     }
-
-    elapsedTime.value = sumAndFormatElapsedTimes(elapsedTimeArray);
+    elapsedTime.value = elapsedTimeArray.length > 0 ? sumAndFormatElapsedTimes(elapsedTimeArray) : '00:00:00';
   };
 
   /**

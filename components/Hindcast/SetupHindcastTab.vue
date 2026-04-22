@@ -143,6 +143,15 @@
               :disabled="!hindcastConfiguration"/>
           </div>
           <div v-if="!useSavedState" class="text-nowrap text-right font-bold p-2 required-label">
+            Cold Start Hour
+          </div>
+          <div v-if="!useSavedState" class="text-nowrap p-1">
+            <Select id="coldStartHour" v-model="coldStartHour" :options="coldStartHourList" default="12" 
+              aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
+              class="!w-24" :disabled="!hindcastConfiguration">
+            </Select>
+          </div>
+          <div v-if="!useSavedState" class="text-nowrap text-right font-bold p-2 required-label">
             Cycle Date
           </div>
           <div v-if="!useSavedState" class="text-nowrap p-1">
@@ -154,15 +163,8 @@
               :disabled="!hindcastConfiguration"/>
           </div>
           <div v-if="!useSavedState" class="text-nowrap text-right font-bold p-2 required-label">
-            Cold Start Hour
+            Cycle Hour
           </div>
-          <div v-if="!useSavedState" class="text-nowrap p-1">
-            <Select id="coldStartHour" v-model="coldStartHour" :options="coldStartHourList" default="12" 
-              aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
-              class="!w-24" :disabled="!hindcastConfiguration">
-            </Select>
-          </div>
-          <div v-if="!useSavedState" class="text-nowrap text-right font-bold p-2 required-label">Cycle Hour</div>
           <div v-if="!useSavedState" class="text-nowrap p-1">
             <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
               aria-label="Cycle Hour Select" title="Cycle Hour Select"
@@ -184,6 +186,9 @@
           </div>
           <div class="text-nowrap p-1">
             <InputNumber id="jobIdEnd" class="!w-12" v-model="numIterations" :min="1"/>
+          </div>
+          <div v-if="useSavedState" class="col-span-4 h-[30px]">
+            &nbsp;
           </div>
         </div>
         <div>

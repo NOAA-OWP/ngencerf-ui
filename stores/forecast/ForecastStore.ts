@@ -255,8 +255,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         }
         if (isValidDate(submitTimeDate.value)) {
           submitTime.value = formatDateForRunOnString(submitTimeDate.value);
-          if (overallColdStartForecastStatus.value === 'Done' && getStatusResponse?._data?.run_end) {
-            elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date(getStatusResponse._data.run_end as string));
+          if (!['Submitted','Running'].includes(forecastJobStatus.value) && !['Submitted','Running'].includes(coldStartJobStatus.value)) {
+            setElapsedTime(getStatusResponse?._data);
           }
         } else {
           errorMessages.push(`Invalid submit date: ${getStatusResponse?._data?.submit_date}`);
@@ -282,7 +282,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     }
     
     // sum and format forecast and cold start elapsed times
-    elapsedTime.value = sumAndFormatElapsedTimes(elapsedTimeArray);
+    elapsedTime.value = elapsedTimeArray.length > 0 ? sumAndFormatElapsedTimes(elapsedTimeArray) : '00:00:00';
   };
 
   /**
