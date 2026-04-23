@@ -136,6 +136,7 @@ const { resetFilters } = useForecastStore();
 const verificationStore = useVerificationStore();
 const {
   verificationJobs,
+  verificationJobType,
   verificationRunListPageSize,
   verificationRunListCurrentPage,
   verificationRunListTotalPages,
@@ -218,6 +219,7 @@ onMounted(() => {
     verificationRunListCurrentPage.value = 1;
 
     // load verificationJobs
+    verificationJobType.value = 'forecast';
     await getVerificationJobs();
     updateGageList();
   });
