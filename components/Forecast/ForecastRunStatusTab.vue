@@ -438,21 +438,24 @@ const startForecastRun = async () => {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
-  } else {
-    runButtonDisabled.value = false;
-    cancelButtonDisabled.value = true;
+  } else if (createAndRunForecastJobResponse?._data?.forecast_run_id) {
+    // job was created, but we got a bad response from the server
+    forecastJobId.value = createAndRunForecastJobResponse._data.forecast_run_id;
     const getStatusResponse = await getStatus();
-    const forecasts: any[] = getStatusResponse?._data?.forecasts;
-    const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
 
-    if (forecast) {
-      forecastJobStatus.value = forecast?.status;
-      coldStartJobStatus.value = forecast?.cold_start?.status;
-      failureMessages.value = forecast?.failure_messages ?? undefined;
+    if (getStatusResponse?._data?.status) {
+      forecastJobStatus.value = getStatusResponse._data.status;
+      coldStartJobStatus.value = getStatusResponse._data?.cold_start?.status ?? undefined;
+      failureMessages.value = getStatusResponse._data?.failure_messages ?? undefined;
     } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Unable to run forecast job`, life: ToastTimeout.timeoutError };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: getStatusResponse?._data?.message ?? `Error when running forecast job`, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
+  } else {
+    runButtonDisabled.value = false;
+    cancelButtonDisabled.value  = true;
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: createAndRunForecastJobResponse?._data?.message ?? `Unable to run forecast job`, life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 };
 

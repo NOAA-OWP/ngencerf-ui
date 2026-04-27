@@ -460,22 +460,24 @@ const startHindcastRun = async () => {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
+  } else if (createAndRunHindcastJobResponse?._data?.hindcast_run_id) {
+    // job was created, but we got a bad response from the server
+    hindcastJobId.value = createAndRunHindcastJobResponse._data.hindcast_run_id;
+    const getStatusResponse = await getStatus();
+
+    if (getStatusResponse?._data?.status) {
+      hindcastJobStatus.value = getStatusResponse._data.status;
+      coldStartJobStatus.value = getStatusResponse._data?.cold_start?.status ?? undefined;
+      failureMessages.value = getStatusResponse._data?.failure_messages ?? undefined;
+    } else {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: getStatusResponse?._data?.message ?? `Error when running hindcast job`, life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
   } else {
     runButtonDisabled.value = false;
     cancelButtonDisabled.value  = true;
-    const getStatusResponse = await getStatus();
-    const hindcasts: any[] = getStatusResponse?._data?.hindcasts;
-    const hindcast = hindcasts?.find((f: any) => f.hindcast_run_id === hindcastJobId.value);
-
-    if (hindcast) {
-      hindcastJobStatus.value = hindcast?.status;
-      coldStartJobStatus.value = hindcast?.cold_start?.status;
-      failureMessages.value = hindcast?.failure_messages ?? undefined;
-    } else {
-      hindcastJobStatus.value = 'Ready';
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Unable to run hindcast job`, life: ToastTimeout.timeoutError };
-      toast.add(tMsg); addToastRecord(tMsg);
-    }
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: createAndRunHindcastJobResponse?._data?.message ?? `Unable to run hindcast job`, life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 };
 

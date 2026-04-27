@@ -143,6 +143,7 @@ const {
 const { 
   loadVerificationRunStatusTabData,
   loadVerificationStatusInformation,
+  getVerificationStatus,
   updateRunningTime,
   createAndRunVerificationJob,
   cancelVerificationJob
@@ -225,10 +226,22 @@ const startVerificationJob = async () => {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
+    } else if (response?._data?.verification_run_id) {
+      // job was created, but we got a bad response from the server
+      verificationJobId.value = response._data.verification_run_id;
+      getVerificationStatus().then((status_response) => {
+        if (status_response?._data?.status) {
+          verificationJobStatus.value = status_response._data.status;
+          failureMessages.value = status_response._data?.failure_messages ?? undefined;
+        } else {
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: status_response?._data?.message ?? `Error when running verification job`, life: ToastTimeout.timeoutError };
+          toast.add(tMsg); addToastRecord(tMsg);
+        }
+      });
     } else {
       runButtonDisabled.value = false;
-      cancelButtonDisabled.value = true;
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Verification job ${verificationJobId.value} in server response`, life: ToastTimeout.timeoutError };
+      cancelButtonDisabled.value  = true;
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: response?._data?.message ?? `Unable to run verification job`, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   })
