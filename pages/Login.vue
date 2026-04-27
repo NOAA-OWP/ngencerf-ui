@@ -12,43 +12,10 @@
             <div class="row-span-12 flex items-center justify-center h-screen-inner">
 
               <div id="LoginBox" class="bg-white mx-auto px-12 py-12 rounded-[10px] max-w-screen-md"
-                :class="!showDialog ? 'loginBox' : 'createAccountBox'">
+                :class="!showCreateAccount ? 'loginBox' : 'createAccountBox'">
 
-                <div v-if="!showDialog" class="mx-auto px-8 text-left">
-                  <form onsubmit="return false">
-
-                    <h1>Login</h1>
-
-                    <div class="mt-10">
-                      <label for="uname" style="font-weight: normal;" class="required-label">Email</label><br>
-                      <input id="uname" class="w-[350px]" type="text" v-model="userName" placeholder=" Email"
-                        aria-label="Username" autocomplete="email" v-on:keypress="autoSubmit" />
-                      <!-- <Button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
-                        Forgot Email
-                      </Button> -->
-                    </div>
-                    <div class="mt-4">
-                      <label for="pword" style="font-weight: normal;" class="required-label">Password</label><br>
-                      <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
-                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false"
-                        class="block w-[350px]" v-on:keypress="autoSubmit" />
-                      <Button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotPassword">
-                        Forgot Password
-                      </Button>
-                    </div>
-
-                    <Button id="LoginButton" class="ngenButtonDiv btn-left mt-4" v-on:click="SubmitLoginForm"
-                      aria-label="sign in">Sign In</Button>
-
-                    <div class="signupButton underline text-base mt-2" aria-label="sign up">
-                      <Button @click="openDialog" class="c-blue">Create an Account</Button>
-                    </div>
-
-                  </form>
-                </div>
-
-                <div v-if="showDialog">
-                  <div class="dialog-overlay" @click.self="closeDialog">
+                <div v-if="showCreateAccount">
+                  <div class="dialog-overlay" @click.self="closeAll">
                     <div class="dialog-content">
                       <h1>Create an Account</h1>
                       <form @submit.prevent="SubmitNewAccountForm">
@@ -90,13 +57,98 @@
                           <Button type="submit" :disabled="disableCreateAccountBtn">Create Account</Button>
                         </div>
                         <div class="signupButton underline text-base inline pl-6">
-                          <Button @click="closeDialog" :class="cancelCreateAccountLinkClasses"
+                          <Button @click="closeAll" :class="cancelCreateAccountLinkClasses"
                             :disabled="disableCreateAccountBtn">Cancel</Button>
                         </div>
                       </form>
                     </div>
                   </div>
                 </div>
+
+                <div v-else-if="showMFASetup" class="mx-auto px-8 text-left">
+                  <form onsubmit="return false">
+                    <h1>Complete MFA Setup</h1>
+
+                    <p>Scan the QR COde with your authenticator app to continue. When your authenticator is set up, enter the 6-digit Code below.</p>
+
+                    <!-- TO DO: Show QR Code Here -->
+
+                    <div class="mt-10">
+                      <label for="MFACodeForSetup" style="font-weight: normal;" class="required-label">Code</label><br>
+                      <input id="MFACodeForSetup" class="w-[350px]" type="text" v-model="MFACode" placeholder="######"
+                        aria-label="MFACode" autocomplete="off" v-on:keypress="autoSubmit($event, 'mfa_setup')" />
+                    </div>
+
+                    <Button id="MFASetupButton" class="ngenButtonDiv btn-left mt-4" v-on:click="ConfirmMFASetup"
+                      aria-label="Confirm Setup">Confirm Setup</Button>
+                  </form>
+                </div>
+
+                <div v-else-if="showMFAVerify" class="mx-auto px-8 text-left">
+                  <h1>MFA Setup Complete</h1>
+
+                  <p>MFA has been set up for your account. Make a note of the following recovery codes
+                    in case you ever lose access to your authenticator app.</p>
+                  
+                  <!-- TO DO: Show Recovery Codes Here -->
+
+                  <p>You may now proceed to ngenCERF.</p>
+                  
+                  <!-- TO DO: Show Download and Copy Buttons Here -->
+                  <Button id="GoToLandingButton" class="ngenButtonDiv btn-left mt-4" v-on:click="GoToLanding"
+                    aria-label="Continue">Continue</Button>
+                </div>
+
+                <div v-else-if="showMFAVerify" class="mx-auto px-8 text-left">
+                  <form onsubmit="return false">
+                    <h1>Verify MFA Code</h1>
+
+                    <p>Enter the MFA code shown in your authenticator app.</p>
+
+                    <div class="mt-10">
+                      <label for="MFACodeForVerification" style="font-weight: normal;" class="required-label">Code</label><br>
+                      <input id="MFACodeForVerification" class="w-[350px]" type="text" v-model="MFACode" placeholder="######"
+                        aria-label="MFACode" autocomplete="off" v-on:keypress="autoSubmit($event, 'mfa_verify')" />
+                    </div>
+
+                    <Button id="VerifyMFAButton" class="ngenButtonDiv btn-left mt-4" v-on:click="VerifyMFACode"
+                      aria-label="Verify">Verify</Button>
+                  </form>
+                </div>
+
+                <div v-else class="mx-auto px-8 text-left">
+                  <form onsubmit="return false">
+
+                    <h1>Login</h1>
+
+                    <div class="mt-10">
+                      <label for="uname" style="font-weight: normal;" class="required-label">Email</label><br>
+                      <input id="uname" class="w-[350px]" type="text" v-model="userName" placeholder=" Email"
+                        aria-label="Username" autocomplete="email" v-on:keypress="autoSubmit($event)" />
+                      <!-- <Button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotUsername">
+                        Forgot Email
+                      </Button> -->
+                    </div>
+                    <div class="mt-4">
+                      <label for="pword" style="font-weight: normal;" class="required-label">Password</label><br>
+                      <Password id="pword" type="password" autocomplete="current-password" v-model="userPassword"
+                        placeholder=" Password" aria-label="Password" toggleMask :feedback="false"
+                        class="block w-[350px]" v-on:keypress="autoSubmit($event)" />
+                      <Button tabindex="-1" class="c-blue underline text-xs" v-on:click="ForgotPassword">
+                        Forgot Password
+                      </Button>
+                    </div>
+
+                    <Button id="LoginButton" class="ngenButtonDiv btn-left mt-4" v-on:click="SubmitLoginForm"
+                      aria-label="sign in">Sign In</Button>
+
+                    <div class="signupButton underline text-base mt-2" aria-label="sign up">
+                      <Button @click="openCreateAccount" class="c-blue">Create an Account</Button>
+                    </div>
+
+                  </form>
+                </div>
+
                 <div class="required-hint mt-4">
                   <span class="required-asterisk">*</span> Required field
                 </div>
@@ -128,6 +180,7 @@ import AppFooter from "@/components/Common/AppFooter.vue";
 import AppHeader from "@/components/Common/AppHeader.vue";
 
 import { useBackendConfig } from "@/composables/UseBackendConfig";
+import { addStyle } from "@primeuix/utils";
 
 const { serverInfo, gitInfo, menuIndex, calibrationTabIndex, evaluationTabIndex, forecastTabIndex, hindcastTabIndex } = storeToRefs(generalStore());
 
@@ -144,13 +197,21 @@ const toast = useToast();
 const userDataStore = useUserDataStore();
 const userName = ref<string>("");
 const userPassword = ref<string>("");
-const showDialog = ref(false);
+const showCreateAccount = ref(false);
+const showMFASetup = ref(false);
+const showMFARecoveryCodes = ref(false);
+const showMFAVerify = ref(false);
 
 const newEmail = ref('');
 const newFirstName = ref('');
 const newLastName = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
+
+const MFAToken = ref<string>('');
+const QRCodeSource = ref<string>('');
+const MFACode = ref<string>('');
+const RecoveryCodes = ref<string[]>([]);
 
 const disableCreateAccountBtn = ref<boolean>(false);
 const createAccountButtonClasses = ref<string[]>(["ngenButtonDiv", "btn-left", "mt-4"]);
@@ -200,12 +261,45 @@ const getGitInformation = () => {
   })
 }
 
-const openDialog = () => {
-  showDialog.value = true;
+const closeAll = () => {
+  showCreateAccount.value = false;
+  showMFASetup.value = false;
+  showMFARecoveryCodes.value = false;
+  showMFAVerify.value = false;
 };
 
-const closeDialog = () => {
-  showDialog.value = false;
+const openCreateAccount = () => {
+  closeAll();
+  showCreateAccount.value = true;
+};
+
+const openMFASetup = async() => {
+  await $fetch<any>(`${ngencerfBaseUrl}/auth/mfa/setup/`, {
+    method: 'POST',
+    body: {
+      mfa_token: MFAToken.value
+    }
+  }).then(response => {
+    if (response?.message) {
+      const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+    closeAll();
+    showMFASetup.value = true;
+    QRCodeSource.value = response?.otpauth_url; // TO DO: convert this into an image and display
+    MFACode.value = '';
+  }
+  ).catch(error => {
+    if (error) {
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error?.message, life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
+  });
+};
+
+const openMFAVerify = () => {
+  closeAll();
+  showMFAVerify.value = true;
 };
 
 const ForgotUsername = () => {
@@ -217,9 +311,17 @@ const ForgotPassword = () => {
   toast.add(tMsg); addToastRecord(tMsg);
 };
 
-const autoSubmit = (e: KeyboardEvent) => {
-  if (e.key === "Enter" && (userName.value.trim() !== "" && userPassword.value.trim() !== "")) {
-    SubmitLoginForm(e);
+const autoSubmit = (e: KeyboardEvent, form_type: string='login') => {
+  if (e.key === "Enter") {
+    if (form_type === 'login' && (userName.value.trim() !== "" && userPassword.value.trim() !== "")) {
+      SubmitLoginForm(e);
+    }
+    else if (form_type === 'mfa_setup' && (MFACode.value.trim().length === 6)) {
+      ConfirmMFASetup(e);
+    }
+    else if (form_type === 'mfa_verify' && (MFACode.value.trim().length === 6)) {
+      VerifyMFACode(e);
+    }
   }
 }
 
@@ -233,7 +335,7 @@ const SubmitLoginForm = async (e: Event) => {
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
     // try to create new access and refresh tokens
 
-    await $fetch<any>(`${ngencerfBaseUrl}/auth/jwt/create/`, {
+    await $fetch<any>(`${ngencerfBaseUrl}/auth/login/`, {
       method: 'POST',
       body: {
         email: userName.value.toLowerCase(),
@@ -247,9 +349,21 @@ const SubmitLoginForm = async (e: Event) => {
       // store user name in UserDataStore
       userDataStore.setFirstName(response.first_name);
       userDataStore.setLastName(response.last_name);
+      // set MFA token if needed
+      MFAToken.value = response?.mfa_token ?? '';
       GetExternalInfo();
       logUserIn();
-      GoToLanding();
+      if (response?.message) {
+        const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+      if (response?.mfa_setup_required) {
+        openMFASetup();
+      } else if (response.mfa_required) {
+        openMFAVerify();
+      } else {
+        GoToLanding();
+      }
     }
     ).catch(error => {
       if (error) {
@@ -264,6 +378,77 @@ const SubmitLoginForm = async (e: Event) => {
     });
   } else if (userName.value.trim() === "" || userPassword.value.trim() === "") {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: "A Username and Password are required", life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+}
+
+/** 
+ * Submits the MFA Code during Setup
+ * @param e - event object
+ */
+const ConfirmMFASetup = async (e: Event) => {
+  e.preventDefault(); // prevents the page from reloading
+
+  if (MFACode.value.trim().length === 6) {
+    // validate the MFA Code
+
+    await $fetch<any>(`${ngencerfBaseUrl}/auth/mfa/setup/confirm/`, {
+      method: 'POST',
+      body: {
+        mfa_token: MFAToken.value,
+        code: MFACode.value
+      }
+    }).then(response => {
+      RecoveryCodes.value = response?.recovery_codes;
+      showMFARecoveryCodes.value = true;
+      if (response?.message) {
+        const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+    }
+    ).catch(error => {
+      if (error) {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error.message, life: ToastTimeout.timeoutError };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+    });
+  } else {
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: "MFA Code must be six digits long.", life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+}
+
+/** 
+ * Submits the MFA Code during Verification
+ * @param e - event object
+ */
+const VerifyMFACode = async (e: Event) => {
+  e.preventDefault(); // prevents the page from reloading
+
+  if (MFACode.value.trim().length === 6) {
+    // validate the MFA Code
+
+    await $fetch<any>(`${ngencerfBaseUrl}/auth/mfa/setup/verify/`, {
+      method: 'POST',
+      body: {
+        mfa_token: MFAToken.value,
+        code: MFACode.value
+      }
+    }).then(response => {
+      if (response?.message) {
+        const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
+        toast.add(tMsg); addToastRecord(tMsg);
+        GoToLanding();
+      }
+    }
+    ).catch(error => {
+      if (error) {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error.message, life: ToastTimeout.timeoutError };
+        toast.add(tMsg); addToastRecord(tMsg);
+      }
+    });
+  } else {
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: "MFA Code must be six digits long.", life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -335,7 +520,7 @@ const SubmitNewAccountForm = async () => {
     cancelCreateAccountLinkClasses.value.splice(cancelCreateAccountLinkClasses.value.indexOf('disabledLink'), 1);
     const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: ToastTimeout.timeoutSuccess };
     toast.add(tMsg); addToastRecord(tMsg);
-    closeDialog();
+    closeAll();
   };
 };
 
@@ -345,6 +530,10 @@ const SubmitNewAccountForm = async () => {
 const GoToLanding = () => {
   navigateTo("LandingPage");
 };
+
+onUnmounted(() => {
+  closeAll();
+})
 
 </script>
 <style lang="scss" scoped>
