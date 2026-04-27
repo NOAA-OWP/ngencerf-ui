@@ -884,7 +884,7 @@ watch(selectedPlotName, async () => {
       // reset all of our plot refs except for selectedPlotName
       resetUserPlotRefs(['selectedPlotName']);
       selectedLogCategory.value = selectedPlotName.value.replace(" Logs", "").toLowerCase();
-    } else if (userCalibrationRunData?.value?.status === 'Done' || (iteration.value && iteration.value >= 1)) {
+    } else if (userCalibrationRunData?.value?.status === 'Done' || (isNotNullOrUndefined(iteration.value) && iteration.value >= 0)) {
       // get selected plot file name and url from server
       const response: any = await queryGetPlot(selectedPlotName.value as string); // store this in RunStatusStore
 
