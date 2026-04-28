@@ -363,6 +363,9 @@ const SubmitLoginForm = async (e: Event) => {
       }
     }).then(response => {
       setUserName(userName.value.toLowerCase());
+      // store user name in UserDataStore
+      userDataStore.setFirstName(response?.first_name);
+      userDataStore.setLastName(response?.last_name);
       // set MFA token if needed
       MFAToken.value = response?.mfa_token ?? '';
       if (response?.message) {
@@ -475,9 +478,6 @@ const setTokenAndLogUserIn = async(response: any) => {
   // store tokens in UserDataStore
   userDataStore.setAccessToken(response?.access);
   userDataStore.setRefreshToken(response?.refresh);
-  // store user name in UserDataStore
-  userDataStore.setFirstName(response?.first_name);
-  userDataStore.setLastName(response?.last_name);
   logUserIn();
 }
 
