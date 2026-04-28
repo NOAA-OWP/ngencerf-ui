@@ -66,25 +66,33 @@
                 </div>
 
                 <div v-else-if="showMFASetup" class="mx-auto px-8 text-left">
-                  <form onsubmit="return false">
-                    <h1>Complete MFA Setup</h1>
+                  <div class="dialog-overlay" @click.self="closeAll">
+                    <div class="dialog-content">
+                      <form onsubmit="return false">
+                        <h1>Complete MFA Setup</h1>
 
-                    <p>Scan the QR COde with your authenticator app to continue. When your authenticator is set up, enter the 6-digit Code below.</p>
+                        <p>Scan the QR Code with your authenticator app to continue. When your authenticator is set up, enter the 6-digit Code below.</p>
 
-                    <!-- TO DO: Show QR Code Here -->
+                        <img :src="QRCodeSource" alt="QR Code">
 
-                    <div class="mt-10">
-                      <label for="MFACodeForSetup" style="font-weight: normal;" class="required-label">Code</label><br>
-                      <input id="MFACodeForSetup" class="w-[350px]" type="text" v-model="MFACode" placeholder="######"
-                        aria-label="MFACode" autocomplete="off" v-on:keypress="autoSubmit($event, 'mfa_setup')" />
+                        <p>Or manually enter the following code into your authenticator app:</p>
+
+                        <p>{{ AuthenticatorKey }}</p>
+
+                        <div class="mt-10">
+                          <label for="MFACodeForSetup" style="font-weight: normal;" class="required-label">Code</label><br>
+                          <input id="MFACodeForSetup" class="w-[350px]" type="text" v-model="MFACode" placeholder="######"
+                            aria-label="MFACode" autocomplete="off" v-on:keypress="autoSubmit($event, 'mfa_setup')" />
+                        </div>
+
+                        <Button id="MFASetupButton" class="ngenButtonDiv btn-left mt-4" v-on:click="ConfirmMFASetup"
+                          aria-label="Confirm Setup">Confirm Setup</Button>
+                      </form>
                     </div>
-
-                    <Button id="MFASetupButton" class="ngenButtonDiv btn-left mt-4" v-on:click="ConfirmMFASetup"
-                      aria-label="Confirm Setup">Confirm Setup</Button>
-                  </form>
+                  </div>
                 </div>
 
-                <div v-else-if="showMFAVerify" class="mx-auto px-8 text-left">
+                <div v-else-if="showMFARecoveryCodes" class="mx-auto px-8 text-left">
                   <h1>MFA Setup Complete</h1>
 
                   <p>MFA has been set up for your account. Make a note of the following recovery codes
@@ -100,20 +108,24 @@
                 </div>
 
                 <div v-else-if="showMFAVerify" class="mx-auto px-8 text-left">
-                  <form onsubmit="return false">
-                    <h1>Verify MFA Code</h1>
+                  <div class="dialog-overlay" @click.self="closeAll">
+                    <div class="dialog-content">
+                      <form onsubmit="return false">
+                        <h1>Verify MFA Code</h1>
 
-                    <p>Enter the MFA code shown in your authenticator app.</p>
+                        <p>Enter the MFA code shown in your authenticator app.</p>
 
-                    <div class="mt-10">
-                      <label for="MFACodeForVerification" style="font-weight: normal;" class="required-label">Code</label><br>
-                      <input id="MFACodeForVerification" class="w-[350px]" type="text" v-model="MFACode" placeholder="######"
-                        aria-label="MFACode" autocomplete="off" v-on:keypress="autoSubmit($event, 'mfa_verify')" />
+                        <div class="mt-10">
+                          <label for="MFACodeForVerification" style="font-weight: normal;" class="required-label">Code</label><br>
+                          <input id="MFACodeForVerification" class="w-[350px]" type="text" v-model="MFACode" placeholder="######"
+                            aria-label="MFACode" autocomplete="off" v-on:keypress="autoSubmit($event, 'mfa_verify')" />
+                        </div>
+
+                        <Button id="VerifyMFAButton" class="ngenButtonDiv btn-left mt-4" v-on:click="VerifyMFACode"
+                          aria-label="Verify">Verify</Button>
+                      </form>
                     </div>
-
-                    <Button id="VerifyMFAButton" class="ngenButtonDiv btn-left mt-4" v-on:click="VerifyMFACode"
-                      aria-label="Verify">Verify</Button>
-                  </form>
+                  </div>
                 </div>
 
                 <div v-else class="mx-auto px-8 text-left">
@@ -169,6 +181,7 @@ import { ref, onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
+import QRCode from "qrcode";
 
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
@@ -210,6 +223,7 @@ const confirmPassword = ref('');
 
 const MFAToken = ref<string>('');
 const QRCodeSource = ref<string>('');
+const AuthenticatorKey = ref<string>('');
 const MFACode = ref<string>('');
 const RecoveryCodes = ref<string[]>([]);
 
@@ -286,7 +300,13 @@ const openMFASetup = async() => {
     }
     closeAll();
     showMFASetup.value = true;
-    QRCodeSource.value = response?.otpauth_url; // TO DO: convert this into an image and display
+    // Convert otpauth_url into a QR Code for display
+    QRCode.toDataURL(response?.otpauth_url, (err, url) => {
+      if (err) console.error(err);
+      console.log(url); // This URL can be set as the src of an <img> element
+      QRCodeSource.value = url;
+    });
+    AuthenticatorKey.value = response?.authenticator_key;
     MFACode.value = '';
   }
   ).catch(error => {
@@ -343,16 +363,8 @@ const SubmitLoginForm = async (e: Event) => {
       }
     }).then(response => {
       setUserName(userName.value.toLowerCase());
-      // store tokens in UserDataStore
-      userDataStore.setAccessToken(response.access);
-      userDataStore.setRefreshToken(response.refresh);
-      // store user name in UserDataStore
-      userDataStore.setFirstName(response.first_name);
-      userDataStore.setLastName(response.last_name);
       // set MFA token if needed
       MFAToken.value = response?.mfa_token ?? '';
-      GetExternalInfo();
-      logUserIn();
       if (response?.message) {
         const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -362,6 +374,8 @@ const SubmitLoginForm = async (e: Event) => {
       } else if (response.mfa_required) {
         openMFAVerify();
       } else {
+        setTokenAndLogUserIn(response);
+        GetExternalInfo();
         GoToLanding();
       }
     }
@@ -401,6 +415,7 @@ const ConfirmMFASetup = async (e: Event) => {
     }).then(response => {
       RecoveryCodes.value = response?.recovery_codes;
       showMFARecoveryCodes.value = true;
+      SubmitLoginForm(e);
       if (response?.message) {
         const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -428,7 +443,7 @@ const VerifyMFACode = async (e: Event) => {
   if (MFACode.value.trim().length === 6) {
     // validate the MFA Code
 
-    await $fetch<any>(`${ngencerfBaseUrl}/auth/mfa/setup/verify/`, {
+    await $fetch<any>(`${ngencerfBaseUrl}/auth/mfa/verify/`, {
       method: 'POST',
       body: {
         mfa_token: MFAToken.value,
@@ -438,8 +453,10 @@ const VerifyMFACode = async (e: Event) => {
       if (response?.message) {
         const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
-        GoToLanding();
       }
+      setTokenAndLogUserIn(response);
+      GetExternalInfo();
+      GoToLanding();
     }
     ).catch(error => {
       if (error) {
@@ -452,6 +469,18 @@ const VerifyMFACode = async (e: Event) => {
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
+
+
+const setTokenAndLogUserIn = async(response: any) => {
+  // store tokens in UserDataStore
+  userDataStore.setAccessToken(response?.access);
+  userDataStore.setRefreshToken(response?.refresh);
+  // store user name in UserDataStore
+  userDataStore.setFirstName(response?.first_name);
+  userDataStore.setLastName(response?.last_name);
+  logUserIn();
+}
+
 
 const GetExternalInfo = async () => {
   await getGitInformation();
