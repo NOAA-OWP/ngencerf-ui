@@ -71,13 +71,17 @@
                       </div>
 
                       <div v-if="overallCalibrationValidationStatus !== 'Done'" style="margin-top:4px; margin-bottom:-4px;">
-                        <span v-if="calibrationStatus === 'Ready'">
+                        <span v-if="!runButtonDisabled">
                           <Button class="font-normal ngenButtonDiv-green h-8" title="Run Button" aria-label="Run Button"
-                            @click="startRun()">Run</Button>
+                            @click="startRun()" :disabled="runButtonDisabled">
+                            Run
+                          </Button>
                         </span>
-                        <span v-if="['Submitted','Running'].includes(calibrationStatus) || validationControlStatus === 'Running' || validationBestStatus === 'Running'">
-                          <Button class="ngenButtonDiv-red h-8 mr-3" title="Cancel Button" @click="cancelRun()"
-                            aria-label="Cancel Button">Cancel</Button>
+                        <span v-if="!cancelButtonDisabled">
+                          <Button class="ngenButtonDiv-red h-8 mr-3" title="Cancel Button" aria-label="Cancel Button"
+                            @click="cancelRun()" :disabled="cancelButtonDisabled">
+                            Cancel
+                          </Button>
                         </span>
                       </div>
                       <!--BUTTONS - END-->
@@ -263,6 +267,9 @@ import { hilightTab } from '@/composables/TabHilight';
 const userDataStore = useUserDataStore();
 
 const toast = useToast();
+
+const runButtonDisabled = ref<boolean>(true);
+const cancelButtonDisabled = ref<boolean>(true);
 
 const {
   submitTimeDate,
@@ -533,6 +540,9 @@ onMounted(async () => {
     }
     isLoading.value = false;
   });
+  
+  runButtonDisabled.value = !['Ready'].includes(calibrationStatus.value);
+  cancelButtonDisabled.value = !runButtonDisabled.value || (!['Submitted','Running'].includes(calibrationStatus.value) && !['Submitted','Running'].includes(validControlAndValidBestStatus.value));
 });
 
 /**
@@ -558,6 +568,7 @@ const createElapsedTimeInterval = () => {
 
 // Run Calibration Job
 const startRun = async () => {
+  runButtonDisabled.value = true;
   validationBestAchieved.value.isBest = false;
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.status = 'Validating and Preparing Job Data';
@@ -599,6 +610,8 @@ const startRun = async () => {
         }
       }
     } else {
+      runButtonDisabled.value = false;
+      cancelButtonDisabled.value = true;
       const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
       
       if (getStatusResponse?._data?.status) {
@@ -622,16 +635,17 @@ const startRun = async () => {
 
 // Cancel Calibration Job
 const cancelRun = async () => {
-  if (['Submitted','Running'].includes(calibrationStatus.value) || validationControlStatus.value === 'Running' || validationBestStatus.value === 'Running') {
+  if (['Submitted','Running'].includes(calibrationStatus.value) || ['Submitted','Running'].includes(validationControlStatus.value) || ['Submitted','Running'].includes(validationBestStatus.value)) {
     try {
+      cancelButtonDisabled.value = true;
       let cancelCalibrationResponse = undefined;
-      if (calibrationStatus.value === 'Running') {
+      if (['Submitted','Running'].includes(calibrationStatus.value)) {
         cancelCalibrationResponse = await cancelCalibrationJob();
       } else {
         // get validations
         const getStatusResponse = await queryGetCalibrationStatus(userCalibrationRunData?.value?.calibration_run_id as number);
         const validations = getStatusResponse?._data?.validations;
-        if (validationControlStatus.value === 'Running') {
+        if (['Submitted','Running'].includes(validationControlStatus.value)) {
           const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
           cancelCalibrationResponse = await cancelValidationJob(validControl.validation_run_id);
         } else {
@@ -654,6 +668,7 @@ const cancelRun = async () => {
         toast.add(tMsg); addToastRecord(tMsg);
       }
     } catch (error) {
+      cancelButtonDisabled.value = false;
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error cancelling Calibration run', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
@@ -700,6 +715,8 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
     if (userCalibrationRunData.value.submit_date) {
       submitTimeDate.value = new Date(userCalibrationRunData.value?.submit_date);
     }
+    
+    cancelButtonDisabled.value = !runButtonDisabled.value || (!['Submitted','Running'].includes(calibrationStatus.value) && !['Submitted','Running'].includes(validControlAndValidBestStatus.value));
 
     if (['Submitted', 'Running', 'Done', 'Failed'].includes(calibrationStatus.value ?? '')) {
       // Calculate Running Time
@@ -1075,6 +1092,8 @@ const gotoEvaluation = () => {
 
 onUnmounted(() => {
   // make sure page clears all selected plots/tables when the user leaves
+  runButtonDisabled.value = true;
+  cancelButtonDisabled.value = true;
   iteration.value = undefined;
   plotList.value = [];
   validationControlStatus.value = undefined;

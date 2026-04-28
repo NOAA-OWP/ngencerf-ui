@@ -2,7 +2,7 @@ import { defineStore, storeToRefs } from "pinia";
 import { DateTime, Duration } from "luxon";
 
 
-import type { SelectOption, CalibrationRunForForecast, CalibrationRunsForForecast, ForecastConfiguration, ForecastJob, ForecastJobs } from "@/composables/NgencerfModels";
+import type { SelectOption, CalibrationRunForHindcast, CalibrationRunsForHindcast, HindcastConfiguration, HindcastJob, HindcastJobs } from "@/composables/NgencerfModels";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 
@@ -12,7 +12,7 @@ import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers"
 import { isValidDate } from '@/utils/CommonHelpers';
 import { formatElapsedTime, formatDateForRunOnString } from '@/utils/TimeHelpers';
 
-export const useForecastStore = defineStore('ForecastStore', () => {
+export const useHindcastStore = defineStore('HindcastStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { 
     userCalibrationRunData, 
@@ -37,46 +37,48 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     clearUserCalibrationRunData } = useUserDataStore();
   const { calibrationJobId } = storeToRefs(generalStore());
   // refs
-  const calibrationRunsForForecastListPageSize = ref<number>(50);
-  const calibrationRunsForForecastListCurrentPage = ref<number>(1);
-  const calibrationRunsForForecastListTotalPages = ref<number>(0);
-  const calibrationRunsForForecastListTotalSize = ref<number>(0);
-  const calibrationRunsForForecastListStartRow = ref<number>(1);
-  const calibrationRunsForForecastListEndRow = ref<number>(calibrationRunsForForecastListPageSize.value);
-  const calibrationRunsForForecastListSort = ref<DynamicObject>({'field': 'calibration_run_id', 'direction': -1});
-  const forecastRunListPageSize = ref<number>(50);
-  const forecastRunListCurrentPage = ref<number>(1);
-  const forecastRunListTotalPages = ref<number>(0);
-  const forecastRunListTotalSize = ref<number>(0);
-  const forecastRunListStartRow = ref<number>(1);
-  const forecastRunListEndRow = ref<number>(forecastRunListPageSize.value);
-  const forecastRunListSort = ref<DynamicObject>({'field': 'forecast_run_id', 'direction': -1});
-  const forecastJobId = ref<number>();
+  const calibrationRunsForHindcastListPageSize = ref<number>(50);
+  const calibrationRunsForHindcastListCurrentPage = ref<number>(1);
+  const calibrationRunsForHindcastListTotalPages = ref<number>(0);
+  const calibrationRunsForHindcastListTotalSize = ref<number>(0);
+  const calibrationRunsForHindcastListStartRow = ref<number>(1);
+  const calibrationRunsForHindcastListEndRow = ref<number>(calibrationRunsForHindcastListPageSize.value);
+  const calibrationRunsForHindcastListSort = ref<DynamicObject>({'field': 'calibration_run_id', 'direction': -1});
+  const hindcastRunListPageSize = ref<number>(50);
+  const hindcastRunListCurrentPage = ref<number>(1);
+  const hindcastRunListTotalPages = ref<number>(0);
+  const hindcastRunListTotalSize = ref<number>(0);
+  const hindcastRunListStartRow = ref<number>(1);
+  const hindcastRunListEndRow = ref<number>(hindcastRunListPageSize.value);
+  const hindcastRunListSort = ref<DynamicObject>({'field': 'hindcast_run_id', 'direction': -1});
+  const hindcastJobId = ref<number>();
   const cycleDate = ref<any>();
   const coldStartDate = ref<any>();
-  const forecastConfigurations = ref<ForecastConfiguration[]>();
-  const forecastConfiguration = ref<ForecastConfiguration>();
-  const forecastConfigurationName = ref<string>();
-  const forecastJobStatus = ref<string>();
+  const hindcastConfigurations = ref<HindcastConfiguration[]>();
+  const hindcastConfiguration = ref<HindcastConfiguration>();
+  const hindcastConfigurationName = ref<string>();
+  const coldStartRunsForHindcast = ref<ColdStartRun[]>();
+  const coldStartJobId = ref<number>();
+  const intervalCycle = ref<number>();
+  const numIterations = ref<number>();
+  const hindcastJobStatus = ref<string>();
   const coldStartJobStatus = ref<string>();
   const failureMessages = ref<any>();;
   const elapsedTime = ref<string>();
   const submitTimeDate = ref<Date>();
   const submitTime = ref<string>();
   const elapsedTimeIntervalId = ref<number>();
-  const forecastJobStatusIntervalId = ref<number>();
-  const forecastPlotName = ref<any>(); // TODO: create forecastPlotName interface
-  const forecastPlot = ref<any>(); // TODO: create forecastPlot interface
+  const hindcastJobStatusIntervalId = ref<number>();
+  const hindcastPlot = ref<any>(); // TODO: create hindcastPlot interface
 
-  const calibrationRunsForForecast = ref<CalibrationRunsForForecast>([]);
-  const calibrationRunForForecast = ref<CalibrationRunForForecast>();
+  const calibrationRunsForHindcast = ref<calibrationRunsForHindcast>([]);
+  const calibrationRunForHindcast = ref<calibrationRunForHindcast>();
 
-  const forecastRuns = ref<ForecastJob[]>([]);
-  const selectedForecastJob = ref<ForecastJob>();
+  const hindcastRuns = ref<HindcastJob[]>([]);
+  const selectedHindcastJob = ref<HindcastJob>();
 
-  const forecastJobNgenGlobalLogging = ref<boolean>(true);
-  const forecastJobLogFileMode = ref<boolean>(false);
-
+  const hindcastJobNgenGlobalLogging = ref<boolean>(true);
+  const hindcastJobLogFileMode = ref<boolean>(false);
   /**
    * Compute resultsPathname based on userCalibrationRunData.value.job_data_dir
    */
@@ -89,9 +91,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   });
 
   /**
-   * Compute Overall Cold Start and Forecast status
+   * Compute Overall Cold Start and Hindcast status
    */
-  const overallColdStartForecastStatus = computed<string>(() => {
+  const overallColdStartHindcastStatus = computed<string>(() => {
     if (
       [
         "Submitted",
@@ -113,14 +115,14 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         "Cancelled",
         "Failed",
         "Server error",
-      ].includes(forecastJobStatus.value as string)
+      ].includes(hindcastJobStatus.value as string)
     ) {
       if (coldStartJobStatus.value === "Done") {
-        return `Cold Start Done, Forecast ${forecastJobStatus.value as string}`;
+        return `Cold Start Done, Hindcast ${hindcastJobStatus.value as string}`;
       } else {
-        return forecastJobStatus.value as string;
+        return hindcastJobStatus.value as string;
       }
-    } else if (forecastJobStatus.value === "Done") {
+    } else if (hindcastJobStatus.value === "Done") {
       return "Done";
     } else {
       return "Unknown";
@@ -128,17 +130,17 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   });
 
   /**
-   * fetch get_forecast_jobs
+   * fetch get_hindcast_jobs
    * @return {void}
    */
-  const getForecastJobs = async (): Promise<any> => {
-    forecastRuns.value = [];
+  const getHindcastJobs = async (): Promise<any> => {
+    hindcastRuns.value = [];
     let requestBody = {
-      limit: forecastRunListPageSize.value,
-      offset: (forecastRunListCurrentPage.value - 1) * forecastRunListPageSize.value,
+      limit: hindcastRunListPageSize.value,
+      offset: (hindcastRunListCurrentPage.value - 1) * hindcastRunListPageSize.value,
       sort: {
-        field: forecastRunListSort.value.field.split(".").at(-1),
-        direction: forecastRunListSort.value.direction === -1 ? 'desc' : 'asc'
+        field: hindcastRunListSort.value.field.split(".").at(-1),
+        direction: hindcastRunListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
         domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
@@ -172,7 +174,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         status: statusTypeFilterList.value
       }
     }
-    const runListDataResult = await makeProtectedApiCall<ForecastJobs>(`${ngencerfBaseUrl}/calibration/get_forecast_jobs/`, {
+    const runListDataResult = await makeProtectedApiCall<HindcastJobs>(`${ngencerfBaseUrl}/calibration/get_hindcast_jobs/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -181,16 +183,16 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       body: JSON.stringify(requestBody)
     });
 
-    forecastRuns.value = runListDataResult?._data?.forecast_jobs ?? [];
-    forecastRunListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
-    forecastRunListTotalPages.value = Math.ceil(forecastRunListTotalSize.value / forecastRunListPageSize.value);
-    forecastRunListStartRow.value = (forecastRunListPageSize.value * (forecastRunListCurrentPage.value - 1)) + 1;
-    forecastRunListEndRow.value = Math.min(forecastRunListStartRow.value + (forecastRunListPageSize.value - 1), forecastRunListTotalSize.value);
+    hindcastRuns.value = runListDataResult?._data?.hindcast_jobs ?? [];
+    hindcastRunListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
+    hindcastRunListTotalPages.value = Math.ceil(hindcastRunListTotalSize.value / hindcastRunListPageSize.value);
+    hindcastRunListStartRow.value = (hindcastRunListPageSize.value * (hindcastRunListCurrentPage.value - 1)) + 1;
+    hindcastRunListEndRow.value = Math.min(hindcastRunListStartRow.value + (hindcastRunListPageSize.value - 1), hindcastRunListTotalSize.value);
     
-    if (forecastRuns.value && forecastRuns.value.length > 0) {
-      forecastRuns.value.forEach((jobItem: ForecastJob) => {
+    if (hindcastRuns.value && hindcastRuns.value.length > 0) {
+      hindcastRuns.value.forEach((jobItem: HindcastJob) => {
         if (jobItem.cold_start?.cold_start_status && jobItem.cold_start.cold_start_status !== 'Done') {
-          jobItem.forecast_status = 'Cold Start ' + jobItem.cold_start.cold_start_status;
+          jobItem.hindcast_status = 'Cold Start ' + jobItem.cold_start.cold_start_status;
         }
         if (jobItem.cold_start?.cold_start_submit_date && jobItem.cold_start.cold_start_submit_date !== '') {
           jobItem.submit_date = jobItem.cold_start.cold_start_submit_date;
@@ -210,21 +212,21 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   /**
   * @returns {SelectOption[]}
   */
-  const forecastRunGageList = computed(() => {
+  const hindcastRunGageList = computed(() => {
     let gageOptionList = <SelectOption[]>[];
     gageOptionList.push({
       'name': "All",
       'description': "All"
     });
-    calibrationRunsForForecast.value.forEach(runItem => {
+    calibrationRunsForHindcast.value.forEach(runItem => {
       const checkGageIndex = gageOptionList.findIndex(
         (gageOption) =>
-          gageOption.name === (runItem as any as CalibrationRunForForecast).gage_id
+          gageOption.name === (runItem as any as calibrationRunForHindcast).gage_id
       ) !== -1;
       if (!checkGageIndex) {
         gageOptionList.push({
-          'name': (runItem as any as CalibrationRunForForecast).gage_id,
-          'description': (runItem as any as CalibrationRunForForecast).gage_id
+          'name': (runItem as any as calibrationRunForHindcast).gage_id,
+          'description': (runItem as any as calibrationRunForHindcast).gage_id
         });
       }
     });
@@ -232,30 +234,35 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   });
 
   /**
-   * Load Forecast Run/Status tab data
+   * Load Hindcast Run/Status tab data
    */
-  const loadForecastRunStatusTabData = async (): Promise<string[]> => {
+  const loadHindcastRunStatusTabData = async (): Promise<string[]> => {
     let errorMessages: string[] = [];
-    // get forecast job data
-    if (forecastJobId?.value) {
+    // get hindcast job data
+    if (hindcastJobId?.value) {
       // query get_status endpoint
       const getStatusResponse: any = await getStatus();
 
       if (getStatusResponse.status === 200) {
-        // set forecastConfiguration, forecastJobStatus, elapsedTime, submitTime, and resultsPathname
-        forecastConfigurationName.value = getStatusResponse?._data?.configuration;
-        forecastJobStatus.value = getStatusResponse?._data?.status;
+        // set hindcastConfiguration, hindcastJobStatus, elapsedTime, submitTime, and resultsPathname
+        hindcastConfigurationName.value = getStatusResponse?._data?.configuration;
+        hindcastJobStatus.value = getStatusResponse?._data?.status;
         coldStartJobStatus.value = getStatusResponse?._data?.cold_start_run?.status;
         failureMessages.value = getStatusResponse?._data?.failure_messages;
 
-        if (getStatusResponse?._data?.cold_start_run?.submit_date) {
+        if (getStatusResponse?._data?.created_new_cold_start && getStatusResponse?._data?.cold_start_run?.submit_date) {
           submitTimeDate.value = new Date(getStatusResponse?._data?.cold_start_run.submit_date as string);
-        } else if (getStatusResponse?._data?.submit_date) {
-          submitTimeDate.value = new Date(getStatusResponse?._data?.submit_date as string);
+        } else {
+          if (getStatusResponse?._data?.submit_date) {
+            submitTimeDate.value = new Date(getStatusResponse?._data?.submit_date as string);
+          }
+          if (!getStatusResponse?._data?.created_new_cold_start && getStatusResponse?._data?.cold_start_run?.cold_start_run_id) {
+            coldStartJobId.value = getStatusResponse._data.cold_start_run.cold_start_run_id;
+          }
         }
         if (isValidDate(submitTimeDate.value)) {
           submitTime.value = formatDateForRunOnString(submitTimeDate.value);
-          if (!['Submitted','Running'].includes(forecastJobStatus.value) && !['Submitted','Running'].includes(coldStartJobStatus.value)) {
+          if (!['Submitted','Running'].includes(hindcastJobStatus.value) && !['Submitted','Running'].includes(coldStartJobStatus.value)) {
             setElapsedTime(getStatusResponse?._data);
           }
         } else {
@@ -271,35 +278,42 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   /**
    * Set elapsedTime
    */
-  const setElapsedTime = (forecastJob: any): void => {
+  const setElapsedTime = (hindcastJob: any): void => {
     const elapsedTimeArray: string[] = [];
 
-    if (forecastJob?.cold_start_run?.elapsed_time) {
-      elapsedTimeArray.push(forecastJob?.cold_start_run?.elapsed_time);
+    // sum and format hindcast and cold start elapsed times
+    if (hindcastJob?.created_new_cold_start && hindcastJob.cold_start_run?.submit_date && hindcastJob.cold_start_run?.run_end) {
+      elapsedTimeArray.push(calculateElapsedTime(
+        new Date(hindcastJob.cold_start_run.submit_date as string), 
+        new Date(hindcastJob.cold_start_run.run_end as string)
+      ));
     }
-    if (forecastJob?.elapsed_time) {
-      elapsedTimeArray.push(forecastJob?.elapsed_time);
+    if (hindcastJob?.submit_date && hindcastJob?.run_end) {
+      elapsedTimeArray.push(calculateElapsedTime(
+        new Date(hindcastJob.submit_date as string), 
+        new Date(hindcastJob.run_end as string)
+      ));
     }
-    
-    // sum and format forecast and cold start elapsed times
     elapsedTime.value = elapsedTimeArray.length > 0 ? sumAndFormatElapsedTimes(elapsedTimeArray) : '00:00:00';
   };
 
   /**
-   * Load Forecast Results tab data
+   * Load Hindcast Results tab data
    */
-  const loadForecastResultsTabData = async (): Promise<string[]> => {
+  const loadHindcastResultsTabData = async (): Promise<string[]> => {
     const errorMessages: string[] = [];
 
-    // load forecast Run/Status tab data
-    const loadForecastErrors: string[] = await loadForecastRunStatusTabData();
-    if (loadForecastErrors.length > 0) {
-      errorMessages.push(...loadForecastErrors);
+    // load Hindcast Run/Status tab data
+    const loadHindcastErrors: string[] = await loadHindcastRunStatusTabData();
+    if (loadHindcastErrors.length > 0) {
+      errorMessages.push(...loadHindcastErrors);
     }
-    const setForecastPlotErrors: string[] = await setForecastPlot() // set forecastPlot
-    if (setForecastPlotErrors.length > 0) {
-      errorMessages.push(...setForecastPlotErrors);
-    }
+    nextTick(async() => {
+      const setHindcastPlotErrors: string[] = await setHindcastPlot();
+      if (setHindcastPlotErrors.length > 0) {
+        errorMessages.push(...setHindcastPlotErrors);
+      }
+    });
     if (errorMessages.length > 0) {
       return errorMessages;
     } else {
@@ -310,25 +324,48 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   /**
    * Query load_forecast_tab endpoint
    */
-  const loadForecastTab = async (): Promise<any> => {
+  const loadHindcastTab = async (): Promise<any> => {
     return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/load_forecast_tab/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationRunForForecast?.value?.calibration_run_id })
+      body: JSON.stringify({ 
+        calibration_run_id: calibrationRunForHindcast?.value?.calibration_run_id,
+        hindcast_only: true 
+      })
     });
   };
 
   /**
-   * Create and Run Forecast Job by querying create_and_run_forecast endpoint
+   * Query get_cold_start_jobs_for_configuration endpoint
    */
-  const createAndRunForecastJob = async (
+  const getColdStartJobsForConfiguration = async (): Promise<any> => {
+    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/get_cold_start_jobs_for_configuration/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({ 
+        calibration_run_id: calibrationJobId?.value, 
+        configuration_name: hindcastConfiguration?.value?.name
+      })
+    });
+  };
+
+  /**
+   * Create and Run Hindcast Job by querying create_and_run_hindcast endpoint
+   */
+  const createAndRunHindcastJob = async (
     calibrationRunId: number, 
-    forecastConfigurationName: string,
+    hindcastConfigurationName: string,
     cycleDate: DateTime,
-    coldStartDate: DateTime | null
+    coldStartDate: DateTime | null,
+    coldStartJobId: number | null,
+    intervalCycle: number,
+    numIterations: number
   ): Promise<any> => {
     const rawLogLevels = toRaw(logLevels.value);
 
@@ -340,7 +377,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         }
         return acc;
       }, {} as Record<string, LogLevel>);
-    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/create_and_run_forecast/`, {
+    return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/create_and_run_hindcast/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -348,12 +385,15 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       },
       body: JSON.stringify({
         calibration_run_id: calibrationRunId, 
-        configuration_name: forecastConfigurationName,
-        cycle_date: cycleDate ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) : null,
-        cold_start_date: coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : null,
+        configuration_name: hindcastConfigurationName,
+        cycle_date: (!coldStartJobId && cycleDate) ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) : null,
+        cold_start_date: (!coldStartJobId && coldStartDate) ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : null,
+        cold_start_run_id: coldStartJobId ?? null,
+        interval_cycle: intervalCycle,
+        num_iterations: numIterations,
         logging_config: {
-          logging_enabled: forecastJobNgenGlobalLogging.value,
-          split_logs_by_module: forecastJobLogFileMode.value,
+          logging_enabled: hindcastJobNgenGlobalLogging.value,
+          split_logs_by_module: hindcastJobLogFileMode.value,
           ...(serializedModules && {
             // add ngenLogLevel and forcingLogLevel to beginning of the object
             modules: {
@@ -368,16 +408,16 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   };
 
   /**
-   * Cancel Forecast Job by querying cancel_job endpoint
+   * Cancel Hindcast Job by querying cancel_job endpoint
    */
-  const cancelForecastJob = async (): Promise<any> => {
+  const cancelHindcastJob = async (): Promise<any> => {
     return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/cancel_job/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ forecast_run_id: forecastJobId.value })
+      body: JSON.stringify({ hindcast_run_id: hindcastJobId.value })
     });
   };
 
@@ -386,28 +426,28 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   * If a single job comes in, make sure we put it into an array.
   * Otherwise, it is an array.
   */
-  async function deleteForecastJob(runId: number) {
-    return await makeProtectedApiCall<ForecastJob>(`${ngencerfBaseUrl}/calibration/delete_forecast_job/`, {
+  async function deleteHindcastJob(runId: number) {
+    return await makeProtectedApiCall<HindcastJob>(`${ngencerfBaseUrl}/calibration/delete_hindcast_job/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ forecast_run_id: runId })
+      body: JSON.stringify({ hindcast_run_id: runId })
     });
   };
 
   /**
-   * Query get_calibration_jobs_for_forecast endpoint
+   * Query get_calibration_jobs_for_hindcast endpoint
    */
-  const getCalibrationJobsForForecast = async (): Promise<any> => {
-    calibrationRunsForForecast.value = [];
+  const getCalibrationJobsForHindcast = async (): Promise<any> => {
+    calibrationRunsForHindcast.value = [];
     let requestBody = {
-      limit: calibrationRunsForForecastListPageSize.value,
-      offset: (calibrationRunsForForecastListCurrentPage.value - 1) * calibrationRunsForForecastListPageSize.value,
+      limit: calibrationRunsForHindcastListPageSize.value,
+      offset: (calibrationRunsForHindcastListCurrentPage.value - 1) * calibrationRunsForHindcastListPageSize.value,
       sort: {
-        field: calibrationRunsForForecastListSort.value.field,
-        direction: calibrationRunsForForecastListSort.value.direction === -1 ? 'desc' : 'asc'
+        field: calibrationRunsForHindcastListSort.value.field,
+        direction: calibrationRunsForHindcastListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
         domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
@@ -441,7 +481,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         include_archived: false
       }
     }
-    const runListDataResult = await makeProtectedApiCall<CalibrationRunsForForecast>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_forecast/`, {
+    const runListDataResult = await makeProtectedApiCall<calibrationRunsForHindcast>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_forecast/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -450,11 +490,11 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       body: JSON.stringify(requestBody)
     });
 
-    calibrationRunsForForecast.value = runListDataResult._data.jobs ?? [];
-    calibrationRunsForForecastListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
-    calibrationRunsForForecastListTotalPages.value = Math.ceil(calibrationRunsForForecastListTotalSize.value / calibrationRunsForForecastListPageSize.value);
-    calibrationRunsForForecastListStartRow.value = (calibrationRunsForForecastListPageSize.value * (calibrationRunsForForecastListCurrentPage.value - 1)) + 1;
-    calibrationRunsForForecastListEndRow.value = Math.min(calibrationRunsForForecastListStartRow.value + (calibrationRunsForForecastListPageSize.value - 1), calibrationRunsForForecastListTotalSize.value);
+    calibrationRunsForHindcast.value = runListDataResult._data.jobs ?? [];
+    calibrationRunsForHindcastListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
+    calibrationRunsForHindcastListTotalPages.value = Math.ceil(calibrationRunsForHindcastListTotalSize.value / calibrationRunsForHindcastListPageSize.value);
+    calibrationRunsForHindcastListStartRow.value = (calibrationRunsForHindcastListPageSize.value * (calibrationRunsForHindcastListCurrentPage.value - 1)) + 1;
+    calibrationRunsForHindcastListEndRow.value = Math.min(calibrationRunsForHindcastListStartRow.value + (calibrationRunsForHindcastListPageSize.value - 1), calibrationRunsForHindcastListTotalSize.value);
     
     if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
       minCreatedAt.value = runListDataResult?._data?.date_range[0];
@@ -496,10 +536,10 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   }
 
   /**
-   * fetch list of gage IDs for forecast runs
+   * fetch list of gage IDs for hindcast runs
    * @return {void}
    */
-  async function fetchForecastGageList() {
+  async function fetchHindcastGageList() {
     // only apply domain and archived filters
     let requestBody = {
       domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
@@ -507,7 +547,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     }
     const gageListResult =
       await makeProtectedApiCall<any>(
-        `${ngencerfBaseUrl}/calibration/get_forecast_gages/`,
+        `${ngencerfBaseUrl}/calibration/get_hindcast_gages/`,
         {
           method: "POST",
           headers: {
@@ -525,7 +565,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   }
 
   /**
-   * Call get_status endpoint with calibrationRunForForecast.value.calibration_run_id
+   * Call get_status endpoint with calibrationRunForHindcast.value.calibration_run_id
    * @return {any}
    */
   const getStatus = async (): Promise<any> => {
@@ -535,25 +575,24 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ forecast_run_id: forecastJobId.value })
+      body: JSON.stringify({ hindcast_run_id: hindcastJobId.value })
     });
   };
 
   /**
-   * Get Forecast Plot
+   * Get Hindcast Plot
    */
-  const getForecastPlot = async (): Promise<any> => {
-    if (forecastJobId.value) {
-      const params = new URLSearchParams({
-        forecast_run_id: forecastJobId.value.toString(),
-      });
-
-      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_forecast_timeseries_data/?${params.toString()}`, {
-        method: "GET",
+  const getHindcastPlot = async (): Promise<any> => {
+    if (hindcastJobId.value) {
+      return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_hindcast_timeseries_data/`, {
+        method: "POST",
         headers: {
           "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": "application/json"
-        }
+          "Content-Type": 'application/json'
+        },
+        body: JSON.stringify({ 
+          hindcast_run_id: hindcastJobId.value
+        })
       });
     }
   };
@@ -571,93 +610,99 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     calibrationJobId.value = 0;
   }
 
-  const setSelectedForecastRunId = (forecast_job_id: number): void => {
-    forecastJobId.value = forecast_job_id;
+  const setSelectedHindcastRunId = (hindcast_job_id: number): void => {
+    hindcastJobId.value = hindcast_job_id;
   }
 
-  const setSelectedForecastRowData = async (forecast_row_data: ForecastJob): Promise<void> => {
-    setSelectedForecastRunId(forecast_row_data.forecast_run_id);
-    setSelectedCalibrationRunId(forecast_row_data.calibration_run_id);
+  const setSelectedHindcastRowData = async (hindcast_row_data: HindcastJob): Promise<void> => {
+    setSelectedHindcastRunId(hindcast_row_data.hindcast_run_id);
+    setSelectedCalibrationRunId(hindcast_row_data.calibration_run_id);
     
-    calibrationRunForForecast.value = (forecast_row_data as any as CalibrationRunForForecast);
-    forecastJobStatus.value = (forecast_row_data as any as CalibrationRunForForecast).status;
-    forecastConfigurationName.value = forecast_row_data.configuration;
+    calibrationRunForHindcast.value = (hindcast_row_data as any as calibrationRunForHindcast);
+    hindcastJobStatus.value = (hindcast_row_data as any as calibrationRunForHindcast).status;
+    hindcastConfigurationName.value = hindcast_row_data.configuration;
   }
 
-  const resetSelectedForecastRunData = (): void => {
-    forecastJobId.value = undefined;
-    forecastJobStatus.value = undefined;
-    forecastConfiguration.value = undefined;
+  const resetSelectedHindcastRunData = (): void => {
+    hindcastJobId.value = undefined;
+    hindcastJobStatus.value = undefined;
+    hindcastConfiguration.value = undefined;
     resetSelectedCalibrationRunId();
   }
 
   /**
-   * Set forecastPlot
+   * Set hindcastPlot
    */
-  const setForecastPlot = async (): Promise<string[]> => {
-    if (forecastJobId?.value) {
-      const getForecastPlotResponse: any = await getForecastPlot();
+  const setHindcastPlot = async (): Promise<string[]> => {
+    if (hindcastJobId?.value) {
+      const getHindcastPlotResponse: any = await getHindcastPlot();
 
-      if (getForecastPlotResponse.status === 200) {
-        forecastPlot.value = getForecastPlotResponse._data;
+      if (getHindcastPlotResponse.status === 200) {
+        hindcastPlot.value = getHindcastPlotResponse._data;
         return [];
       } else {
-        return useApiErrorResponsePreprocess(getForecastPlotResponse);
+        return useApiErrorResponsePreprocess(getHindcastPlotResponse);
       }
     } else {
-      return ['No forecast job id found'];
+      return ['No dataset found for this hindcast job id'];
     }
   };
 
   /**
-   * reset user-selected forecast data
+   * reset user-selected hindcast data
    */
-  const resetUserSelectedForecastCalibrationRun = (): void => {
-    forecastJobId.value = undefined;
+  const resetUserSelectedHindcastCalibrationRun = (): void => {
+    hindcastJobId.value = undefined;
     cycleDate.value = undefined;
     coldStartDate.value = undefined;
-    forecastConfigurations.value = [];
-    forecastConfiguration.value = undefined;
-    forecastConfigurationName.value = undefined;
-    forecastJobStatus.value = undefined;
+    hindcastConfigurations.value = [];
+    hindcastConfiguration.value = undefined;
+    hindcastConfigurationName.value = undefined;
+    hindcastJobStatus.value = undefined;
     coldStartJobStatus.value = undefined;
     failureMessages.value = undefined;
     elapsedTime.value = undefined;
     submitTimeDate.value = undefined;
     submitTime.value = undefined;
-    forecastPlotName.value = undefined;
-    forecastPlot.value = undefined;
-    calibrationRunForForecast.value = undefined;
+    hindcastPlot.value = undefined;
+    calibrationRunForHindcast.value = undefined;
 
     clearInterval(elapsedTimeIntervalId.value);
     elapsedTimeIntervalId.value = undefined;
-    clearInterval(forecastJobStatusIntervalId.value);
-    forecastJobStatusIntervalId.value = undefined;
+    clearInterval(hindcastJobStatusIntervalId.value);
+    hindcastJobStatusIntervalId.value = undefined;
 
     clearUserCalibrationRunData();
   }
 
   /**
-   * Hard Reset Forecast Store
+   * Hard Reset Hindcast Store
    */
-  const hardResetForecastStore = (): void => {
-    forecastJobStatus.value = "";
+  const hardResetHindcastStore = (): void => {
+    hindcastJobId.value = undefined;
+    coldStartDate.value = undefined;
+    cycleDate.value = undefined;
+    coldStartJobId.value = undefined;
+    intervalCycle.value = undefined;
+    numIterations.value = undefined;
+    hindcastJobStatus.value = "";
     coldStartJobStatus.value = "";
     elapsedTime.value = undefined;
     submitTime.value = undefined;
+    hindcastPlot.value = undefined;
 
     if (elapsedTimeIntervalId.value) {
       clearInterval(elapsedTimeIntervalId.value);
       elapsedTimeIntervalId.value = undefined;
     }
 
-    if (forecastJobStatusIntervalId.value) {
-      clearInterval(forecastJobStatusIntervalId.value);
-      forecastJobStatusIntervalId.value = undefined;
+    if (hindcastJobStatusIntervalId.value) {
+      clearInterval(hindcastJobStatusIntervalId.value);
+      hindcastJobStatusIntervalId.value = undefined;
     }
 
-    forecastJobNgenGlobalLogging.value = true;
-    forecastJobLogFileMode.value = false;
+    hindcastJobNgenGlobalLogging.value = true;
+    hindcastJobLogFileMode.value = false;
   };
 
   /**
@@ -678,68 +723,72 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   };
 
   return {
-    forecastJobId,
+    hindcastJobId,
     cycleDate,
     coldStartDate,
-    forecastConfigurations,
-    forecastConfiguration,
-    forecastConfigurationName,
-    forecastJobStatus,
+    hindcastConfigurations,
+    hindcastConfiguration,
+    hindcastConfigurationName,
+    coldStartRunsForHindcast,
+    coldStartJobId,
+    intervalCycle,
+    numIterations,
+    hindcastJobStatus,
     coldStartJobStatus,
     failureMessages,
     elapsedTime,
     submitTimeDate,
     submitTime,
     elapsedTimeIntervalId,
-    forecastJobStatusIntervalId,
+    hindcastJobStatusIntervalId,
     resultsPathname,
-    forecastPlotName,
-    forecastPlot,
-    forecastRunGageList,
-    calibrationRunsForForecast,
-    calibrationRunForForecast,
-    calibrationRunsForForecastListPageSize,
-    calibrationRunsForForecastListCurrentPage,
-    calibrationRunsForForecastListTotalPages,
-    calibrationRunsForForecastListTotalSize,
-    calibrationRunsForForecastListStartRow,
-    calibrationRunsForForecastListEndRow,
-    calibrationRunsForForecastListSort,
-    forecastRunListPageSize,
-    forecastRunListCurrentPage,
-    forecastRunListTotalPages,
-    forecastRunListTotalSize,
-    forecastRunListStartRow,
-    forecastRunListEndRow,
-    forecastRunListSort,
-    forecastRuns,
-    selectedForecastJob,
-    overallColdStartForecastStatus,
-    forecastJobNgenGlobalLogging,
-    forecastJobLogFileMode,
-    getForecastJobs,
-    loadForecastRunStatusTabData,
-    loadForecastResultsTabData,
-    loadForecastTab,
-    createAndRunForecastJob,
-    cancelForecastJob,
-    deleteForecastJob,
-    getCalibrationJobsForForecast,
-    resetUserSelectedForecastCalibrationRun,
+    hindcastPlot,
+    hindcastRunGageList,
+    calibrationRunsForHindcast,
+    calibrationRunForHindcast,
+    calibrationRunsForHindcastListPageSize,
+    calibrationRunsForHindcastListCurrentPage,
+    calibrationRunsForHindcastListTotalPages,
+    calibrationRunsForHindcastListTotalSize,
+    calibrationRunsForHindcastListStartRow,
+    calibrationRunsForHindcastListEndRow,
+    calibrationRunsForHindcastListSort,
+    hindcastRunListPageSize,
+    hindcastRunListCurrentPage,
+    hindcastRunListTotalPages,
+    hindcastRunListTotalSize,
+    hindcastRunListStartRow,
+    hindcastRunListEndRow,
+    hindcastRunListSort,
+    hindcastRuns,
+    selectedHindcastJob,
+    overallColdStartHindcastStatus,
+    hindcastJobNgenGlobalLogging,
+    hindcastJobLogFileMode,
+    getHindcastJobs,
+    loadHindcastRunStatusTabData,
+    loadHindcastResultsTabData,
+    loadHindcastTab,
+    getColdStartJobsForConfiguration,
+    createAndRunHindcastJob,
+    cancelHindcastJob,
+    deleteHindcastJob,
+    getCalibrationJobsForHindcast,
+    resetUserSelectedHindcastCalibrationRun,
     loadSelectedCalibrationRun,
     setSelectedCalibrationRunId,
     resetSelectedCalibrationRunId,
-    setForecastPlot,
+    setHindcastPlot,
     setElapsedTime,
     getStatus,
-    getForecastPlot,
-    setSelectedForecastRunId,
-    resetSelectedForecastRunData,
-    setSelectedForecastRowData,
-    hardResetForecastStore,
+    getHindcastPlot,
+    setSelectedHindcastRunId,
+    resetSelectedHindcastRunData,
+    setSelectedHindcastRowData,
+    hardResetHindcastStore,
     resetFilters,
     fetchGageList,
-    fetchForecastGageList
+    fetchHindcastGageList
   };
 });
 
@@ -749,5 +798,5 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    actions, and getters.
 */
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useForecastStore, import.meta.hot));
+  import.meta.hot.accept(acceptHMRUpdate(useHindcastStore, import.meta.hot));
 }

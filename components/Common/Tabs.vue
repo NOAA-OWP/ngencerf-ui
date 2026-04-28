@@ -94,47 +94,89 @@
             Forecast Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[3].includes(currentForecastTab) || calibrationRunForForecast && (!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status))" data-tab="3"
+          <div v-show="[3].includes(currentForecastTab) || (calibrationRunForForecast && (!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)) && !forecastJobId && currentForecastTab <= 5)" data-tab="3"
             class="tabs prevent-select" @click="tabClicked" aria-label="Setup Forecast Tab"
             title="Setup Forecast Tab">
             Setup Forecast
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[4].includes(currentForecastTab) || (calibrationRunForForecast && calibrationRunForForecast?.configuration)" data-tab="4"
-            class="tabs prevent-select" @click="tabClicked" aria-label="Run/Status tab" title="Run/Status Tab">
-            Run/Status
+          <div v-show="[4].includes(currentForecastTab) || (calibrationRunForForecast && calibrationRunForForecast?.configuration && currentForecastTab <= 5)" 
+            data-tab="4" class="tabs prevent-select" @click="tabClicked" 
+            aria-label="Forecast Run/Status tab" title="Forecast Run/Status Tab">
+            Forecast Run/Status
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[5].includes(currentForecastTab) || calibrationRunForForecast && calibrationRunForForecast?.forecast_status === 'Done'" data-tab="5" class="tabs prevent-select" @click="tabClicked"
-            aria-label="Results tab" title="Results tab">
-            Results
+          <div v-show="[5].includes(currentForecastTab) || (calibrationRunForForecast && calibrationRunForForecast?.forecast_status === 'Done' && currentForecastTab <= 5)" 
+            data-tab="5" class="tabs prevent-select" @click="tabClicked"
+            aria-label="Forecast Results Tab" title="Forecast Results Tab">
+            Forecast Results
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div data-tab="6" class="tabs prevent-select" @click="tabClicked"
+            aria-label="Verification Runs Tab" title="Verification Runs Tab">
+            Verification Runs
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div v-show="[7].includes(currentForecastTab) || (selectedVerificationJob && currentForecastTab >= 6)" 
+            data-tab="7" class="tabs prevent-select" @click="tabClicked" 
+            aria-label="Verification Run/Status Tab" title="Verification Run/Status Tab">
+            Verification Run/Status
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div v-show="[8].includes(currentForecastTab) || (selectedVerificationJob && selectedVerificationJob.status === 'Done' && currentForecastTab >= 6)" 
+            data-tab="8" class="tabs prevent-select" @click="tabClicked"
+            aria-label="Verification Results Tab" title="Verification Results Tab">
+            Verification Results
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
         </div>
       </span>
 
-      <span v-else-if="currentMenu === 4"> <!-- VERIFICATION TABS -->
+      <span v-else-if="currentMenu === 4"> <!-- HINDCAST TABS -->
         <div class="@md:bg" style="margin-left: 0px; overflow: hidden">
           <span data-tab="1" class="tabs activeTab prevent-select" @click="tabClicked"
-            aria-label="Forecast Runs Tab" title="Forecast Runs Tab">
-            Forecast Runs
+            aria-label="Calibration Runs tab" title="Calibration Runs tab">
+            Calibration Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </span>
-          <span data-tab="2" class="tabs prevent-select" @click="tabClicked"
+          <div data-tab="2" class="tabs prevent-select" @click="tabClicked" aria-label="Hindcast Runs Tab"
+            title="Hindcast Runs Tab">
+            Hindcast Runs
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div v-show="[3].includes(currentHindcastTab) || (calibrationRunForHindcast && (!calibrationRunForHindcast?.hindcast_status || ['Saved','Ready'].includes(calibrationRunForHindcast?.hindcast_status)) && !hindcastJobId && currentHindcastTab <= 5)" data-tab="3"
+            class="tabs prevent-select" @click="tabClicked" aria-label="Setup Hindcast Tab"
+            title="Setup Hindcast Tab">
+            Setup Hindcast
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div v-show="[4].includes(currentHindcastTab) || (calibrationRunForHindcast && calibrationRunForHindcast?.configuration && currentHindcastTab <= 5)" 
+            data-tab="4" class="tabs prevent-select" @click="tabClicked" 
+            aria-label="Hindcast Run/Status tab" title="Hindcast Run/Status Tab">
+            Hindcast Run/Status
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div v-show="[5].includes(currentHindcastTab) || (calibrationRunForHindcast && calibrationRunForHindcast?.hindcast_status === 'Done' && currentHindcastTab <= 5)" 
+            data-tab="5" class="tabs prevent-select" @click="tabClicked"
+            aria-label="Hindcast Results Tab" title="Hindcast Results Tab">
+            Hindcast Results
+            <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
+          </div>
+          <div data-tab="6" class="tabs prevent-select" @click="tabClicked"
             aria-label="Verification Runs Tab" title="Verification Runs Tab">
             Verification Runs
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
-          </span>
-          <div v-show="[3].includes(currentVerificationTab) || selectedVerificationJob" 
-            data-tab="3" class="tabs prevent-select" @click="tabClicked" 
-            aria-label="Run/Status Tab" title="Run/Status Tab">
-            Run/Status
+          </div>
+          <div v-show="[7].includes(currentHindcastTab) || (selectedVerificationJob && currentHindcastTab >= 6)" 
+            data-tab="7" class="tabs prevent-select" @click="tabClicked" 
+            aria-label="Verification Run/Status Tab" title="Verification Run/Status Tab">
+            Verification Run/Status
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
-          <div v-show="[4].includes(currentVerificationTab) || (selectedVerificationJob && selectedVerificationJob.status === 'Done')" 
-            id="results-tab" data-tab="4" class="tabs prevent-select" @click="tabClicked"
-            aria-label="Results Tab" title="Results Tab">
-            Results
+          <div v-show="[8].includes(currentHindcastTab) || (selectedVerificationJob && selectedVerificationJob.status === 'Done' && currentHindcastTab >= 6)" 
+            data-tab="8" class="tabs prevent-select" @click="tabClicked"
+            aria-label="Verification Results Tab" title="Verification Results Tab">
+            Verification Results
             <div :class="tabNotCompleted ? 'errorDot' : 'noErrorDot'"></div>
           </div>
         </div>
@@ -150,7 +192,8 @@ import { generalStore } from "@/stores/common/GeneralStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
-import { useVerificationStore } from "@/stores/verification/VerificationStore";
+import { useVerificationStore } from "~/stores/forecast/VerificationStore";
+import { useHindcastStore } from "@/stores/hindcast/HindcastStore";
 
 const {
   calibrationJobId,
@@ -161,7 +204,7 @@ const {
   getCalibrationTabIndex,
   getEvaluationTabIndex,
   getForecastTabIndex,
-  getVerificationTabIndex,
+  getHindcastTabIndex,
   getMenuIndex,
 } = generalStore();
 
@@ -173,15 +216,17 @@ const {
 
 const { runStatusTabVisible } = storeToRefs(useEvaluationRunStatusStore());
 
-const { calibrationRunForForecast } = storeToRefs(useForecastStore());
+const { calibrationRunForForecast, forecastJobId } = storeToRefs(useForecastStore());
 
 const { selectedVerificationJob } = storeToRefs(useVerificationStore());
+
+const { calibrationRunForHindcast, hindcastJobId } = storeToRefs(useHindcastStore());
 
 const emit = defineEmits(["tabNumber"]);
 const currentCalibrationTab = ref(getCalibrationTabIndex());
 const currentEvaluationTab = ref(getEvaluationTabIndex());
 const currentForecastTab = ref(getForecastTabIndex());
-const currentVerificationTab = ref(getVerificationTabIndex());
+const currentHindcastTab = ref(getHindcastTabIndex());
 const currentMenu = ref(getMenuIndex());
 
 // temporary. Will be replaced by logic from each tabuserCalibrationRunData
@@ -203,8 +248,8 @@ const tabClicked = (event: Event) => {
       currentForecastTab.value = Number(ele.getAttribute("data-tab"));
       emit("tabNumber", currentForecastTab.value);
     } else if (currentMenu.value === 4) {
-      currentVerificationTab.value = Number(ele.getAttribute("data-tab"));
-      emit("tabNumber", currentVerificationTab.value);
+      currentHindcastTab.value = Number(ele.getAttribute("data-tab"));
+      emit("tabNumber", currentHindcastTab.value);
     }
   })
 }

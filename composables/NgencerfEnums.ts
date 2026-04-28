@@ -19,22 +19,29 @@ export const ForecastTabs = {
   tab_calibrationRuns: 0,
   tab_forecastRuns: 1,
   tab_setupForecast: 2,
-  tab_runStatus: 3,
-  tab_results: 4,
+  tab_forecastRunStatus: 3,
+  tab_forecastResults: 4,
+  tab_verificationJobs: 5,
+  tab_verificationRunStatus: 6,
+  tab_verificationResults: 7,
 };
 
-export const VerificationTabs = {
-  tab_forecastRuns: 0,
-  tab_verificationJobs: 1,
-  tab_runStatus: 2,
-  tab_results: 3,
+export const HindcastTabs = {
+  tab_calibrationRuns: 0,
+  tab_hindcastRuns: 1,
+  tab_setupHindcast: 2,
+  tab_hindcastRunStatus: 3,
+  tab_hindcastResults: 4,
+  tab_verificationJobs: 5,
+  tab_verificationRunStatus: 6,
+  tab_verificationResults: 7,
 };
 
 export const NgencerfPages = {
   page_calibration: 1,
   page_evaluation: 2,
   page_forecast: 3,
-  page_verification: 4,
+  page_hindcast: 4,
 };
 
 export const CalibrationHelpPages = {

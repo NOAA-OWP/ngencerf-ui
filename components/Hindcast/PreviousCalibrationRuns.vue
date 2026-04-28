@@ -21,12 +21,12 @@
         </div>
       </div>
 
-      <div id="calibrationRunsForForecastList">
+      <div id="calibrationRunsForHindcastList">
         <div id="CalTable" class="w-max mx-auto">
           <JobFilterDialog id="JobFilterDialog" job-type="Calibration" :disable-all="false" 
             :show-status="false" :show-modules="false" :show-archived="false"
-            :totalSize="calibrationRunsForForecastListTotalSize" :totalPages="calibrationRunsForForecastListTotalPages"
-            v-model:currentPage="calibrationRunsForForecastListCurrentPage"
+            :totalSize="calibrationRunsForHindcastListTotalSize" :totalPages="calibrationRunsForHindcastListTotalPages"
+            v-model:currentPage="calibrationRunsForHindcastListCurrentPage"
             @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
             @UpdateGageList="updateGageList()" ref="jobFilterDialog" />
 
@@ -34,21 +34,21 @@
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
             :model="cmCalibrationRun"></ContextMenu>
           
-          <div v-if="calibrationRunsForForecast.length > 0 && calibrationRunsForForecastListTotalSize > 0" class="pagination-box">
+          <div v-if="calibrationRunsForHindcast.length > 0 && calibrationRunsForHindcastListTotalSize > 0" class="pagination-box">
             <div class="pagination-rows">
-              Rows {{ calibrationRunsForForecastListStartRow }} to {{ calibrationRunsForForecastListEndRow }} of {{ calibrationRunsForForecastListTotalSize }}
+              Rows {{ calibrationRunsForHindcastListStartRow }} to {{ calibrationRunsForHindcastListEndRow }} of {{ calibrationRunsForHindcastListTotalSize }}
             </div>
-            <Paging v-model:currentPage="calibrationRunsForForecastListCurrentPage" :totalPages=calibrationRunsForForecastListTotalPages />
+            <Paging v-model:currentPage="calibrationRunsForHindcastListCurrentPage" :totalPages=calibrationRunsForHindcastListTotalPages />
           </div>
           <div v-else>
             No results. Try changing or clearing filters.
           </div>
 
-          <DataTable id="CalibrationRunForForecastTable" :value="calibrationRunsForForecast" 
+          <DataTable id="CalibrationRunForHindcastTable" :value="calibrationRunsForHindcast" 
             scrollable scroll-height="400px" table-style="min-width: 50rem"
-            v-model:sortField="calibrationRunsForForecastListSort.field" v-model:sortOrder="calibrationRunsForForecastListSort.direction"
-            v-model:selection="calibrationRunForForecast" selectionMode="single" :rowStyle="rowStyle"
-            @rowSelect="onCalibrationRunForForecastRowSelect" @rowUnselect="onCalibrationRunForForecastRowUnSelect"
+            v-model:sortField="calibrationRunsForHindcastListSort.field" v-model:sortOrder="calibrationRunsForHindcastListSort.direction"
+            v-model:selection="calibrationRunForHindcast" selectionMode="single" :rowStyle="rowStyle"
+            @rowSelect="oncalibrationRunForHindcastRowSelect" @rowUnselect="oncalibrationRunForHindcastRowUnSelect"
             @rowContextmenu="onRowContextMenu" class="boxed">
             <Column :pt="ptColumn" field="calibration_run_id" sortable>
               <template #header>
@@ -205,10 +205,10 @@ import { useToast } from "primevue/usetoast";
 
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import type { ToastMessageOptions } from "primevue/toast";
-import type { CalibrationRunForForecast, DataTableContextMenuOption } from "@/composables/NgencerfModels";
+import type { calibrationRunForHindcast, DataTableContextMenuOption } from "@/composables/NgencerfModels";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 
-import { useForecastStore } from "@/stores/forecast/ForecastStore";
+import { useHindcastStore } from "@/stores/hindcast/HindcastStore";
 import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
@@ -220,7 +220,7 @@ import Paging from "../Common/Paging.vue";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
-import { ForecastTabs } from "@/composables/NgencerfEnums";
+import { HindcastTabs } from "@/composables/NgencerfEnums";
 
 const { deleteCalibrationRun, archiveCalibrationRun, exportJob, getCalibrationJobZip } = useCalibrationJobStore();
 
@@ -234,31 +234,31 @@ const ptColumn = ref({
   bodyCell: { style: { "text-align": "center" } }
 });
 
-const forecastStore = useForecastStore();
+const HindcastStore = useHindcastStore();
 const { 
-  forecastJobId,
-  calibrationRunsForForecastListPageSize,
-  calibrationRunsForForecastListCurrentPage,
-  calibrationRunsForForecastListTotalPages,
-  calibrationRunsForForecastListTotalSize,
-  calibrationRunsForForecastListStartRow,
-  calibrationRunsForForecastListEndRow,
-  calibrationRunsForForecastListSort 
-} = storeToRefs(forecastStore);
+  hindcastJobId,
+  calibrationRunsForHindcastListPageSize,
+  calibrationRunsForHindcastListCurrentPage,
+  calibrationRunsForHindcastListTotalPages,
+  calibrationRunsForHindcastListTotalSize,
+  calibrationRunsForHindcastListStartRow,
+  calibrationRunsForHindcastListEndRow,
+  calibrationRunsForHindcastListSort 
+} = storeToRefs(HindcastStore);
 const { 
-  getCalibrationJobsForForecast, 
-  resetUserSelectedForecastCalibrationRun, 
-  hardResetForecastStore,
+  getCalibrationJobsForHindcast, 
+  resetUserSelectedHindcastCalibrationRun, 
+  hardResetHindcastStore,
   resetFilters,
   fetchGageList
-} = forecastStore;
+} = HindcastStore;
 
 
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
 
 //this model is for highlighting purpose
-const selectedCalibrationRun = ref<CalibrationRunForForecast>();
+const selectedCalibrationRun = ref<calibrationRunForHindcast>();
 
 const { isLoading } = storeToRefs(generalStore());
 const { calibrationDownloadJobID } = storeToRefs(useCalibrationJobStore());
@@ -266,21 +266,21 @@ const { calibrationDownloadJobID } = storeToRefs(useCalibrationJobStore());
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const onRowContextMenu = (event: any) => {
   cmCalibrationRun.value = [];
-  const crRowData = event.data as CalibrationRunForForecast;
-  if (calibrationRunForForecast && calibrationRunForForecast.value?.calibration_run_id === crRowData.calibration_run_id) {
+  const crRowData = event.data as calibrationRunForHindcast;
+  if (calibrationRunForHindcast && calibrationRunForHindcast.value?.calibration_run_id === crRowData.calibration_run_id) {
     crContextMenu.value.show(event.originalEvent);
-    //forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
+    //hindcastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
     setSelectedCalibrationRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
-    cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => navigateToSetupForecast() });
+    cmCalibrationRun.value.push({ label: 'Run New Hindcast', icon: 'pi pi-chevron-circle-right', command: () => navigateToSetupHindcast() });
     cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
-    if (calibrationRunForForecast.value?.is_downloadable) {
+    if (calibrationRunForHindcast.value?.is_downloadable) {
       cmCalibrationRun.value.push({ label: 'Download Results', icon: 'pi pi-download', command: () => downloadSelectedCalibrationData() });
     }
     cmCalibrationRun.value.push({ label: 'Export Calibration Config', icon: 'pi pi-file-export', command: () => exportSelectedCalibrationData() });
-    if (!calibrationRunForForecast?.value?.status.includes('Submitted') && !calibrationRunForForecast?.value?.status.includes('Running') && !calibrationRunForForecast?.value?.is_locked) {
+    if (!calibrationRunForHindcast?.value?.status.includes('Submitted') && !calibrationRunForHindcast?.value?.status.includes('Running') && !calibrationRunForHindcast?.value?.is_locked) {
       cmCalibrationRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun() });
     }
-    if (!calibrationRunForForecast?.value?.status.includes('Submitted') && !calibrationRunForForecast?.value?.status.includes('Running') && !calibrationRunForForecast.value?.is_archived) {
+    if (!calibrationRunForHindcast?.value?.status.includes('Submitted') && !calibrationRunForHindcast?.value?.status.includes('Running') && !calibrationRunForHindcast.value?.is_archived) {
       cmCalibrationRun.value.push({ label: 'Archive', icon: 'pi pi-folder', command: () => archiveSelectedCalibrationRun(true) });
     }
   }
@@ -301,19 +301,18 @@ const {
 
 const { userCalibrationRunData, uiGageList } = storeToRefs(useUserDataStore());
 
-const { calibrationRunsForForecast, calibrationRunForForecast, forecastRunGageList } = storeToRefs(useForecastStore());
+const { calibrationRunsForHindcast, calibrationRunForHindcast, hindcastRunGageList } = storeToRefs(useHindcastStore());
 
-const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId, fetchForecastGageList } = useForecastStore();
+const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId, fetchHindcastGageList } = useHindcastStore();
 
 onMounted(async () => {
   isLoading.value = true;
-  forecastJobId.value = undefined;
-  calibrationRunsForForecastListCurrentPage.value = 1;
+  calibrationRunsForHindcastListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals
-  hardResetForecastStore();
+  hardResetHindcastStore();
 
-  hilightTab(ForecastTabs.tab_calibrationRuns);
+  hilightTab(HindcastTabs.tab_calibrationRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
@@ -321,8 +320,8 @@ onMounted(async () => {
     resetSelectedCalibrationRunId();
     //clear calibration data if user were on calibration tab and clear evaluation previous run data user may have selected
     resetUserSelectedEvalCalibrationRun();
-    resetUserSelectedForecastCalibrationRun();
-    await getCalibrationJobsForForecast();
+    resetUserSelectedHindcastCalibrationRun();
+    await getCalibrationJobsForHindcast();
     updateGageList();
     isLoading.value = false;
   });
@@ -333,15 +332,15 @@ const updateGageList = async() => {
 }
 
 // watch for sort order change - reset current page to 1
-watch(calibrationRunsForForecastListSort, () => {
-  calibrationRunsForForecastListCurrentPage.value = 1;
+watch(calibrationRunsForHindcastListSort, () => {
+  calibrationRunsForHindcastListCurrentPage.value = 1;
   refreshJobList();
 },{ deep: true });
 
 // Watch for page number changes in job list
-watch(calibrationRunsForForecastListCurrentPage, () => {
-  if (isNaN(calibrationRunsForForecastListCurrentPage.value) || calibrationRunsForForecastListCurrentPage.value < 1 || calibrationRunsForForecastListCurrentPage.value > Math.ceil(calibrationRunsForForecastListTotalSize.value / calibrationRunsForForecastListPageSize.value)) {
-    console.log('ERROR: Page number ' + calibrationRunsForForecastListCurrentPage.value + ' out of bounds');
+watch(calibrationRunsForHindcastListCurrentPage, () => {
+  if (isNaN(calibrationRunsForHindcastListCurrentPage.value) || calibrationRunsForHindcastListCurrentPage.value < 1 || calibrationRunsForHindcastListCurrentPage.value > Math.ceil(calibrationRunsForHindcastListTotalSize.value / calibrationRunsForHindcastListPageSize.value)) {
+    console.log('ERROR: Page number ' + calibrationRunsForHindcastListCurrentPage.value + ' out of bounds');
   } else {
     refreshJobList();
   }
@@ -349,7 +348,7 @@ watch(calibrationRunsForForecastListCurrentPage, () => {
 
 const refreshJobList = async () => {
   isLoading.value = true;
-  await getCalibrationJobsForForecast();
+  await getCalibrationJobsForHindcast();
   isLoading.value = false;
 }
 
@@ -362,18 +361,18 @@ const viewCalibrationDetails = async (calibration_run_id: number) => {
   })
 }
 
-const onCalibrationRunForForecastRowSelect = async (event: any) => {
+const oncalibrationRunForHindcastRowSelect = async (event: any) => {
   //isLoading.value = true;
-  const rowData = event.data as CalibrationRunForForecast;
+  const rowData = event.data as calibrationRunForHindcast;
   setSelectedCalibrationRunId(rowData.calibration_run_id);
-  //forecastJobId.value = rowData.calibration_run_id;
-  //await loadSelectedCalibrationRun(forecastJobId.value as number);
+  //hindcastJobId.value = rowData.calibration_run_id;
+  //await loadSelectedCalibrationRun(hindcastJobId.value as number);
   //await fetchUserSelectedCalibrationValidationRunList();
   //isLoading.value = false;
 }
 
-const onCalibrationRunForForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
-  //forecastJobId.value = 0;
+const oncalibrationRunForHindcastRowUnSelect = async (event: DataTableRowClickEvent) => {
+  //hindcastJobId.value = 0;
   resetSelectedCalibrationRunId();
 }
 
@@ -386,14 +385,14 @@ watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
   }
 });
 
-const navigateToSetupForecast = async () => {
-  if (calibrationRunForForecast?.value?.calibration_run_id && calibrationRunForForecast.value.calibration_run_id > 0) {
-    forecastJobId.value = undefined;
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast Tab"]');
+const navigateToSetupHindcast = async () => {
+  if (calibrationRunForHindcast?.value?.calibration_run_id && calibrationRunForHindcast.value.calibration_run_id > 0) {
+    hindcastJobId.value = undefined;
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Hindcast Tab"]');
     if (e) {
       e.click();
     } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Setup Forecast Tab not found', life: ToastTimeout.timeoutError};
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Setup Hindcast Tab not found', life: ToastTimeout.timeoutError};
       toast.add(tMsg); addToastRecord(tMsg);
     }
   } else {
@@ -411,7 +410,7 @@ const rowStyle = (data: any) => {
 const confirmDelete = useConfirm();
 
 const deleteSelectedCalibrationRun = () => {
-  const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
+  const selectedRunId = calibrationRunForHindcast.value?.calibration_run_id as number;
   let confirmMessage = "Are you sure you want to delete this run?"
   confirmDelete.require({
     message: confirmMessage,
@@ -457,7 +456,7 @@ const acceptDelete = (selectedRunId: number) => {
           life: ToastTimeout.timeoutError};
         toast.add(tMsg); addToastRecord(tMsg);
       } 
-      getCalibrationJobsForForecast();
+      getCalibrationJobsForHindcast();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -465,12 +464,12 @@ const acceptDelete = (selectedRunId: number) => {
       });
     }
   });
-  calibrationRunForForecast.value = undefined;
+  calibrationRunForHindcast.value = undefined;
 };
 
 const confirmArchive = useConfirm();
 const archiveSelectedCalibrationRun = () => {
-  const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
+  const selectedRunId = calibrationRunForHindcast.value?.calibration_run_id as number;
   let confirmMessage = "Are you sure you want to Archive this calibration run? Unarchiving must be done from the Calibration workflow."
   confirmArchive.require({
     message: confirmMessage,
@@ -515,7 +514,7 @@ const acceptArchive = (selectedRunId: number) => {
           life: ToastTimeout.timeoutError};
         toast.add(tMsg); addToastRecord(tMsg);
       }
-      getCalibrationJobsForForecast();
+      getCalibrationJobsForHindcast();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Archive Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -530,7 +529,7 @@ const acceptArchive = (selectedRunId: number) => {
  * Export user's calibration job configuration data to a JSON file
  */
 const exportSelectedCalibrationData = async () => {
-  const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
+  const selectedRunId = calibrationRunForHindcast.value?.calibration_run_id as number;
   isLoading.value = true;
   const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Export Calibration Config', detail: 'Request to export Calibration Job ID ' + selectedRunId + ' has been processed.', life: ToastTimeout.timeoutInfo };
   toast.add(tMsg); addToastRecord(tMsg);
@@ -549,8 +548,8 @@ const exportSelectedCalibrationData = async () => {
  * Download all files in user's calibration job folder to a zip file
  */
  const downloadSelectedCalibrationData = async () => {
-  const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
-  if (calibrationRunForForecast.value?.is_downloadable) {
+  const selectedRunId = calibrationRunForHindcast.value?.calibration_run_id as number;
+  if (calibrationRunForHindcast.value?.is_downloadable) {
     //isLoading.value = true;
     const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Results Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and the file will be saved when ready.', life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
@@ -595,7 +594,7 @@ const toggleMessagesGroup = () => {
 @use "@/assets/styles/global.scss";
 @use "@/assets/styles/styles.scss";
 
-#calibrationRunsForForecastList {
+#calibrationRunsForHindcastList {
   height: 80%;
 }
 
@@ -603,7 +602,7 @@ const toggleMessagesGroup = () => {
   width: 300px;
 }
 
-#CalibrationRunForForecastTable,
+#calibrationRunForHindcastTable,
 .gage-filter-wrapper {
   width: 1325px;
   margin: 0 auto;

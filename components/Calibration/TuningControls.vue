@@ -391,7 +391,7 @@ const {
 const toast = useToast();
 const selectedParameter = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
-const isInitialSetupDone = ref<Boolean>(false);
+const isInitialSetupDone = ref<boolean>(false);
 const selectedTuningParameterData = ref();
 const tuningContextMenu = ref();
 
@@ -435,7 +435,6 @@ onMounted(async () => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
 
-    console.log('userSelectedCalibrationTuningParameters:',userSelectedCalibrationTuningParameters.value);
     if (userSelectedCalibrationTuningParameters.value.length > 0 && !userCalibrationRunData?.value?.modules?.includes('LSTM')) {
       validateTuningParameters().then(response => {
         if (response._data.parameter_warnings) {

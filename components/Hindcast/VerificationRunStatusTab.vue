@@ -1,14 +1,9 @@
 <template>
-  <div id="ForecastRunStatusPage">
+  <div id="HindcastRunStatusPage">
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
-          <div v-if="!verificationJobId" class="w-full">
-            <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
-              Click Run to submit and run the verification.
-            </p>
-          </div>
-          <div v-else-if="logListOptions.length > 0" class="inline-block">
+          <div v-if="logListOptions.length > 1" class="inline-block">
             <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
@@ -16,12 +11,17 @@
               </Select>
             </div>
           </div>
+          <div v-else-if="!verificationJobId" class="w-full">
+            <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
+              Click Run to submit and run the verification.
+            </p>
+          </div>
           
           <div class="grid auto-cols-max grid-cols-3 gap=1 text-sm text-left mt-2">
             <div class="col-span-1">
               <div>
-                <span class="font-medium">Forecast Job ID: </span>
-                {{ forecastJobId ?? '-'.repeat(15) }}
+                <span class="font-medium">Hindcast Job ID: </span>
+                {{ hindcastJobId ?? '-'.repeat(15) }}
               </div>
               <div>
                 <span class="font-medium">Verification Job ID: </span>
@@ -31,11 +31,11 @@
             <div class="col-span-1">
               <div>
                 <span class="font-medium">Configuration: </span>
-                {{ selectedVerificationJob?.forecast_run?.configuration ?? (selectedForecastJob?.configuration ?? 'Unknown') }}
+                {{ selectedVerificationJob?.hindcast_run?.configuration ?? (selectedHindcastJob?.configuration ?? 'Unknown') }}
               </div>
               <div>
                 <span class="font-medium">Cycle Date: </span>
-                {{ (selectedVerificationJob?.forecast_run?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedVerificationJob.forecast_run.cycle_date) + ' UTC' : (selectedForecastJob?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedForecastJob.cycle_date) + ' UTC' : 'None')) }}
+                {{ (selectedVerificationJob?.hindcast_run?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedVerificationJob.hindcast_run.cycle_date) + ' UTC' : (selectedHindcastJob?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedHindcastJob.cycle_date) + ' UTC' : 'None')) }}
               </div>
             </div>
             <div class="col-span-1">
@@ -53,13 +53,13 @@
               </div>
               <div class="mt-2 mb-2">
                 <!--BUTTONS - START-->
-                <span v-if="forecastJobId && !verificationJobId && !verificationJobStatus">
+                <span v-if="!runButtonDisabled">
                   <Button class=" ngenButtonDiv-green font-normal" title="Run Button" aria-label="Run Button"
                     @click="startVerificationJob()" :disabled="runButtonDisabled">
                     Run
                   </Button>
                 </span>
-                <span v-if="['Submitted','Running'].includes(verificationJobStatus)">
+                <span v-if="!cancelButtonDisabled">
                   <Button class="col-span-1 ngenButtonDiv-red" title="Cancel Button" aria-label="Cancel Button"
                     @click="stopVerificationJob()" :disabled="cancelButtonDisabled">
                     Cancel
@@ -108,36 +108,47 @@ import { ToastTimeout } from "@/composables/NgencerfEnums";
 import { hilightTab } from '@/composables/TabHilight';
 import { storeToRefs } from "pinia";
 
-import { useVerificationStore } from "@/stores/verification/VerificationStore";
+import { useForecastStore } from "~/stores/forecast/ForecastStore";
+import { useHindcastStore } from "~/stores/hindcast/HindcastStore";
+import { useVerificationStore } from "~/stores/forecast/VerificationStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useLogStore } from '@/stores/common/LogStore';
 
 const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
-const runButtonDisabled = ref<boolean>(false);
-const cancelButtonDisabled = ref<boolean>(false);
-
 const toast = useToast();
 
+const runButtonDisabled = ref<boolean>(true);
+const cancelButtonDisabled = ref<boolean>(true);
+
+const forecastStore = useForecastStore();
+const hindcastStore = useHindcastStore();
 const verificationStore = useVerificationStore();
 
-const { 
-  selectedForecastJob,
-  selectedVerificationJob,
-  forecastJobId,
-  verificationJobId, 
+const {
   submitTimeDate,
   submitTime,
   elapsedTime,
+  failureMessages
+} = storeToRefs(forecastStore);
+
+const {
+  selectedHindcastJob,
+  hindcastJobId,
+} = storeToRefs(hindcastStore);
+
+const { 
+  selectedVerificationJob,
+  verificationJobId, 
   verificationStatusCheckingInterval,
   verificationRunningTimeInterval,
-  verificationJobStatus,
-  failureMessages
+  verificationJobStatus
 } = storeToRefs(verificationStore);
 const { 
   loadVerificationRunStatusTabData,
   loadVerificationStatusInformation,
+  getVerificationStatus,
   updateRunningTime,
   createAndRunVerificationJob,
   cancelVerificationJob
@@ -145,7 +156,6 @@ const {
 
 const {
   selectedLogCategory,
-  logList,
   logListOptions
 } = storeToRefs(useLogStore());
 const {
@@ -154,7 +164,7 @@ const {
 } = useLogStore();
 
 onMounted(async() => {
-  hilightTab(VerificationTabs.tab_runStatus);
+  hilightTab(HindcastTabs.tab_verificationRunStatus);
 
   clearInterval(verificationStatusCheckingInterval.value);
   clearInterval(verificationRunningTimeInterval.value);
@@ -174,9 +184,10 @@ onMounted(async() => {
   }
 
   runButtonDisabled.value = verificationJobStatus.value && !['Unknown','Ready'].includes(verificationJobStatus.value);
-  cancelButtonDisabled.value = ['Submitted','Running'].includes(verificationJobStatus.value);
+  cancelButtonDisabled.value = !runButtonDisabled.value || !['Submitted','Running'].includes(verificationJobStatus.value);
 
   watch(verificationJobStatus, async (newVerificationJobStatus, oldVerificationJobStatus) => {
+    cancelButtonDisabled.value = !runButtonDisabled.value || !['Submitted','Running'].includes(verificationJobStatus.value);
     if (verificationJobId.value && 
       ( 
         newVerificationJobStatus === 'Running' || 
@@ -194,7 +205,6 @@ onMounted(async() => {
  */
 const startVerificationJob = async () => {
   runButtonDisabled.value = true;
-  cancelButtonDisabled.value = false;
   createAndRunVerificationJob().then((response) => {
     if (response.status >= 200 && response.status < 300) {
       verificationJobId.value = response._data.verification_run_id;
@@ -221,10 +231,22 @@ const startVerificationJob = async () => {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
+    } else if (response?._data?.verification_run_id) {
+      // job was created, but we got a bad response from the server
+      verificationJobId.value = response._data.verification_run_id;
+      getVerificationStatus().then((status_response) => {
+        if (status_response?._data?.status) {
+          verificationJobStatus.value = status_response._data.status;
+          failureMessages.value = status_response._data?.failure_messages ?? undefined;
+        } else {
+          const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: status_response?._data?.message ?? `Error when running verification job`, life: ToastTimeout.timeoutError };
+          toast.add(tMsg); addToastRecord(tMsg);
+        }
+      });
     } else {
       runButtonDisabled.value = false;
-      cancelButtonDisabled.value = true;
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Could not find Verification job ${verificationJobId.value} in server response`, life: ToastTimeout.timeoutError };
+      cancelButtonDisabled.value  = true;
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: response?._data?.message ?? `Unable to run verification job`, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   })
@@ -260,11 +282,13 @@ const stopVerificationJob = async () => {
 
 const goNextTab = () => {
   const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[VerificationTabs.tab_results];
+  const e = <HTMLElement>tabs[HindcastTabs.tab_verificationResults];
   e.click();
 }
 
 onUnmounted(() => {
+  runButtonDisabled.value = true;
+  cancelButtonDisabled.value = true;
   clearInterval(verificationStatusCheckingInterval.value);
   clearInterval(verificationRunningTimeInterval.value);
   verificationStatusCheckingInterval.value = undefined;
@@ -273,7 +297,6 @@ onUnmounted(() => {
   failureMessages.value = undefined;
   submitTime.value = undefined;
   elapsedTime.value = undefined;
-  logList.value = [];
   logListOptions.value = [];
   resetUserLogRefs();
 })

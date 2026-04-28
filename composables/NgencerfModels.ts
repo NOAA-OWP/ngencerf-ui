@@ -716,6 +716,12 @@ export type ForecastConfiguration = {
   fcst_timestep: number;
 };
 
+export type ColdStartRun = {
+  cold_start_status: string;
+  cold_start_date: string;
+  cold_start_submit_date: string;
+}
+
 export type CalibrationRunsForForecast = CalibrationRunForForecast[];
 
 export type CalibrationRunForForecast = {
@@ -739,11 +745,56 @@ export type CalibrationRunForForecast = {
   forecast_status: string;
   configuration: string;
   cycle_date: string;
-  cold_start?: {
-    cold_start_status: string;
-    cold_start_date: string;
-    cold_start_submit_date: string;
+  cold_start?: ColdStartRun;
+  logging_config: {
+    logging_enabled: boolean;
+    modules: {
+      [key: string]: string;
+    }
+    split_logs_by_module: boolean;
   }
+};
+
+export type HindcastConfiguration = {
+  name: string;
+  data_sources: string;
+  time_range: string;
+  is_active: boolean;
+  availability_lag: number;
+  domain: string;
+  cycle_start: number;
+  cycle_end: number;
+  cycle_freq: number;
+  fcst_win: number;
+  fcst_timestep: number;
+};
+
+export type CalibrationRunsForHindcast = CalibrationRunForHindcast[];
+
+export type CalibrationRunForHindcast = {
+  calibration_run_id: number;
+  gage_id: string;
+  domain_name: string;
+  job_genesis: string;
+  created_at: string;
+  status: string;
+  calibration_start_period: string;
+  calibration_end_period: string;
+  job_name: string;
+  submit_date: string;
+  objective_function: string;
+  optimization_algorithm: string;
+  validations: CalibrationJobValidationItem[];
+  is_archived: boolean;
+  is_locked: boolean;
+  is_downloadable: boolean;
+  hindcast_run_id: number;
+  hindcast_status: string;
+  configuration: string;
+  cycle_date: string;
+  cold_start?: ColdStartRun;
+  interval_cycle: number;
+  num_iterations: number;
   logging_config: {
     logging_enabled: boolean;
     modules: {
@@ -760,11 +811,7 @@ export interface ForecastJob {
   cycle_date: string;
   gage_id: string;
   forecast_status: string;
-  cold_start?: {
-    cold_start_status: string;
-    cold_start_date: string;
-    cold_start_submit_date: string;
-  }
+  cold_start?: ColdStartRun;
   submit_date: string;
   failure_messages: any;
 }
@@ -774,10 +821,32 @@ export type ForecastJobs = {
   total_count?: number;
 }
 
+export interface HindcastJob {
+  calibration_run_id: number;
+  hindcast_run_id: number;
+  configuration: string;
+  cycle_date: string;
+  gage_id: string;
+  hindcast_status: string;
+  cold_start?: ColdStartRun;
+  cold_start_run_id?: number;
+  interval_cycle: number;
+  num_iterations: number;
+  submit_date: string;
+  failure_messages: any;
+}
+
+export type HindcastJobs = {
+  hindcast_jobs: HindcastJob[];
+  total_count?: number;
+}
+
 export interface VerificationJob {
   verification_run_id: number;
   forecast_run?: ForecastJob;
   forecast_run_id?: number;
+  hindcast_run?: HindcastJob;
+  hindcast_run_id?: number;
   yaml_config_data: DynamicObject;
   submit_date: string;
   run_start: string;

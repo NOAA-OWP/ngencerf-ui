@@ -1,5 +1,5 @@
-<template>
-  <!-- ForecastLeftBlock.vue -->
+<template> 
+  <!-- HindcastLeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
@@ -7,16 +7,16 @@
         <PreviousCalibrationRuns />
       </span>
       <span v-else-if="activeTab === 2">
-        <ForecastRunsTab />
+        <HindcastRunsTab />
       </span>
       <span v-else-if="activeTab === 3">
-        <SetupForecastTab />
+        <SetupHindcastTab />
       </span>
       <span v-else-if="activeTab === 4">
-        <ForecastRunStatusTab />
+        <HindcastRunStatusTab />
       </span>
       <span v-else-if="activeTab === 5">
-        <ForecastResultsTab />
+        <HindcastResultsTab />
       </span>
       <span v-if="activeTab === 6">
         <VerificationRunsTab />
@@ -32,27 +32,34 @@
 </template>
 
 <script setup lang="ts">
-import { generalStore } from "@/stores/common/GeneralStore";
-
 import Tabs from '@/components/Common/Tabs.vue'
-import PreviousCalibrationRuns from '@/components/Forecast/PreviousCalibrationRuns.vue';
-import ForecastRunsTab from './ForecastRunsTab.vue';
-import SetupForecastTab from './SetupForecastTab.vue';
-import ForecastRunStatusTab from './ForecastRunStatusTab.vue';
-import ForecastResultsTab from './ForecastResultsTab.vue';
+
+import PreviousCalibrationRuns from "./PreviousCalibrationRuns.vue"
+import HindcastRunsTab from "./HindcastRunsTab.vue"
+import SetupHindcastTab from './SetupHindcastTab.vue';
+import HindcastRunStatusTab from './HindcastRunStatusTab.vue';
+import HindcastResultsTab from './HindcastResultsTab.vue';
 import VerificationRunsTab from "./VerificationRunsTab.vue"
 import VerificationRunStatusTab from "./VerificationRunStatusTab.vue"
 import VerificationResultsTab from "./VerificationResultsTab.vue"
 
-const { getForecastTabIndex, setForecastTabIndex } = generalStore();
+import { generalStore } from "@/stores/common/GeneralStore";
+const { getHindcastTabIndex, setHindcastTabIndex } = generalStore();
 
-const activeTab = ref(getForecastTabIndex());
+import { useVerificationStore } from '@/stores/forecast/VerificationStore';
+const { verificationJobId } = storeToRefs(useVerificationStore());
+
+// Default to Tab 1, HeadwaterBasinGage
+const activeTab = ref(getHindcastTabIndex());
 
 // Activate new tab
 const tabChanged = (tabNum: number) => {
-  if (activeTab.value !== tabNum) {
-    activeTab.value = tabNum;
-    setForecastTabIndex(tabNum);
-  } 
+  activeTab.value = tabNum;
+  setHindcastTabIndex(tabNum);
 };
+
+onUnmounted(() => {
+  verificationJobId.value = undefined;
+})
+
 </script>

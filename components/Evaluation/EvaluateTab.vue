@@ -337,7 +337,7 @@ const EvaluationSupplementalDataStore = useEvaluationSupplementalDataStore();
 const userDataStore = useUserDataStore();
 const toast = useToast();
 
-const showMessagesGroup = ref<Boolean>(false);
+const showMessagesGroup = ref<boolean>(false);
 
 const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
@@ -390,7 +390,7 @@ const {
 } = EvaluationSupplementalDataStore;
 
 const plotListDefault = ref<string>('Select an option');
-const expandPlotTable = ref<Boolean>(false);
+const expandPlotTable = ref<boolean>(false);
 const plotTables = ref<DynamicObject>({});
 const plotTableList = ref<any[]>([]);
 const selectedPlotTable = ref<string>('');
@@ -403,7 +403,7 @@ const plotTableTotalPages = ref<number>(1);
 const plotTableStartRow = ref<number>(1);
 const plotTableEndRow = ref<number>(plotTablePageSize.value);
 const plotTableErrorMessage = ref<string>('');
-const selectedPlotHasTimeseries = ref<Boolean>(false);
+const selectedPlotHasTimeseries = ref<boolean>(false);
 const plotGraphArea = ref<HTMLElement>();
 const plotGraphSVG = ref<HTMLElement>();
 const plotGraphDataRaw = ref<any[]>([]);
@@ -421,8 +421,8 @@ const plotGraphSliderHelpDisplay = ref<string>('');
 const sliderBoxPosition = ref<DynamicObject>({});
 const sliderDragPosition = ref<DynamicObject>({});
 const sliderDragType = ref<string>('');
-const showPlotGraph = ref<Boolean>(false);
-const showCustomizePlot = ref<Boolean>(false);
+const showPlotGraph = ref<boolean>(false);
+const showCustomizePlot = ref<boolean>(false);
 const selectedSupplementalTable = ref<number>(0);
 const iterations = ref<APIResponse>({});
 const iterationMetricsData = ref<any[]>([]);

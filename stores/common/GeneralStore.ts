@@ -18,7 +18,7 @@ export const generalStore = defineStore(
     const calibrationTabIndex = ref("1");
     const evaluationTabIndex = ref("1");
     const forecastTabIndex = ref("1");
-    const verificationTabIndex = ref("1");
+    const hindcastTabIndex = ref("1");
 
     const menuIndex = ref("1");
 
@@ -52,8 +52,6 @@ export const generalStore = defineStore(
     const gageDataSourceHasChanged = ref<boolean>(false);
     // This is set if the user changes the modules on the Formulation page
     const modulesHaveChanged = ref<boolean>(false);
-    // This is set if Verification Setup has changed
-    const verificationSetupHasChanged = ref<boolean>(false);
 
     const toastRecords = ref<ToastRecord[]>([]);
 
@@ -107,12 +105,12 @@ export const generalStore = defineStore(
       forecastTabIndex.value = tab.toString();
     }
 
-    //  Verification Tab index
-    function getVerificationTabIndex() {
-      return parseInt(verificationTabIndex.value);
+    //  Hindcast Tab index
+    function getHindcastTabIndex() {
+      return parseInt(hindcastTabIndex.value);
     }
-    function setVerificationTabIndex(tab: number) {
-      verificationTabIndex.value = tab.toString();
+    function setHindcastTabIndex(tab: number) {
+      hindcastTabIndex.value = tab.toString();
     }
 
     // Previous calibration run for Evaluation
@@ -133,7 +131,7 @@ export const generalStore = defineStore(
       calibrationTabIndex.value = '1';
       evaluationTabIndex.value = '1';
       forecastTabIndex.value = '1';
-      verificationTabIndex.value = '1';
+      hindcastTabIndex.value = '1';
     }
 
     return {
@@ -146,8 +144,8 @@ export const generalStore = defineStore(
       setEvaluationTabIndex,
       getForecastTabIndex,
       setForecastTabIndex,
-      getVerificationTabIndex,
-      setVerificationTabIndex,
+      getHindcastTabIndex,
+      setHindcastTabIndex,
       getEvalRunSelected,
       setEvalRunSelected,
       calibrationJobId,
@@ -167,8 +165,7 @@ export const generalStore = defineStore(
       gageHasChanged,
       gageDataSourceHasChanged,
       modulesHaveChanged,
-      verificationSetupHasChanged,
-      verificationTabIndex,
+      hindcastTabIndex,
       menuIndex,
       evaluationRunSelected,
       isLoading,

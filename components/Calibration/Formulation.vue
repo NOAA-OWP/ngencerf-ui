@@ -432,7 +432,6 @@ const saveFormulationData = () => {
     toast.removeAllGroups();
 
     let modulePropertyErrors = validateModuleProperties();
-    console.log('modulePropertyErrors:',modulePropertyErrors);
     if (modulePropertyErrors.length > 0) {
       modulePropertyErrors.forEach((err: any) => {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Module Property Error', detail: err, life: ToastTimeout.timeoutError };
