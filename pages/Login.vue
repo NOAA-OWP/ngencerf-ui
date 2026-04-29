@@ -71,22 +71,22 @@
                       <form onsubmit="return false">
                         <h1>Complete MFA Setup</h1>
 
-                        <p>Scan the QR Code with your authenticator app to continue. When your authenticator is set up, enter the 6-digit Code below.</p>
+                        <p class="mt-4">Scan the QR Code with your authenticator app to continue. When your authenticator is set up, enter the 6-digit Code below.</p>
 
-                        <img :src="QRCodeSource" alt="QR Code">
+                        <img class="mt-4" :src="QRCodeSource" alt="QR Code">
 
-                        <p>Or manually enter the following code into your authenticator app:</p>
+                        <p class="mt-4">Or manually enter the following code into your authenticator app:</p>
 
-                        <p>{{ AuthenticatorKey }}</p>
+                        <p class="mt-4">{{ AuthenticatorKey }}</p>
 
                         <div class="mt-10">
                           <label for="MFACodeForSetup" style="font-weight: normal;" class="required-label">Code</label><br>
-                          <input id="MFACodeForSetup" class="w-[350px]" type="text" v-model="MFACode" placeholder="######"
+                          <input id="MFACodeForSetup" class="!w-[100px]" type="text" v-model="MFACode" placeholder="######"
                             aria-label="MFACode" autocomplete="off" v-on:keypress="autoSubmit($event, 'mfa_setup')" />
                         </div>
 
                         <Button id="MFASetupButton" class="ngenButtonDiv btn-left mt-4" v-on:click="ConfirmMFASetup"
-                          aria-label="Confirm Setup">Confirm Setup</Button>
+                          aria-label="Confirm Setup" :disabled="MFASetupButtonDisabled">Confirm Setup</Button>
                       </form>
                     </div>
                   </div>
@@ -95,15 +95,21 @@
                 <div v-else-if="showMFARecoveryCodes" class="mx-auto px-8 text-left">
                   <h1>MFA Setup Complete</h1>
 
-                  <p>MFA has been set up for your account. Make a note of the following recovery codes
+                  <p class="mt-4">MFA has been set up for your account. Make a note of the following recovery codes
                     in case you ever lose access to your authenticator app.</p>
-                  
-                  <!-- TO DO: Show Recovery Codes Here -->
 
-                  <p>You may now proceed to ngenCERF.</p>
+                  <div class="mt-4">
+                    <textarea class="w-[160px] h-[250px] rounded-md border border-gray-300 p-2" id="RecoveryCodes">{{ RecoveryCodes.join('\n') }}</textarea>
+                  </div>
                   
-                  <!-- TO DO: Show Download and Copy Buttons Here -->
-                  <Button id="GoToLandingButton" class="ngenButtonDiv btn-left mt-4" v-on:click="GoToLanding"
+                  <Button id="CopyRecoveryCodes" class="ngenButtonDiv btn-left mt-4" v-on:click="CopyRecoveryCodes"
+                    aria-label="Copy">Copy</Button>
+                  <Button id="DownloadRecoveryCodes" class="ngenButtonDiv ml-4 mt-4" v-on:click="DownloadRecoveryCodes"
+                    aria-label="Download">Download</Button>
+
+                  <p class="mt-10">You may now proceed to ngenCERF.</p>
+                  
+                  <Button id="GoToLandingButton" class="ngenButtonDiv btn-left mt-4" v-on:click="SubmitLoginForm"
                     aria-label="Continue">Continue</Button>
                 </div>
 
@@ -113,16 +119,19 @@
                       <form onsubmit="return false">
                         <h1>Verify MFA Code</h1>
 
-                        <p>Enter the MFA code shown in your authenticator app.</p>
+                        <p class="mt-4">
+                          Enter the MFA code shown in your authenticator app.
+                          {{ RecoveryCodes.length ? 'If the current authenticator code was just used, wait for the next code before verifying login.' : '' }}
+                        </p>
 
-                        <div class="mt-10">
+                        <div class="mt-4">
                           <label for="MFACodeForVerification" style="font-weight: normal;" class="required-label">Code</label><br>
-                          <input id="MFACodeForVerification" class="w-[350px]" type="text" v-model="MFACode" placeholder="######"
+                          <input id="MFACodeForVerification" class="!w-[200px]" type="text" v-model="MFACode" placeholder="######"
                             aria-label="MFACode" autocomplete="off" v-on:keypress="autoSubmit($event, 'mfa_verify')" />
                         </div>
 
                         <Button id="VerifyMFAButton" class="ngenButtonDiv btn-left mt-4" v-on:click="VerifyMFACode"
-                          aria-label="Verify">Verify</Button>
+                          aria-label="Verify" :disabled="MFAVerifyButtonDisabled">Verify</Button>
                       </form>
                     </div>
                   </div>
@@ -161,7 +170,7 @@
                   </form>
                 </div>
 
-                <div class="required-hint mt-4">
+                <div v-if="!showMFARecoveryCodes" class="required-hint px-8 py-2">
                   <span class="required-asterisk">*</span> Required field
                 </div>
               </div>
@@ -225,6 +234,8 @@ const MFAToken = ref<string>('');
 const QRCodeSource = ref<string>('');
 const AuthenticatorKey = ref<string>('');
 const MFACode = ref<string>('');
+const MFASetupButtonDisabled = ref<boolean>(false);
+const MFAVerifyButtonDisabled = ref<boolean>(false);
 const RecoveryCodes = ref<string[]>([]);
 
 const disableCreateAccountBtn = ref<boolean>(false);
@@ -294,6 +305,7 @@ const openMFASetup = async() => {
       mfa_token: MFAToken.value
     }
   }).then(response => {
+    toast.removeAllGroups();
     if (response?.message) {
       const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
       toast.add(tMsg); addToastRecord(tMsg);
@@ -301,21 +313,53 @@ const openMFASetup = async() => {
     closeAll();
     showMFASetup.value = true;
     // Convert otpauth_url into a QR Code for display
-    QRCode.toDataURL(response?.otpauth_url, (err, url) => {
-      if (err) console.error(err);
-      console.log(url); // This URL can be set as the src of an <img> element
-      QRCodeSource.value = url;
+    QRCode.toDataURL(response?.otpauth_url, (error, url) => {
+      if (error) {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error, life: ToastTimeout.timeoutError };
+        toast.add(tMsg); addToastRecord(tMsg);
+      } else {
+        QRCodeSource.value = url;
+      }
     });
     AuthenticatorKey.value = response?.authenticator_key;
     MFACode.value = '';
   }
   ).catch(error => {
     if (error) {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error?.message, life: ToastTimeout.timeoutError };
+      toast.removeAllGroups();
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error?.data?.message ?? error, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   });
 };
+
+const CopyRecoveryCodes = async() => {
+  try {
+    await navigator.clipboard.writeText(document.getElementById("RecoveryCodes").value);
+    const tMsg: ToastMessageOptions = { severity: 'info', detail: 'Recovery Codes Copied to Clipboard', life: ToastTimeout.timeoutInfo };
+    toast.add(tMsg); addToastRecord(tMsg);
+  } catch (err) {
+    const tMsg: ToastMessageOptions = { severity: 'error', detail: 'Error Copying Recovery Codes to Clipboard: ' + err, life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
+}
+
+const DownloadRecoveryCodes = async() => {
+  const blob = new Blob([RecoveryCodes.value.join('\n')], { type: 'text/plain' });
+  const fileUrl = URL.createObjectURL(blob);
+  
+  const link = document.createElement('a');
+  link.href = fileUrl;
+  link.download = 'ngenCERF Recovery Codes - ' + userName.value.toLowerCase() + '.txt';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(fileUrl);
+
+  const tMsg: ToastMessageOptions = { severity: 'info', detail: 'Recovery Codes have been saved to a text file.', life: ToastTimeout.timeoutInfo };
+  toast.add(tMsg); addToastRecord(tMsg);
+}
 
 const openMFAVerify = () => {
   closeAll();
@@ -327,6 +371,7 @@ const ForgotUsername = () => {
 };
 
 const ForgotPassword = () => {
+  toast.removeAllGroups();
   const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Info', detail: 'Please contact the ngenCERF administrator to reset your password.', life: ToastTimeout.timeoutInfo };
   toast.add(tMsg); addToastRecord(tMsg);
 };
@@ -354,7 +399,7 @@ const SubmitLoginForm = async (e: Event) => {
 
   if (userName.value.trim() !== "" && userPassword.value.trim() !== "") {
     // try to create new access and refresh tokens
-
+    toast.removeAllGroups();
     await $fetch<any>(`${ngencerfBaseUrl}/auth/login/`, {
       method: 'POST',
       body: {
@@ -362,10 +407,8 @@ const SubmitLoginForm = async (e: Event) => {
         password: userPassword.value
       }
     }).then(response => {
+      MFACode.value = '';
       setUserName(userName.value.toLowerCase());
-      // store user name in UserDataStore
-      userDataStore.setFirstName(response?.first_name);
-      userDataStore.setLastName(response?.last_name);
       // set MFA token if needed
       MFAToken.value = response?.mfa_token ?? '';
       if (response?.message) {
@@ -384,13 +427,8 @@ const SubmitLoginForm = async (e: Event) => {
     }
     ).catch(error => {
       if (error) {
-        let err = error.data?.detail;
-        if (!err) {
-          err = "Cannot reach server. Error code: " + error.statusCode;
-        }
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: err, life: ToastTimeout.timeoutError };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error?.data?.message ?? 'Unable to reach server', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
-        console.error("Error during user creation:", error.message, error.data.detail);
       }
     });
   } else if (userName.value.trim() === "" || userPassword.value.trim() === "") {
@@ -408,7 +446,8 @@ const ConfirmMFASetup = async (e: Event) => {
 
   if (MFACode.value.trim().length === 6) {
     // validate the MFA Code
-
+    toast.removeAllGroups();
+    MFASetupButtonDisabled.value = true;
     await $fetch<any>(`${ngencerfBaseUrl}/auth/mfa/setup/confirm/`, {
       method: 'POST',
       body: {
@@ -416,9 +455,9 @@ const ConfirmMFASetup = async (e: Event) => {
         code: MFACode.value
       }
     }).then(response => {
+      closeAll();
       RecoveryCodes.value = response?.recovery_codes;
       showMFARecoveryCodes.value = true;
-      SubmitLoginForm(e);
       if (response?.message) {
         const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -430,6 +469,7 @@ const ConfirmMFASetup = async (e: Event) => {
         toast.add(tMsg); addToastRecord(tMsg);
       }
     });
+    MFASetupButtonDisabled.value = false;
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: "MFA Code must be six digits long.", life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
@@ -442,10 +482,10 @@ const ConfirmMFASetup = async (e: Event) => {
  */
 const VerifyMFACode = async (e: Event) => {
   e.preventDefault(); // prevents the page from reloading
-
-  if (MFACode.value.trim().length === 6) {
+  toast.removeAllGroups();
+  if (MFACode.value.trim().length === 6 || MFACode.value.trim().length === 13) {
     // validate the MFA Code
-
+    MFAVerifyButtonDisabled.value = true;
     await $fetch<any>(`${ngencerfBaseUrl}/auth/mfa/verify/`, {
       method: 'POST',
       body: {
@@ -463,18 +503,22 @@ const VerifyMFACode = async (e: Event) => {
     }
     ).catch(error => {
       if (error) {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error.message, life: ToastTimeout.timeoutError };
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error?.data?.message ?? error, life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
     });
+    MFAVerifyButtonDisabled.value = false;
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: "MFA Code must be six digits long.", life: ToastTimeout.timeoutError };
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: "MFA Code must be six digits long. If entering a recovery code, it must be 13 characters long.", life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
 
 
 const setTokenAndLogUserIn = async(response: any) => {
+  // store user name in UserDataStore
+  userDataStore.setFirstName(response?.first_name);
+  userDataStore.setLastName(response?.last_name);
   // store tokens in UserDataStore
   userDataStore.setAccessToken(response?.access);
   userDataStore.setRefreshToken(response?.refresh);
@@ -489,6 +533,7 @@ const GetExternalInfo = async () => {
 
 
 const SubmitNewAccountForm = async () => {
+  toast.removeAllGroups();
   if (newPassword.value !== confirmPassword.value) {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Passwords do not match.', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
