@@ -81,7 +81,7 @@
 
                         <div class="mt-10">
                           <label for="MFACodeForSetup" style="font-weight: normal;" class="required-label">Code</label><br>
-                          <input id="MFACodeForSetup" class="!w-[100px]" type="text" v-model="MFACode" placeholder="######"
+                          <input id="MFACodeForSetup" ref="MFACodeForSetup" class="!w-[100px]" type="text" v-model="MFACode" placeholder="######"
                             aria-label="MFACode" autocomplete="off" v-on:keypress="autoSubmit($event, 'mfa_setup')" />
                         </div>
 
@@ -109,7 +109,7 @@
 
                   <p class="mt-10">You may now proceed to ngenCERF.</p>
                   
-                  <Button id="GoToLandingButton" class="ngenButtonDiv btn-left mt-4" v-on:click="SubmitLoginForm"
+                  <Button id="GoToLandingButton" class="ngenButtonDiv btn-left mt-4" v-on:click="closeAll"
                     aria-label="Continue">Continue</Button>
                 </div>
 
@@ -126,7 +126,7 @@
 
                         <div class="mt-4">
                           <label for="MFACodeForVerification" style="font-weight: normal;" class="required-label">Code</label><br>
-                          <input id="MFACodeForVerification" class="!w-[200px]" type="text" v-model="MFACode" placeholder="######"
+                          <input id="MFACodeForVerification" ref="MFACodeForVerification" class="!w-[200px]" type="text" v-model="MFACode" placeholder="######"
                             aria-label="MFACode" autocomplete="off" v-on:keypress="autoSubmit($event, 'mfa_verify')" />
                         </div>
 
@@ -231,6 +231,8 @@ const newPassword = ref('');
 const confirmPassword = ref('');
 
 const MFAToken = ref<string>('');
+const MFACodeForSetup = ref(null);
+const MFACodeForVerification = ref(null);
 const QRCodeSource = ref<string>('');
 const AuthenticatorKey = ref<string>('');
 const MFACode = ref<string>('');
@@ -287,6 +289,9 @@ const getGitInformation = () => {
 }
 
 const closeAll = () => {
+  // clear username/password and close all other dialogues
+  userName.value = '';
+  userPassword.value = '';
   showCreateAccount.value = false;
   showMFASetup.value = false;
   showMFARecoveryCodes.value = false;
@@ -323,13 +328,12 @@ const openMFASetup = async() => {
     });
     AuthenticatorKey.value = response?.authenticator_key;
     MFACode.value = '';
+    nextTick(async () => {
+      MFACodeForSetup.value?.focus;
+    });
   }
   ).catch(error => {
-    if (error) {
-      toast.removeAllGroups();
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error?.data?.message ?? error, life: ToastTimeout.timeoutError };
-      toast.add(tMsg); addToastRecord(tMsg);
-    }
+    handleMFAError(error);
   });
 };
 
@@ -364,6 +368,9 @@ const DownloadRecoveryCodes = async() => {
 const openMFAVerify = () => {
   closeAll();
   showMFAVerify.value = true;
+  nextTick(async () => {
+    MFACodeForVerification.value?.focus;
+  });
 };
 
 const ForgotUsername = () => {
@@ -426,10 +433,7 @@ const SubmitLoginForm = async (e: Event) => {
       }
     }
     ).catch(error => {
-      if (error) {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error?.data?.message ?? 'Unable to reach server', life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
+      handleMFAError(error);
     });
   } else if (userName.value.trim() === "" || userPassword.value.trim() === "") {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: "A Username and Password are required", life: ToastTimeout.timeoutError };
@@ -464,11 +468,9 @@ const ConfirmMFASetup = async (e: Event) => {
       }
     }
     ).catch(error => {
-      if (error) {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error.message, life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
+      handleMFAError(error);
     });
+    MFACode.value = '';
     MFASetupButtonDisabled.value = false;
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: "MFA Code must be six digits long.", life: ToastTimeout.timeoutError };
@@ -502,15 +504,29 @@ const VerifyMFACode = async (e: Event) => {
       GoToLanding();
     }
     ).catch(error => {
-      if (error) {
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error?.data?.message ?? error, life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
+      handleMFAError(error);
     });
+    MFACode.value = '';
     MFAVerifyButtonDisabled.value = false;
   } else {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: "MFA Code must be six digits long. If entering a recovery code, it must be 13 characters long.", life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
+  }
+}
+
+const handleMFAError = (error: any) => {
+  toast.removeAllGroups();
+  const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: error?.data?.message ?? error, life: ToastTimeout.timeoutError };
+  toast.add(tMsg); addToastRecord(tMsg);
+  switch (error?.data?.ui_action) {
+    case 'RETURN_TO_LOGIN':
+    case 'STAY_ON_LOGIN':
+      closeAll();
+      break; 
+    case 'RESTART_MFA_SETUP':
+      closeAll();
+      openMFASetup();
+      break;
   }
 }
 
