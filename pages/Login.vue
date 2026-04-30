@@ -329,7 +329,7 @@ const openMFASetup = async() => {
     AuthenticatorKey.value = response?.authenticator_key;
     MFACode.value = '';
     nextTick(async () => {
-      MFACodeForSetup.value?.focus;
+      MFACodeForSetup.value?.focus();
     });
   }
   ).catch(error => {
@@ -369,7 +369,7 @@ const openMFAVerify = () => {
   closeAll();
   showMFAVerify.value = true;
   nextTick(async () => {
-    MFACodeForVerification.value?.focus;
+    MFACodeForVerification.value?.focus();
   });
 };
 
