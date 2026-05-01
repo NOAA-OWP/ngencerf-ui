@@ -221,7 +221,7 @@ export function formatDuration(duration: any): string {
   let totalSeconds = Math.floor(duration.seconds);
   let totalMinutes = duration.minutes + Math.floor(totalSeconds / 60);
   let totalHours = duration.hours + Math.floor(totalMinutes / 60);
-  let totalDays = Math.floor(duration.days);
+  let totalDays = Math.floor(duration.days) + Math.floor(totalHours / 24);
 
   // normalize the values
   const seconds = totalSeconds % 60;
