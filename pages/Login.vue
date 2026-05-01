@@ -17,7 +17,7 @@
                 <div v-if="showCreateAccount">
                   <div class="dialog-overlay" @click.self="closeAll">
                     <div class="dialog-content">
-                      <h1>Create an Account</h1>
+                      <h1 class="leading-tight text-balance">Create an Account</h1>
                       <form @submit.prevent="SubmitNewAccountForm">
                         <div class="form-group inputBox">
                           <label for="email" class="required-label">Email</label>
@@ -69,7 +69,8 @@
                   <div class="dialog-overlay" @click.self="closeAll">
                     <div class="dialog-content">
                       <form onsubmit="return false">
-                        <h1>Complete MFA Setup</h1>
+                        <h1 class="leading-tight text-balance">Complete MFA Setup</h1>
+                        <h2>{{ userName }}</h2>
 
                         <p class="mt-4">Scan the QR Code with your authenticator app to continue. When your authenticator is set up, enter the 6-digit Code below.</p>
 
@@ -87,13 +88,18 @@
 
                         <Button id="MFASetupButton" class="ngenButtonDiv btn-left mt-4" v-on:click="ConfirmMFASetup"
                           aria-label="Confirm Setup" :disabled="MFASetupButtonDisabled">Confirm Setup</Button>
+                        <div class="signupButton underline text-base inline pl-6">
+                          <Button @click="closeAll" :class="cancelCreateAccountLinkClasses"
+                            :disabled="disableCreateAccountBtn">Cancel</Button>
+                        </div>
                       </form>
                     </div>
                   </div>
                 </div>
 
                 <div v-else-if="showMFARecoveryCodes" class="mx-auto px-8 text-left">
-                  <h1>MFA Setup Complete</h1>
+                  <h1 class="leading-tight text-balance">MFA Setup Complete</h1>
+                  <h2>{{ userName }}</h2>
 
                   <p class="mt-4">MFA has been set up for your account. Make a note of the following recovery codes
                     in case you ever lose access to your authenticator app.</p>
@@ -117,7 +123,8 @@
                   <div class="dialog-overlay" @click.self="closeAll">
                     <div class="dialog-content">
                       <form onsubmit="return false">
-                        <h1>Verify MFA Code</h1>
+                        <h1 class="leading-tight text-balance">Verify MFA Code</h1>
+                        <h2>{{ userName }}</h2>
 
                         <p class="mt-4">
                           Enter the MFA code shown in your authenticator app.
@@ -132,6 +139,10 @@
 
                         <Button id="VerifyMFAButton" class="ngenButtonDiv btn-left mt-4" v-on:click="VerifyMFACode"
                           aria-label="Verify" :disabled="MFAVerifyButtonDisabled">Verify</Button>
+                        <div class="signupButton underline text-base inline pl-6">
+                          <Button @click="closeAll" :class="cancelCreateAccountLinkClasses"
+                            :disabled="disableCreateAccountBtn">Cancel</Button>
+                        </div>
                       </form>
                     </div>
                   </div>
@@ -140,7 +151,7 @@
                 <div v-else class="mx-auto px-8 text-left">
                   <form onsubmit="return false">
 
-                    <h1>Login</h1>
+                    <h1  class="leading-tight text-balance">Login</h1>
 
                     <div class="mt-10">
                       <label for="uname" style="font-weight: normal;" class="required-label">Email</label><br>
@@ -246,6 +257,7 @@ const cancelCreateAccountLinkClasses = ref<string[]>(['c-blue'])
 
 onMounted(() => {
   popupActive.value = false;
+  closeAll();
   nextTick(async () => {
     sessionStorage.clear();
     localStorage.clear();
@@ -289,7 +301,7 @@ const getGitInformation = () => {
 }
 
 const closeAll = () => {
-  // clear username/password and close all other dialogues
+  // clear username/password
   userName.value = '';
   userPassword.value = '';
   showCreateAccount.value = false;
@@ -299,8 +311,10 @@ const closeAll = () => {
 };
 
 const openCreateAccount = () => {
-  closeAll();
   showCreateAccount.value = true;
+  showMFASetup.value = false;
+  showMFARecoveryCodes.value = false;
+  showMFAVerify.value = false;
 };
 
 const openMFASetup = async() => {
@@ -311,12 +325,14 @@ const openMFASetup = async() => {
     }
   }).then(response => {
     toast.removeAllGroups();
-    if (response?.message) {
+    /* if (response?.message) {
       const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
       toast.add(tMsg); addToastRecord(tMsg);
-    }
-    closeAll();
+    } */
     showMFASetup.value = true;
+    showCreateAccount.value = false;
+    showMFARecoveryCodes.value = false;
+    showMFAVerify.value = false;
     // Convert otpauth_url into a QR Code for display
     QRCode.toDataURL(response?.otpauth_url, (error, url) => {
       if (error) {
@@ -354,7 +370,7 @@ const DownloadRecoveryCodes = async() => {
   
   const link = document.createElement('a');
   link.href = fileUrl;
-  link.download = 'ngenCERF Recovery Codes - ' + userName.value.toLowerCase() + '.txt';
+  link.download = 'ngenCERF Recovery Codes.txt';
   
   document.body.appendChild(link);
   link.click();
@@ -366,8 +382,10 @@ const DownloadRecoveryCodes = async() => {
 }
 
 const openMFAVerify = () => {
-  closeAll();
   showMFAVerify.value = true;
+  showCreateAccount.value = false;
+  showMFASetup.value = false;
+  showMFARecoveryCodes.value = false;
   nextTick(async () => {
     MFACodeForVerification.value?.focus();
   });
@@ -459,9 +477,11 @@ const ConfirmMFASetup = async (e: Event) => {
         code: MFACode.value
       }
     }).then(response => {
-      closeAll();
       RecoveryCodes.value = response?.recovery_codes;
       showMFARecoveryCodes.value = true;
+      showCreateAccount.value = false;
+      showMFASetup.value = false;
+      showMFAVerify.value = false;
       if (response?.message) {
         const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
@@ -524,7 +544,6 @@ const handleMFAError = (error: any) => {
       closeAll();
       break; 
     case 'RESTART_MFA_SETUP':
-      closeAll();
       openMFASetup();
       break;
   }
@@ -620,10 +639,6 @@ const SubmitNewAccountForm = async () => {
 const GoToLanding = () => {
   navigateTo("LandingPage");
 };
-
-onUnmounted(() => {
-  closeAll();
-})
 
 </script>
 <style lang="scss" scoped>
