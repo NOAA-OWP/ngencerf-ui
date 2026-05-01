@@ -249,7 +249,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
         hindcastJobStatus.value = getStatusResponse?._data?.status;
         coldStartJobStatus.value = getStatusResponse?._data?.cold_start_run?.status;
         failureMessages.value = getStatusResponse?._data?.failure_messages;
-        
+
         if (!cycleDate.value && getStatusResponse?._data?.cycle_date) {
           cycleDate.value = getStatusResponse._data.cycle_date;
         }
@@ -307,7 +307,10 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
         new Date(hindcastJob.run_end as string)
       ));
     }
-    elapsedTime.value = elapsedTimeArray.length > 0 ? sumAndFormatElapsedTimes(elapsedTimeArray) : '00:00:00';
+    let elapsedTimeArrayParsed = elapsedTimeArray.map((time) => {
+      return time.replace(' Day,','').replace(' Days,','')
+    });
+    elapsedTime.value = elapsedTimeArray.length > 0 ? sumAndFormatElapsedTimes(elapsedTimeArrayParsed) : '00:00:00';
   };
 
   /**
