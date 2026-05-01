@@ -342,7 +342,7 @@ onMounted(async () => {
       });
     });
   }
-
+  
   if (!cycleDate.value && calibrationRunForHindcast?.value?.cycle_date) {
     cycleDate.value = calibrationRunForHindcast.value.cycle_date;
   }
