@@ -482,10 +482,10 @@ const ConfirmMFASetup = async (e: Event) => {
       showCreateAccount.value = false;
       showMFASetup.value = false;
       showMFAVerify.value = false;
-      if (response?.message) {
+      /* if (response?.message) {
         const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
-      }
+      } */
     }
     ).catch(error => {
       handleMFAError(error);
@@ -515,10 +515,10 @@ const VerifyMFACode = async (e: Event) => {
         code: MFACode.value
       }
     }).then(response => {
-      if (response?.message) {
+      /* if (response?.message) {
         const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
-      }
+      } */
       setTokenAndLogUserIn(response);
       GetExternalInfo();
       GoToLanding();
@@ -580,7 +580,7 @@ const SubmitNewAccountForm = async () => {
   if (!cancelCreateAccountLinkClasses.value.includes('disabledLink')) cancelCreateAccountLinkClasses.value.push('disabledLink');
 
   //try to create a new account for user
-  const { data, error, } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
+  await $fetch<any>(`${ngencerfBaseUrl}/auth/users/`, {
     method: 'POST',
     body: {
       email: newEmail.value.toLowerCase(),
@@ -589,14 +589,19 @@ const SubmitNewAccountForm = async () => {
       password: newPassword.value,
       re_password: confirmPassword.value
     }
-  });
-
-  if (error.value) {
+  }).then(response => {
     disableCreateAccountBtn.value = false;
     createAccountButtonClasses.value.splice(createAccountButtonClasses.value.indexOf('disabledButton'), 1);
     cancelCreateAccountLinkClasses.value.splice(cancelCreateAccountLinkClasses.value.indexOf('disabledLink'), 1);
-    if (error.value?.data.email) {
-      let detail = error.value?.data.email[0];
+    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: ToastTimeout.timeoutSuccess };
+    toast.add(tMsg); addToastRecord(tMsg);
+    closeAll();
+  }).catch(error => {
+    disableCreateAccountBtn.value = false;
+    createAccountButtonClasses.value.splice(createAccountButtonClasses.value.indexOf('disabledButton'), 1);
+    cancelCreateAccountLinkClasses.value.splice(cancelCreateAccountLinkClasses.value.indexOf('disabledLink'), 1);
+    if (error?.data.email) {
+      let detail = error?.data.email[0];
       if (detail.indexOf('already exists')) {
         // customize error message since the one we get back from Djoser isn't ideal
         detail = 'A user with this Email address has already registered.'
@@ -604,34 +609,25 @@ const SubmitNewAccountForm = async () => {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: detail, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
       return;
-    } else if (error.value?.data.first_name) {
-      let detail = error.value?.data.first_name[0];
+    } else if (error?.data.first_name) {
+      let detail = error?.data.first_name[0];
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: detail, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
       return;
-    } else if (error.value?.data.last_name) {
-      let detail = error.value?.data.last_name[0];
+    } else if (error?.data.last_name) {
+      let detail = error?.data.last_name[0];
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: detail, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
       return;
-    } else if (error.value?.data.password) {
-      error.value?.data.password.forEach((e: any) => {
+    } else if (error?.data.password) {
+      error?.data.password.forEach((e: any) => {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: e, life: ToastTimeout.timeoutError }
         toast.add(tMsg); addToastRecord(tMsg);
       });
       return;
     }
-  }
-
-  if (data.value.email && data.value.id) {
-    disableCreateAccountBtn.value = false;
-    createAccountButtonClasses.value.splice(createAccountButtonClasses.value.indexOf('disabledButton'), 1);
-    cancelCreateAccountLinkClasses.value.splice(cancelCreateAccountLinkClasses.value.indexOf('disabledLink'), 1);
-    const tMsg: ToastMessageOptions = { severity: 'success', summary: 'Success', detail: 'Account created successfully. Please log in.', life: ToastTimeout.timeoutSuccess };
-    toast.add(tMsg); addToastRecord(tMsg);
-    closeAll();
-  };
-};
+  });
+}
 
 /**
  * Navigates to the landing page.

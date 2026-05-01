@@ -203,18 +203,22 @@ const changePassword = async () => {
   } else if (passwordChangeData.new_password !== passwordChangeData.re_new_password) {
     failureMessages.push("New password fields do not match.");
   } else {
-    const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/set_password/`, {
+    await $fetch<any>(`${ngencerfBaseUrl}/auth/users/set_password/`, {
       method: 'POST',
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
       body: passwordChangeData
-    });
-    if (error?.value) {
-      let e = error.value?.data;
+    }).then(response => {
+      // Clear out the inputs and report success
+      oldpass.value = "";
+      newpass.value = "";
+      confirmNewpass.value = "";
+    }).catch(error => {
+      let e = error?.data;
       if (!e) {
-        failureMessages.push("Cannot reach server. Error code: " + error.value.statusCode);
+        failureMessages.push("Cannot reach server. Error code: " + error?.statusCode);
       } else {
         for (const key of Object.keys(e)) {
           for (const message of e[key]) {
@@ -222,13 +226,9 @@ const changePassword = async () => {
           }
         }
       }
-    } else {
-      // Clear out the inputs and report success
-      oldpass.value = "";
-      newpass.value = "";
-      confirmNewpass.value = "";
-    }
+    });
   }
+
   if (failureMessages.length > 0) {
     failureMessages.push("Password not updated.");
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: failureMessages.join('\n'), life: ToastTimeout.timeoutSuccess };
@@ -252,18 +252,22 @@ const updateName = async () => {
   if (updateNameData.first_name === "" || updateNameData.last_name=== "") {
     failureMessages.push("First and last names must be filled out.")
   } else {
-    const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/me/`, {
+    await $fetch<any>(`${ngencerfBaseUrl}/auth/users/me/`, {
       method: 'PATCH',
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
       body: updateNameData
-    });
-    if (error?.value) {
-      let e = error.value?.data;
+    }).then(response => {
+      // Clear out the inputs and report success
+      setFirstName(updateNameData.first_name);
+      setLastName(updateNameData.last_name);
+      userInitials.value = getUserInitials();
+    }).catch(error => {
+      let e = error?.data;
       if (!e) {
-        failureMessages.push("Cannot reach server. Error code: " + error.value.statusCode);
+        failureMessages.push("Cannot reach server. Error code: " + error.statusCode);
       } else {
         for (const key of Object.keys(e)) {
           for (const message of e[key]) {
@@ -271,12 +275,7 @@ const updateName = async () => {
           }
         }
       }
-    } else {
-      // Clear out the inputs and report success
-      setFirstName(updateNameData.first_name);
-      setLastName(updateNameData.last_name);
-      userInitials.value = getUserInitials();
-    }
+    });
   }
   if (failureMessages.length > 0) {
     failureMessages.push("Name not updated.");
