@@ -249,6 +249,19 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
         hindcastJobStatus.value = getStatusResponse?._data?.status;
         coldStartJobStatus.value = getStatusResponse?._data?.cold_start_run?.status;
         failureMessages.value = getStatusResponse?._data?.failure_messages;
+        
+        if (!cycleDate.value && getStatusResponse?._data?.cycle_date) {
+          cycleDate.value = getStatusResponse._data.cycle_date;
+        }
+        if (!coldStartDate.value && getStatusResponse?._data?.cold_start_run?.cold_start_date) {
+          coldStartDate.value = getStatusResponse._data.cold_start_run.cold_start_date;
+        }
+        if (!intervalCycle.value && getStatusResponse?._data?.interval_cycle) {
+          intervalCycle.value = getStatusResponse._data.interval_cycle;
+        }
+        if (!numIterations.value && getStatusResponse?._data?.num_iterations) {
+          numIterations.value = getStatusResponse?._data.num_iterations;
+        }
 
         if (getStatusResponse?._data?.created_new_cold_start && getStatusResponse?._data?.cold_start_run?.submit_date) {
           submitTimeDate.value = new Date(getStatusResponse?._data?.cold_start_run.submit_date as string);
