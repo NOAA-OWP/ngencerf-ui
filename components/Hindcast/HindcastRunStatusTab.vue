@@ -235,7 +235,7 @@ import { useLogStore } from '@/stores/common/LogStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 import { isValidDate } from '@/utils/CommonHelpers';
-import { calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
+import { calculateElapsedTime } from '@/utils/TimeHelpers';
 
 const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
@@ -392,7 +392,7 @@ const createElapsedTimeInterval = () => {
     // continue incrementing elapsedTime every second while coldStartJobStatus is Submitted
     // or hindcastJobStatus is Submitted or Running
     if (['Submitted','Running'].includes(coldStartJobStatus.value ?? '') || ['Submitted', 'Running'].includes(hindcastJobStatus.value ?? '')) {
-      elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
+      elapsedTime.value = formatDuration(calculateElapsedTime(submitTimeDate.value as Date, new Date()));
     } else {
       clearInterval(elapsedTimeIntervalId.value);
       elapsedTimeIntervalId.value = undefined;

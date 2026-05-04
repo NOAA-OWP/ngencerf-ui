@@ -212,7 +212,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
 
   const updateRunningTime = (): void => {
     if (submitTimeDate.value) {
-      elapsedTime.value = calculateElapsedTime( submitTimeDate.value, new Date() );
+      elapsedTime.value = formatDuration(calculateElapsedTime( submitTimeDate.value, new Date() ));
     }
   }
 

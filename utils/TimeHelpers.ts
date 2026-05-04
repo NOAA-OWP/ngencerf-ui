@@ -134,9 +134,9 @@ export function calculateTimeRange(
  * Calculates the elapsed time between two Date objects
  * @param start_time Date object representing the start time
  * @param end_time Date object representing the end time
- * @returns {string} string of the elapsed time in 'hh:mm:ss or 'd 'Days,' hh:mm:ss' format
+ * @returns {Duration} duration of the elapsed time
  */
-export function calculateElapsedTime(start_time: Date, end_time: Date): string {
+export function calculateElapsedTime(start_time: Date, end_time: Date): Duration {
   const start = DateTime.fromJSDate(start_time);
   const end = DateTime.fromJSDate(end_time);
   
@@ -146,8 +146,8 @@ export function calculateElapsedTime(start_time: Date, end_time: Date): string {
   // Floor the seconds to remove fractions
   diffDuration = diffDuration.set({ seconds: Math.floor(diffDuration.seconds) });
   
-  // return a formatted string in 'hh:mm:ss' or 'd 'Days,' hh:mm:ss' format
-  return formatDuration(diffDuration);
+  // return a duration to be formatted later
+  return diffDuration;
 };
 
 /**
@@ -179,31 +179,17 @@ export function formatElapsedTime(elapsedTime: string): string {
  * @param elapsedTimesArray array of strings in the format 'hh:mm:ss' or 'hh:mm:ss.ssssss'
  * @returns {string} string representation of a Duration object in 'hh:mm:ss or 'd 'Days,' hh:mm:ss' format
  */
-export function sumAndFormatElapsedTimes(elapsedTimesArray: string[]): string {
+export function sumAndFormatElapsedTimes(elapsedTimesArray: Duration[]): string {
   // initialize the sum of durations
   let durationsSum: any = null;
 
   // iterate through the array of elapsed times
   elapsedTimesArray.forEach((elapsedTime) => {
-    let days = 0;
-    if (elapsedTime.split(' ').length > 1) {
-      days = parseInt(elapsedTime.split(' ')[0]);
-    }
-    // account for possibility of days showing up first separated by a space for values >= 24 hours
-    const [hours, minutes, rawSeconds] = elapsedTime.split(' ').length > 1 ? elapsedTime.split(' ')[1].split(':') : elapsedTime.split(':');
-    const seconds = Number(rawSeconds?.split('.')[0]); // remove decimal part safely
-
-    const duration = Duration.fromObject({
-      hours: days > 0 ? parseInt(hours) + (days*24): parseInt(hours) || 0,
-      minutes: parseInt(minutes) || 0,
-      seconds: Math.floor(seconds), // ignore milliseconds
-    });
-
     // add the duration to the sum
     if (!durationsSum) {
-      durationsSum = duration;
+      durationsSum = elapsedTime;
     } else {
-      durationsSum = durationsSum.plus(duration);
+      durationsSum = durationsSum.plus(elapsedTime);
     }
   });
 
