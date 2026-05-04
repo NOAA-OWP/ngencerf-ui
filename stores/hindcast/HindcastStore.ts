@@ -292,7 +292,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
    * Set elapsedTime
    */
   const setElapsedTime = (hindcastJob: any): void => {
-    const elapsedTimeArray: string[] = [];
+    const elapsedTimeArray: Duration[] = [];
 
     // sum and format hindcast and cold start elapsed times
     if (hindcastJob?.created_new_cold_start && hindcastJob.cold_start_run?.submit_date && hindcastJob.cold_start_run?.run_end) {
@@ -307,10 +307,7 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
         new Date(hindcastJob.run_end as string)
       ));
     }
-    let elapsedTimeArrayParsed = elapsedTimeArray.map((time) => {
-      return time.replace(' Day,','').replace(' Days,','')
-    });
-    elapsedTime.value = elapsedTimeArray.length > 0 ? sumAndFormatElapsedTimes(elapsedTimeArrayParsed) : '00:00:00';
+    elapsedTime.value = elapsedTimeArray.length > 0 ? sumAndFormatElapsedTimes(elapsedTimeArray) : '00:00:00';
   };
 
   /**

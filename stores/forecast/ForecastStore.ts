@@ -272,13 +272,20 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    * Set elapsedTime
    */
   const setElapsedTime = (forecastJob: any): void => {
-    const elapsedTimeArray: string[] = [];
+    const elapsedTimeArray: Duration[] = [];
 
-    if (forecastJob?.cold_start_run?.elapsed_time) {
-      elapsedTimeArray.push(forecastJob?.cold_start_run?.elapsed_time);
+    // sum and format forecast and cold start elapsed times
+    if (forecastJob.cold_start_run?.submit_date && forecastJob.cold_start_run?.run_end) {
+      elapsedTimeArray.push(calculateElapsedTime(
+        new Date(forecastJob.cold_start_run.submit_date as string), 
+        new Date(forecastJob.cold_start_run.run_end as string)
+      ));
     }
-    if (forecastJob?.elapsed_time) {
-      elapsedTimeArray.push(forecastJob?.elapsed_time);
+    if (forecastJob?.submit_date && forecastJob?.run_end) {
+      elapsedTimeArray.push(calculateElapsedTime(
+        new Date(forecastJob.submit_date as string), 
+        new Date(forecastJob.run_end as string)
+      ));
     }
     
     // sum and format forecast and cold start elapsed times
