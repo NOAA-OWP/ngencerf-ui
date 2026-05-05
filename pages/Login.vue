@@ -436,10 +436,10 @@ const SubmitLoginForm = async (e: Event) => {
       setUserName(userName.value.toLowerCase());
       // set MFA token if needed
       MFAToken.value = response?.mfa_token ?? '';
-      if (response?.message) {
+      /* if (response?.message) {
         const tMsg: ToastMessageOptions = { severity: 'info', detail: response.message, life: ToastTimeout.timeoutInfo };
         toast.add(tMsg); addToastRecord(tMsg);
-      }
+      } */
       if (response?.mfa_setup_required) {
         openMFASetup();
       } else if (response.mfa_required) {
