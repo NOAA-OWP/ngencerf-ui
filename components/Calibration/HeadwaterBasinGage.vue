@@ -32,7 +32,7 @@
 
             <div class="col-span-1" v-if="getForcingOptionsList.length > 1">
               <label for="Forcing" class="required-label">Forcing Source</label><br />
-              <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
+              <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="display_name"
                 optionValue="name" class="user-select" @change="uploadForcingDlgOpen($event)"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 aria-label="Forcing Source Select" title="Forcing Source Select"></Select>
@@ -566,6 +566,7 @@ const saveTabData = async() => {
     }
 
     await saveGageTabData().then(response => {
+      console.log('saveGageTabData response:',response);
       if (response.status === 400) {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Save Gage Data Failed.', detail: response._data.message, life: ToastTimeout.timeoutError};
         toast.add(tMsg); addToastRecord(tMsg);
@@ -605,7 +606,6 @@ const updateJobData = async (response: any) => {
 
     userCalibrationRunData.value.gage = newGage;
     userCalibrationRunData.value.forcing_source_requested = response?._data?.forcing_source_requested as string;
-    userCalibrationRunData.value.forcing_source_actual = response?._data?.forcing_source_actual as string;
     userCalibrationRunData.value.observational_source = gagePayload.value.observational_source as string;
     userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
     if (response?._data?.geopackage_image_url) {
@@ -613,7 +613,7 @@ const updateJobData = async (response: any) => {
     }
 
     // Assume EDS status is true if sources are set
-    if (userCalibrationRunData.value.forcing_source_actual !== '') {
+    if (userCalibrationRunData.value.forcing_source_requested !== '') {
       userCalibrationRunData.value.external_data_status.forcing = true;
     }
     if (userCalibrationRunData.value.observational_source !== '') {
@@ -627,7 +627,6 @@ const updateJobData = async (response: any) => {
     if(response?._data?.eds_errors) {
       response._data.eds_errors.forEach((eds_error: edsError) => {
         if (eds_error.name === 'forcing') {
-          userCalibrationRunData.value.forcing_source_actual = '';
           userCalibrationRunData.value.external_data_status.forcing = false;
         }
         else if (eds_error.name === 'observational') {

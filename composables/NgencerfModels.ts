@@ -146,7 +146,6 @@ export interface UserCalibrationRunData {
   last_updated_on: string;
   gage: GageData;
   forcing_source_requested: string;
-  forcing_source_actual: string;
   forcing_user_dir: string;
   forcing_dir_path: string;
   observational_source: string;
@@ -303,6 +302,7 @@ export interface DomainValueData {
 
 export interface ForcingSourceValueData {
   name: string;
+  display_name: string;
   description: string;
   is_active: boolean;
 }

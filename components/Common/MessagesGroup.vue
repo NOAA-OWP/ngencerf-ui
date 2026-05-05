@@ -33,10 +33,7 @@
         <div class="col-span-2">
           <div v-if="calData?.forcing_source_requested" :aria-label="'Forcing Data ' + calData?.forcing_source_requested"
             :title="'Forcing Data ' + calData?.forcing_source_requested"><span class="font-medium">Forcing Source: </span>
-            <span v-if="(calData?.forcing_source_actual && calData.forcing_source_actual != calData?.forcing_source_requested)">
-              {{ calData?.forcing_source_actual }} ({{ calData?.forcing_source_requested }} Was Requested)
-            </span>
-            <span v-else>
+            <span>
               {{ calData?.forcing_source_requested }}
             </span>
           </div>
