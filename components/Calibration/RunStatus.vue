@@ -260,7 +260,7 @@ import { generalStore } from "~/stores/common/GeneralStore";
 
 import { ValidationPlotNames } from "@/composables/NgencerfEnums";
 import { isCalibrationJobStatusSavedOrReady, isValidDate, isNotNullOrUndefined } from '@/utils/CommonHelpers';
-import { formatDateForRunOnString, calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
+import { formatDateForRunOnString, calculateElapsedTime } from '@/utils/TimeHelpers';
 
 import { hilightTab } from '@/composables/TabHilight';
 
@@ -519,12 +519,12 @@ onMounted(async () => {
       validControlAndValidBestStatus.value = validationControlStatus?.value ? getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value) : undefined;
 
       if (getStatusResponse?._data?.run_end) {
-        calibrationElapsedTime.value = calculateElapsedTime(
+        calibrationElapsedTime.value = formatDuration(calculateElapsedTime(
           submitTimeDate.value as Date, 
           validBest?.run_end ? new Date(validBest.run_end) :
           validControl?.run_end ? new Date(validControl.run_end) : 
           new Date(getStatusResponse?._data?.run_end)
-        );
+        ));
       }
     
       // check to see if iteration number is defined for any status other than Saved or Ready
@@ -558,7 +558,7 @@ const createElapsedTimeInterval = () => {
       (userCalibrationRunData.value?.status === 'Done' &&
       (!validControlAndValidBestStatus.value || ['Submitted', 'Ready', 'Running'].includes(validControlAndValidBestStatus.value ?? '')))) {
       // Calculate calibrationElapsedTime every second while Calibration is Running or Validation is not Done
-      calibrationElapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date()); 
+      calibrationElapsedTime.value = formatDuration(calculateElapsedTime(submitTimeDate.value as Date, new Date()));
     } else {
       clearInterval(elapsedTimeIntervalId.value);
       elapsedTimeIntervalId.value = undefined;
@@ -827,12 +827,12 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
               clearInterval(validationsStatusIntervalId.value);
               validationsStatusIntervalId.value = undefined;
               
-              calibrationElapsedTime.value = calculateElapsedTime(
+              calibrationElapsedTime.value = formatDuration(calculateElapsedTime(
                 submitTimeDate.value as Date, 
                 validBest?.run_end ? new Date(validBest.run_end) :
                 validControl?.run_end ? new Date(validControl.run_end) : 
                 new Date(getStatusResponse?._data?.run_end)
-              );
+              ));
             }
           }, 10000) as unknown as number;
         }
@@ -846,12 +846,12 @@ watch(overallCalibrationValidationStatus, async (newCalibrationStatus, oldCalibr
         const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
         const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
 
-        calibrationElapsedTime.value = calculateElapsedTime(
+        calibrationElapsedTime.value = formatDuration(calculateElapsedTime(
           submitTimeDate.value as Date, 
           validBest?.run_end ? new Date(validBest.run_end) :
           validControl?.run_end ? new Date(validControl.run_end) : 
           new Date(getStatusResponse?._data?.run_end)
-        );
+        ));
 
         if (validControl?.status) {
           validationControlStatus.value = validControl.status;

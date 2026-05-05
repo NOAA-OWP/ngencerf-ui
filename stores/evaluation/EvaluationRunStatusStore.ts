@@ -85,7 +85,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
 
   const updateRunningTime = (): void => {
     const convertedStartTime = new Date( startTime.value );
-    runningTime.value = calculateElapsedTime( convertedStartTime, new Date() );
+    runningTime.value = formatDuration(calculateElapsedTime( convertedStartTime, new Date() ));
   }
 
   /**
