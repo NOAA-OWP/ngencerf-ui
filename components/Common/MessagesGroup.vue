@@ -31,10 +31,10 @@
         </div>
 
         <div class="col-span-2">
-          <div v-if="calData?.forcing_source_requested" :aria-label="'Forcing Data ' + calData?.forcing_source_requested"
-            :title="'Forcing Data ' + calData?.forcing_source_requested"><span class="font-medium">Forcing Source: </span>
+          <div v-if="calData?.forcing_source" :aria-label="'Forcing Data ' + calData?.forcing_source"
+            :title="'Forcing Data ' + calData?.forcing_source"><span class="font-medium">Forcing Source: </span>
             <span>
-              {{ calData?.forcing_source_requested }}
+              {{ calData?.forcing_source }}
             </span>
           </div>
           <div v-if="calData?.observational_source" :aria-label="'Observational Data ' + calData?.observational_source"

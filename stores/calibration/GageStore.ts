@@ -182,7 +182,7 @@ export const useGageStore = defineStore(
       if (selectedGageValue.value)
         gagePayload.value["gage_id"] = selectedGageValue.value;
       if (selectedForcingValue.value)
-        gagePayload.value["forcing_source_requested"] = selectedForcingValue.value;
+        gagePayload.value["forcing_source"] = selectedForcingValue.value;
       if (selectedObservationalValue.value)
         gagePayload.value["observational_source"] = selectedObservationalValue.value;
       if (selectedGeopackageValue.value)
