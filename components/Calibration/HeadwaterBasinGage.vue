@@ -566,7 +566,6 @@ const saveTabData = async() => {
     }
 
     await saveGageTabData().then(response => {
-      console.log('saveGageTabData response:',response);
       if (response.status === 400) {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Save Gage Data Failed.', detail: response._data.message, life: ToastTimeout.timeoutError};
         toast.add(tMsg); addToastRecord(tMsg);
