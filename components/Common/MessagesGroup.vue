@@ -230,7 +230,7 @@ const {
 const calData = ref(userCalibrationRunData);
 const { getForcingOptionsList } = storeToRefs(useGageStore());
 const { moduleProperties, selectedModuleValues } = storeToRefs(useFormulationStore());
-const { updateFormulationValidRefs, fetchFormulationModuleOptions } = useFormulationStore();
+const { updateFormulationValidRefs, fetchFormulationModuleOptions, setUserSelection } = useFormulationStore();
 const {
   userSelectedCalibrationTuningParameters,
   selectedOutputVariableToCalibrate,
@@ -272,6 +272,7 @@ const forcingSourceDisplay = computed(() => {
 });
 
 onMounted(async() => {
+  setUserSelection();
   // make sure module properties are loaded
   if (!moduleProperties.value || moduleProperties.value.length === 0) {
     await updateFormulationValidRefs();

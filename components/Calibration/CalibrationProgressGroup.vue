@@ -85,7 +85,7 @@ import { ToastTimeout } from "@/composables/NgencerfEnums";
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { selectedModuleValues, formulationIsCalibratable, moduleProperties } = storeToRefs(useFormulationStore());
-const { loadFormulationTabData } = useFormulationStore();
+const { loadFormulationTabData, setUserSelection } = useFormulationStore();
 const { tuningParametersAreValid } = storeToRefs(useTuningStore());
 const { validateTuningParameters } = useTuningStore();
 const { addToastRecord } = generalStore();
@@ -98,18 +98,7 @@ const emit = defineEmits(["tabNumber"]);
 onMounted(async() => {
   if (userCalibrationRunData.value) {
     // check to see if formulation is calibratable
-    if (userCalibrationRunData.value?.modules != null) {
-      try {
-        selectedModuleValues.value = JSON.parse(
-          JSON.stringify(userCalibrationRunData.value.modules)
-        );
-      } catch (e) {
-        console.error("Failed to clone modules:", e);
-        selectedModuleValues.value = [];
-      }
-    } else {
-      selectedModuleValues.value = [];
-    }
+    setUserSelection();
     formulationIsCalibratable.value = false;
     if (selectedModuleValues.value.length > 0) {
       loadFormulationTabData().then(response => {
