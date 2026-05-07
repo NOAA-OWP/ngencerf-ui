@@ -69,6 +69,7 @@ const {
   selectedLogStatus
 } = storeToRefs(useLogStore());
 const {
+  queryGetLogData,
   updateLogRefs
 } = useLogStore();
 
