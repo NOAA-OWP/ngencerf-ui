@@ -107,7 +107,7 @@
       <p class="prompt-txt mt-2 text-center">
         Fill out all the fields below.
       </p>
-      <div v-show="coldStartRunsForHindcast.length > 0" class="text-nowrap flex gap-2 mt-2">
+      <div v-show="coldStartRunsForHindcast?.length > 0" class="text-nowrap flex gap-2 mt-2">
         <input id="useSavedState_1" type="radio" :value="true" v-model="useSavedState" :disabled="!hindcastConfiguration"/>
         <label for="useSavedState_1" class="mr-6">Use Saved State</label>
         <input id="useSavedState_0" type="radio" :value="false" v-model="useSavedState" :disabled="!hindcastConfiguration"/>

@@ -283,6 +283,8 @@ const onRowContextMenu = (event: any) => {
 onMounted(async () => {
   isLoading.value = true;
   forecastJobId.value = undefined;
+  calibrationRunForForecast.value = undefined;
+  selectedForecastJob.value = undefined;
   forecastRunListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals

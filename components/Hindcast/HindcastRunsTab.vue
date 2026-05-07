@@ -282,6 +282,9 @@ const onRowContextMenu = (event: any) => {
 
 onMounted(async () => {
   isLoading.value = true;
+  hindcastJobId.value = undefined;
+  calibrationRunForHindcast.value = undefined;
+  selectedHindcastJob.value = undefined;
   hindcastRunListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals
