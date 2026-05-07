@@ -259,7 +259,7 @@ const ptColumn = ref({
 });
 
 const plotGraphColors = ref<any[]>([
-  'blue', 'turquoise', 'aqua', 'teal', 'green', 'lime', 'gold', 'yellow', 'orange', 'coral', 
+  'black', 'blue', 'turquoise', 'aqua', 'teal', 'green', 'lime', 'gold', 'yellow', 'orange', 'coral', 
   'pink', 'red', 'maroon', 'purple', 'violet'
 ]);
 const plotGraphColorList = ref<any[]>([]);
