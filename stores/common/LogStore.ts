@@ -22,7 +22,7 @@ export const useLogStore = defineStore('LogStore', () => {
   const logList = ref<any[]>([]);
   const logListDefault = ref<string>('Select an option');
   const logs = ref<APIResponse>({});
-  const logDataPageSize = ref<number>(100);
+  const logDataPageSize = ref<number>(1000);
   const logLists = ref<DynamicObject>({});
   const logListOptions = ref<any[]>([]);
   const selectedLogCategory = ref<string>('');
