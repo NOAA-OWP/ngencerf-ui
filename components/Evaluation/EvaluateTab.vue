@@ -396,6 +396,7 @@ const plotTableList = ref<any[]>([]);
 const selectedPlotTable = ref<string>('');
 const plotTableData = ref<any[]>([]);
 const plotTableColumns = ref<any[]>([]);
+const timeColumn = ref<string>('time');
 const plotTableTotalSize = ref<number>(0);
 const plotTablePageSize = ref<number>(100);
 const plotTableCurrentPage = ref<number>(1);
@@ -818,6 +819,7 @@ watch(selectedPlotName, async () => {
               plotTableData.value = [];
             }
             adjustPlotTableColumns();
+            plotTableData.value = adjustRawValues(plotTableData.value);
           } else {
             plotTables.value = { default_table: [] };
             for (let d = 0; d < response?._data?.plot_data.length; d++) {
@@ -838,6 +840,7 @@ watch(selectedPlotName, async () => {
             }
             plotTableData.value = plotTables.value.default_table;
             adjustPlotTableColumns();
+            plotTableData.value = adjustRawValues(plotTableData.value);
           }
           plotTableStartRow.value = 1;
           plotTableEndRow.value = plotTableData.value.length;
@@ -952,6 +955,7 @@ watch(selectedPlotTable, async () => {
   if (selectedPlotTable.value !== '') {
     plotTableData.value = plotTables.value[selectedPlotTable.value];
     adjustPlotTableColumns();
+    plotTableData.value = adjustRawValues(plotTableData.value);
   }
 });
 
@@ -969,33 +973,51 @@ watch(selectedGridDateTime, async () => {
   }
 });
 
-// set plotTableColumns whenever plotTableData is changed
 function adjustPlotTableColumns() {
-  if (plotTableData.value.length > 0) {
-    Object.keys(plotTableData.value[0]).forEach(key => {
-      let column_header_words = key.split("_");
-      for (let w = 0; w < column_header_words.length; w++) {
-        let word = column_header_words[w]
-        column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
-      }
-      let column_header = column_header_words.join(" ");
-      plotTableColumns.value.push({ header: column_header, value: key });
-    });
-    for (let d = 0; d < plotTableData.value.length; d++) {
-      Object.keys(plotTableData.value[d]).forEach(key => {
-        if (plotTableData.value[d][key] && (plotTableData.value[d][key] === null || plotTableData.value[d][key] === '')) {
-          plotTableData.value[d][key] = '';
-        } else if (!isNaN(parseFloat(plotTableData.value[d][key])) && isFinite(plotTableData.value[d][key]) && plotTableData.value[d][key].toString().indexOf('.') > 0) {
+  plotTableColumns.value = [];
+  let plotData = plotTableData.value.length > 0 ? plotTableData.value : plotGraphDataRaw.value;
+  if (plotData.length > 0) {
+    for (let d = 0; d < plotData.length; d++) {
+      Object.keys(plotData[d]).forEach(key => {
+        if (!plotTableColumns.value.find(col => col.value == key)) {
+          let column_header_words = key.split("_");
+          for (let w = 0; w < column_header_words.length; w++) {
+            let word = column_header_words[w]
+            column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
+          }
+          let column_header = column_header_words.join(" ");
+          plotTableColumns.value.push({ header: column_header, value: key });
+        }
+      });
+    }
+    timeColumn.value = plotTableColumns.value[0].value;
+  }
+}
+
+function adjustRawValues(plotData: any) {
+  if (plotData.length > 0) {
+    for (let d = 0; d < plotData.length; d++) {
+      Object.keys(plotData[d]).forEach(key => {
+        if (plotData[d][key] && (plotData[d][key] === null || plotData[d][key] === '')) {
+          plotData[d][key] = '';
+        } else if (!isNaN(parseFloat(plotData[d][key])) && isFinite(plotData[d][key]) && plotData[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
           try {
-            plotTableData.value[d][key] = Number(plotTableData.value[d][key]).toFixed(5);
+            plotData[d][key] = parseFloat(Number(plotData[d][key]).toFixed(5));
           } catch (error) {
-            console.error('Error rounding value ' + plotTableData.value[d][key] + ': ', error);
+            console.error('Error rounding value ' + plotData[d][key] + ': ', error);
           }
         }
       });
     }
   }
+  return plotData.sort(
+    (a, b) => {
+      const aTime = new Date(a[timeColumn.value] + 'Z').getTime()
+      const bTime = new Date(b[timeColumn.value] + 'Z').getTime()
+      return aTime - bTime
+    }
+  );
 }
 
 // Watch for page number changes in plot table
@@ -1033,7 +1055,7 @@ watch(plotTableCurrentPage, async () => {
           }
           plotTables.value.default_table.push(data_row);
         }
-        plotTableData.value = plotTables.value.default_table;
+        plotTableData.value = adjustRawValues(plotTables.value.default_table);
       }
     }
   }
@@ -1070,8 +1092,9 @@ const togglePlotGraph = async () => {
       if (selectedPlotName.value == selectedGridDisplay?.value?.name) {
         // special case for grid time series
         plotGraphDataRaw.value = gridTimeSeriesData.value;
-        plotTableData.value = plotGraphDataRaw.value;
         adjustPlotTableColumns();
+        plotGraphDataRaw.value = adjustRawValues(plotGraphDataRaw.value);
+        plotTableData.value = plotGraphDataRaw.value;
       } else {
         // standard interactive plot logic
         const response: any = await queryGetPlot(
@@ -1085,6 +1108,8 @@ const togglePlotGraph = async () => {
         );
         if (response?._data?.plot_data) {
           plotGraphDataRaw.value = response?._data?.plot_data;
+          adjustPlotTableColumns();
+          plotGraphDataRaw.value = adjustRawValues(plotGraphDataRaw.value);
         }
       }
       // setting min/max dates will trigger the date filter below
@@ -1098,6 +1123,7 @@ const togglePlotGraph = async () => {
         end: plotGraphDateLimits.value.end,
       };
       showPlotGraph.value = true;
+      updatePlotGraphDates();
       nextTick(() => {
         drawInteractiveSlider();
       })
@@ -1426,27 +1452,46 @@ const updatePlotGraphDates = () => {
   interactivePlotDateFilter();
 }
 
-watch(plotGraphDateRange, async () => {
-  if (plotGraphDataRaw.value) {
-    interactivePlotDateFilter();
+watch(
+  () => [plotGraphDateRange.value.start, plotGraphDateRange.value.end],
+  ([start, end]) => {
+    if (!start || !end) return
+
+    let newStart = start
+    let newEnd = end
+
+    // normalize
+    if (newStart > newEnd) {
+      [newStart, newEnd] = [newEnd, newStart];
+    }
+
+    // clamp
+    if (newStart < plotGraphDateLimits.value.start) {
+      newStart = plotGraphDateLimits.value.start
+    }
+    if (newEnd > plotGraphDateLimits.value.end) {
+      newEnd = plotGraphDateLimits.value.end
+    }
+
+    // only write if changed (CRITICAL)
+    if (
+      newStart !== plotGraphDateRange.value.start ||
+      newEnd !== plotGraphDateRange.value.end
+    ) {
+      plotGraphDateRange.value.start = newStart
+      plotGraphDateRange.value.end = newEnd
+      return // avoid filtering this cycle
+    }
+
+    // ✅ only run when stable
+    if (plotGraphDataRaw.value?.length) {
+      interactivePlotDateFilter()
+    }
   }
-});
+)
 
 const interactivePlotDateFilter = () => {
   let tempPlotGraphData = [];
-
-  if (plotGraphDateRange.value.start > plotGraphDateRange.value.end) {
-    plotGraphDateRange.value = {
-      start: plotGraphDateRange.value.end,
-      end: plotGraphDateRange.value.start
-    }
-  }
-  if (plotGraphDateRange.value.start < plotGraphDateLimits.value.start) {
-    plotGraphDateRange.value.start = plotGraphDateLimits.value.start;
-  }
-  if (plotGraphDateRange.value.end > plotGraphDateLimits.value.end) {
-    plotGraphDateRange.value.end = plotGraphDateLimits.value.end;
-  }
   let startDate = new Date(plotGraphDateRange.value.start);
   let endDate = new Date(plotGraphDateRange.value.end);
   startDate.setHours(0);
@@ -1594,7 +1639,6 @@ const setSliderDateRange = () => {
   plotGraphDateRange.value.start = newStartDate.toISOString().split('T')[0];
   (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
   plotGraphDateRange.value.end = newEndDate.toISOString().split('T')[0];
-  updatePlotGraphDates();
 }
 
 const toggleCustomizePlot = async () => {

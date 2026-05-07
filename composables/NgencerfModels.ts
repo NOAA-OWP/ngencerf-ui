@@ -145,8 +145,7 @@ export interface UserCalibrationRunData {
   submit_date: string; // e.g. "2024-09-13T05:50:22.334Z"
   last_updated_on: string;
   gage: GageData;
-  forcing_source_requested: string;
-  forcing_source_actual: string;
+  forcing_source: string;
   forcing_user_dir: string;
   forcing_dir_path: string;
   observational_source: string;
@@ -280,7 +279,7 @@ export interface SaveGageTabPayload {
   calibration_run_id?: number;
   job_name?: string;
   gage_id?: string;
-  forcing_source_requested?: string;
+  forcing_source?: string;
   observational_source?: string;
   geopackage_source?: string;
 }
@@ -303,6 +302,7 @@ export interface DomainValueData {
 
 export interface ForcingSourceValueData {
   name: string;
+  display_name: string;
   description: string;
   is_active: boolean;
 }
@@ -880,7 +880,7 @@ export type GageResetData = {
   };
   geopackage_source: string;
   observational_source: string;
-  forcing_source_requested: string;
+  forcing_source: string;
   geopackage_image_url: string;
 }
 

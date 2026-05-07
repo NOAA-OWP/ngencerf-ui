@@ -321,12 +321,12 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
     if (loadHindcastErrors.length > 0) {
       errorMessages.push(...loadHindcastErrors);
     }
-    nextTick(async() => {
+    /* nextTick(async() => {
       const setHindcastPlotErrors: string[] = await setHindcastPlot();
       if (setHindcastPlotErrors.length > 0) {
         errorMessages.push(...setHindcastPlotErrors);
       }
-    });
+    }); */
     if (errorMessages.length > 0) {
       return errorMessages;
     } else {

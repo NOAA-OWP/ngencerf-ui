@@ -31,13 +31,10 @@
         </div>
 
         <div class="col-span-2">
-          <div v-if="calData?.forcing_source_requested" :aria-label="'Forcing Data ' + calData?.forcing_source_requested"
-            :title="'Forcing Data ' + calData?.forcing_source_requested"><span class="font-medium">Forcing Source: </span>
-            <span v-if="(calData?.forcing_source_actual && calData.forcing_source_actual != calData?.forcing_source_requested)">
-              {{ calData?.forcing_source_actual }} ({{ calData?.forcing_source_requested }} Was Requested)
-            </span>
-            <span v-else>
-              {{ calData?.forcing_source_requested }}
+          <div v-if="forcingSourceDisplay" :aria-label="'Forcing Data ' + forcingSourceDisplay"
+            :title="'Forcing Data ' + forcingSourceDisplay"><span class="font-medium">Forcing Source: </span>
+            <span>
+              {{ forcingSourceDisplay }}
             </span>
           </div>
           <div v-if="calData?.observational_source" :aria-label="'Observational Data ' + calData?.observational_source"
@@ -218,6 +215,7 @@
 import { storeToRefs } from 'pinia';
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { useGageStore } from "@/stores/calibration/GageStore";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
@@ -230,6 +228,7 @@ const {
   calibrationJobLogFileMode 
 } = storeToRefs(useUserDataStore());
 const calData = ref(userCalibrationRunData);
+const { getForcingOptionsList } = storeToRefs(useGageStore());
 const { moduleProperties, selectedModuleValues } = storeToRefs(useFormulationStore());
 const { updateFormulationValidRefs, fetchFormulationModuleOptions } = useFormulationStore();
 const {
@@ -267,6 +266,10 @@ const formatDate = (d: any) => {
     return formatISOStringOrDateToYYYYMMDDHHMM(d);
   }
 };
+
+const forcingSourceDisplay = computed(() => {
+  return getForcingOptionsList?.value?.find(option => option.name === calData?.value?.forcing_source)?.display_name;
+});
 
 onMounted(async() => {
   // make sure module properties are loaded
