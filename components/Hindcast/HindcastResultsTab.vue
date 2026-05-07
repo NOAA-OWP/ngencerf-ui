@@ -376,14 +376,7 @@ const showHindcastPlot = async () => {
     // standard interactive plot logic
     // assume the first column is time
     adjustPlotGraphColumns();
-    plotGraphDataRaw.value = [...hindcastPlot.value.timeseries_data].sort(
-      (a, b) => {
-        const aTime = new Date(a[timeColumn.value] + 'Z').getTime()
-        const bTime = new Date(b[timeColumn.value] + 'Z').getTime()
-        return aTime - bTime
-      }
-    );
-    adjustPlotGraphDataRawValues();
+    plotGraphDataRaw.value = adjustRawValues(hindcastPlot.value.timeseries_data);
     // setting min/max dates will trigger the date filter below
     plotGraphDateLimits.value = {
       start: plotGraphDataRaw.value[0][timeColumn.value],
@@ -450,23 +443,30 @@ function adjustPlotGraphColumns() {
   }
 }
 
-function adjustPlotGraphDataRawValues() {
-  if (plotGraphDataRaw.value.length > 0) {
-    for (let d = 0; d < plotGraphDataRaw.value.length; d++) {
-      Object.keys(plotGraphDataRaw.value[d]).forEach(key => {
-        if (plotGraphDataRaw.value[d][key] && (plotGraphDataRaw.value[d][key] === null || plotGraphDataRaw.value[d][key] === '')) {
-          plotGraphDataRaw.value[d][key] = '';
-        } else if (!isNaN(parseFloat(plotGraphDataRaw.value[d][key])) && isFinite(plotGraphDataRaw.value[d][key]) && plotGraphDataRaw.value[d][key].toString().indexOf('.') > 0) {
+function adjustRawValues(plotData: any) {
+  if (plotData.length > 0) {
+    for (let d = 0; d < plotData.length; d++) {
+      Object.keys(plotData[d]).forEach(key => {
+        if (plotData[d][key] && (plotData[d][key] === null || plotData[d][key] === '')) {
+          plotData[d][key] = '';
+        } else if (!isNaN(parseFloat(plotData[d][key])) && isFinite(plotData[d][key]) && plotData[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
           try {
-            plotGraphDataRaw.value[d][key] = parseFloat(Number(plotGraphDataRaw.value[d][key]).toFixed(5));
+            plotData[d][key] = parseFloat(Number(plotData[d][key]).toFixed(5));
           } catch (error) {
-            console.error('Error rounding value ' + plotGraphDataRaw.value[d][key] + ': ', error);
+            console.error('Error rounding value ' + plotData[d][key] + ': ', error);
           }
         }
       });
     }
   }
+  return plotData.sort(
+    (a, b) => {
+      const aTime = new Date(a[timeColumn.value] + 'Z').getTime()
+      const bTime = new Date(b[timeColumn.value] + 'Z').getTime()
+      return aTime - bTime
+    }
+  );
 }
 
 // draw interactive plot when plot graph data is first loaded, and also when checkboxes are clicked
