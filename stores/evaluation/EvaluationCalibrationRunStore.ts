@@ -27,6 +27,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     moduleOperator, 
     uiGageId, 
     uiGageList, 
+    uiDomainName,
     createdAtStart,
     createdAtEnd,
     minCreatedAt,
@@ -115,6 +116,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         direction: evaluationRunListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
         gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
         module_filter: {
           modules: modulesFilterList.value,
@@ -148,8 +150,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         ,
         status: statusTypeFilterList.value,
         include_archived: includeArchivedJobs.value
-      },
-      get_gages: uiGageList.value.length === 0
+      }
     }
     const runListDataResult = await makeProtectedApiCall<ValidatedevaluationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
       method: "POST",
@@ -201,10 +202,6 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     evaluationRunListStartRow.value = (evaluationRunListPageSize.value * (evaluationRunListCurrentPage.value - 1)) + 1;
     evaluationRunListEndRow.value = Math.min(evaluationRunListStartRow.value + (evaluationRunListPageSize.value - 1), evaluationRunListTotalSize.value);
     
-    if (runListDataResult?._data?.gages) {
-      uiGageList.value = runListDataResult?._data?.gages;
-      uiGageList.value.sort();
-    }
     if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
       minCreatedAt.value = runListDataResult?._data?.date_range[0];
       maxCreatedAt.value = runListDataResult?._data?.date_range[1];
@@ -227,8 +224,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       },
       filters: {
         gage_id: uiCompareGageId.value && uiCompareGageId.value !== "All" ? uiCompareGageId.value: "",
-      },
-      get_gages: uiGageList.value.length === 0
+      }
     }
     const runListDataResult = await makeProtectedApiCall<ValidatedevaluationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
       method: "POST",
@@ -301,20 +297,49 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       displayCalibrationValidationRunList.value.push(validation);
     }) 
   }
-  
-    /**
-     * Get Calibration Plot Names for Comparison
-     * @return {any}
-     */
-    const queryGetPlotNamesForComparison = async (): Promise<any> => {
-      return makeProtectedApiCall<CalibrationPlotListNamesData>(`${ngencerfBaseUrl}/calibration/get_plot_names_for_comparison/`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": 'application/json'
-        },
-      });
-    };
+
+  /**
+   * fetch list of gage IDs
+   * @return {void}
+   */
+  async function fetchGageList() {
+    // only apply domain and archived filters
+    let requestBody = {
+      domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+      include_archived: false
+    }
+    const gageListResult =
+      await makeProtectedApiCall<any>(
+        `${ngencerfBaseUrl}/calibration/get_calibration_gages_for_evaluation/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+    
+    if (gageListResult?._data?.gages) {
+      return gageListResult._data.gages.sort();
+    }
+    return [];
+  }
+
+  /**
+   * Get Calibration Plot Names for Comparison
+   * @return {any}
+   */
+  const queryGetPlotNamesForComparison = async (): Promise<any> => {
+    return makeProtectedApiCall<CalibrationPlotListNamesData>(`${ngencerfBaseUrl}/calibration/get_plot_names_for_comparison/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+    });
+  };
 
   /**
    * Get Calibration Plots for Comparison
@@ -426,6 +451,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
    * reset job filters
    */
   const resetFilters = () => {
+    uiDomainName.value = 'All';
     uiGageId.value = 'All';
     modulesFilterList.value = []; 
     moduleOperator.value = 'All';
@@ -465,6 +491,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     getReferenceDataSetOptions,
     resetUserSelectedCalibrationValidationRunList,
     fetchUserSelectedCalibrationValidationRunList,
+    fetchGageList,
     displayUserSelectedCalibrationValidationRunList,
     resetUserSelectedCalibrationCompareRunList,
     resetUserSelectedEvalValidationRun,

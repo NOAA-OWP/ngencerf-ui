@@ -48,6 +48,7 @@ export const useTuningStore = defineStore(
     const selectedOutputVariableToCalibrate = ref<string>("Streamflow");
     const calibratableParametersHaveChanged = ref<boolean>(false);
     const tuningDataHasChanged = ref<boolean>(false);
+    const tuningParametersAreValid = ref<boolean>(false);
 
     /**
      * Load Tuning Tab data
@@ -115,6 +116,26 @@ export const useTuningStore = defineStore(
       }
 
       return loadTuningTabData.value;
+    }
+
+    /**
+     * return validate tuning parameters response from the server
+     * @returns {GeneralApiSaveResponse}
+     */
+    async function validateTuningParameters() {
+      return await makeProtectedApiCall<GeneralApiSaveResponse>(
+        `${ngencerfBaseUrl}/calibration/validate_parameters/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            calibration_run_id: calibrationJobId.value
+          }),
+        }
+      );
     }
 
     /**
@@ -204,6 +225,8 @@ export const useTuningStore = defineStore(
       calibratableParametersHaveChanged,
       tuningDataHasChanged,
       saveTuningTabRequestBody,
+      tuningParametersAreValid,
+      validateTuningParameters,
       saveTuningTabData,
       clearCalibratableParameters,
       hardResetTuningTimeConrols,

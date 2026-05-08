@@ -15,7 +15,7 @@
             <div class="col-span-1">
               <div class="col-span-1">
                 <label for="Domain">Domain</label><br />
-                <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
+                <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="display_name"
                   optionValue="name" placeholder=" ... " aria-label="Domain Select" title="Domain Select"
                   @change="onDomainSelectionChange"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
@@ -32,7 +32,7 @@
 
             <div class="col-span-1" v-if="getForcingOptionsList.length > 1">
               <label for="Forcing" class="required-label">Forcing Source</label><br />
-              <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
+              <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="display_name"
                 optionValue="name" class="user-select" @change="uploadForcingDlgOpen($event)"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 aria-label="Forcing Source Select" title="Forcing Source Select"></Select>
@@ -68,10 +68,10 @@
               <table class="table-auto">
                 <caption><span style="font-size:1.2em;font-weight: bold;">Gage Detail</span></caption>
                 <tbody>
-                  <tr v-if="selectedDomainValue" class="rowOdd" :aria-label="'Domain: ' + selectedDomainValue"
-                    :title="'Domain: ' + selectedDomainValue">
+                  <tr v-if="selectedDomain" class="rowOdd" :aria-label="'Domain: ' + selectedDomain?.display_name"
+                    :title="'Domain: ' + selectedDomain?.display_name">
                     <th scope="row" class="dataName td1">Domain:</th>
-                    <td class="dataText td2">{{ selectedDomainValue }}</td>
+                    <td class="dataText td2">{{ selectedDomain?.display_name }}</td>
                   </tr>
                   <tr v-if="gageData?.gage_id" lass="rowEven" :aria-label="'Gage ID: ' + gageData?.gage_id"
                     :title="'>Gage ID: ' + gageData?.gage_id">
@@ -205,6 +205,17 @@ const fileUploadDialogOpened = ref<boolean>(false);
 const nextPrevDialogOpened = ref<boolean>(false);
 const jobNameHasChanged = ref<boolean>(false);
 
+const selectedDomain = computed(() => {
+  if (gageData?.value?.gage_id) {
+    let gage = (gageTabData.value?.gages.find(gage => gage.gage_id === gageData.value.gage_id));
+    if (gage) {
+      let domain = (getDomainOptionsList.value.find(domain => domain.name === gage.domain || domain.display_name === gage.domain));
+      return domain;
+    }
+  }
+  return '';
+});
+
 const resetData = ref<GageResetData>({
   external_data_status: {
     observational: false,
@@ -213,7 +224,7 @@ const resetData = ref<GageResetData>({
   },
   geopackage_source: "",
   observational_source: "",
-  forcing_source_requested: "",
+  forcing_source: "",
   geopackage_image_url: ""
 })
 
@@ -221,7 +232,7 @@ const setResetDataValues = () => {
   if (userCalibrationRunData.value) {
     // Save all information from the external data JSON.parse(JSON.stringify(obj));
     resetData.value.external_data_status = JSON.parse(JSON.stringify(userCalibrationRunData.value.external_data_status));
-    resetData.value.forcing_source_requested = userCalibrationRunData.value.forcing_source_requested ? userCalibrationRunData.value.forcing_source_requested : (getForcingOptionsList.value ? getForcingOptionsList.value[0].name : '');
+    resetData.value.forcing_source = userCalibrationRunData.value.forcing_source ? userCalibrationRunData.value.forcing_source : (getForcingOptionsList.value ? getForcingOptionsList.value[0].name : '');
     resetData.value.observational_source = userCalibrationRunData.value.observational_source ? userCalibrationRunData.value.observational_source : (getObservationalOptionsList.value ? getObservationalOptionsList.value[0].name : '');
     resetData.value.geopackage_source = userCalibrationRunData.value.geopackage_source ? userCalibrationRunData.value.geopackage_source : (getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : '');
     resetData.value.geopackage_image_url = userCalibrationRunData.value.geopackage_image_url;
@@ -244,7 +255,7 @@ onMounted(async() => {
     if (userCalibrationRunData?.value?.gage?.gage_id) {
       gageSelectionReset();
     } else {
-      selectedForcingValue.value = resetData.value.forcing_source_requested;
+      selectedForcingValue.value = resetData.value.forcing_source;
       selectedObservationalValue.value = resetData.value.observational_source;
       selectedGeopackageValue.value = resetData.value.geopackage_source;
     }
@@ -260,6 +271,13 @@ watch(jobNameInput, () => {
     jobNameHasChanged.value = false;
   }
 })
+
+watch(selectedDomain, () => {
+  // update domain dropdown
+  if (selectedDomain.value) {
+    selectedDomainValue.value = selectedDomain?.value?.name ?? '';
+  }
+});
 
 const onDomainSelectionChange = () => {
   gageDataSourceHasChanged.value = true;
@@ -280,7 +298,7 @@ const onGageSelectionChange = () => {
     nextTick(() => {
       const gage = document.getElementById('Gage');
       (gage?.childNodes[0] as HTMLInputElement).innerText = selectedGageValue.value;
-      document.getElementById("HBGSaveButton")?.focus();
+      document.getElementById("HBGSaveButton")?.focus()
     });
   }
   fetchSelectedGageData();
@@ -316,12 +334,12 @@ const gageSelectionReset = () => {
     userCalibrationRunData.value.external_data_status = JSON.parse(JSON.stringify(resetData.value.external_data_status))
     userCalibrationRunData.value.geopackage_source = resetData.value.geopackage_source;
     userCalibrationRunData.value.observational_source = resetData.value.observational_source;
-    userCalibrationRunData.value.forcing_source_requested = resetData.value.forcing_source_requested;
+    userCalibrationRunData.value.forcing_source = resetData.value.forcing_source;
     userCalibrationRunData.value.geopackage_image_url = resetData.value.geopackage_image_url;
   }
   selectedGeopackageValue.value = resetData.value.geopackage_source;
   selectedObservationalValue.value = resetData.value.observational_source;
-  selectedForcingValue.value = resetData.value.forcing_source_requested;
+  selectedForcingValue.value = resetData.value.forcing_source;
 }
 
 const clearDataDueToGageChange = () => {
@@ -395,7 +413,7 @@ const showForcingFileUploadDialog = (headerText: string) => {
         saveFunction: saveUserForcingFiles
       },
       onClose: (opt) => {
-        if (selectedForcingValue.value !== userCalibrationRunData?.value?.forcing_source_requested) {
+        if (selectedForcingValue.value !== userCalibrationRunData?.value?.forcing_source) {
           gageDataSourceHasChanged.value = true;
         }
         handleDialogClose(opt)
@@ -538,10 +556,10 @@ const saveTabData = async() => {
   } else {
     toast.removeAllGroups();
 
+    jobNameHasChanged.value = false;
     // Check for gage / data source change
     if (gageHasChanged.value || gageDataSourceHasChanged.value) {
       clearDataDueToGageChange();
-      jobNameHasChanged.value = false;
       gageHasChanged.value = false;
       gageDataSourceHasChanged.value = false;
       isLoading.value = true;
@@ -586,14 +604,15 @@ const updateJobData = async (response: any) => {
     }
 
     userCalibrationRunData.value.gage = newGage;
-    userCalibrationRunData.value.forcing_source_requested = response?._data?.forcing_source_requested as string;
-    userCalibrationRunData.value.forcing_source_actual = response?._data?.forcing_source_actual as string;
+    userCalibrationRunData.value.forcing_source = response?._data?.forcing_source as string;
     userCalibrationRunData.value.observational_source = gagePayload.value.observational_source as string;
     userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
-    userCalibrationRunData.value.geopackage_image_url = response?._data?.geopackage_image_url ?? "";
+    if (response?._data?.geopackage_image_url) {
+      userCalibrationRunData.value.geopackage_image_url = response._data.geopackage_image_url;
+    }
 
     // Assume EDS status is true if sources are set
-    if (userCalibrationRunData.value.forcing_source_actual !== '') {
+    if (userCalibrationRunData.value.forcing_source !== '') {
       userCalibrationRunData.value.external_data_status.forcing = true;
     }
     if (userCalibrationRunData.value.observational_source !== '') {
@@ -607,7 +626,6 @@ const updateJobData = async (response: any) => {
     if(response?._data?.eds_errors) {
       response._data.eds_errors.forEach((eds_error: edsError) => {
         if (eds_error.name === 'forcing') {
-          userCalibrationRunData.value.forcing_source_actual = '';
           userCalibrationRunData.value.external_data_status.forcing = false;
         }
         else if (eds_error.name === 'observational') {
@@ -658,7 +676,7 @@ const validateTab = () => {
     error = true;
     text.push("Gage value has been changed");
   }
-  if (selectedForcingValue.value != resetData.value.forcing_source_requested) {
+  if (selectedForcingValue.value != resetData.value.forcing_source) {
     error = true;
     text.push("Forcing Source has been changed");
   }

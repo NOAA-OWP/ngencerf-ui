@@ -92,12 +92,17 @@ export const useGageStore = defineStore(
      * @returns {SelectOption[]}
      */
     const getDomainOptionsList = computed(() => {
-      domainOptionsList.value = [];
+      domainOptionsList.value = [{
+        name: '',
+        display_name: 'All',
+        selected: false,
+        groups: [],
+      }];
       if (gageTabData?.value?.domain_values.length) {
         gageTabData.value?.domain_values.forEach((domain_value) => {
           domainOptionsList.value.push({
             name: domain_value.name,
-            description: domain_value.description,
+            display_name: domain_value.display_name,
             selected: false,
             groups: [],
           });
@@ -114,7 +119,7 @@ export const useGageStore = defineStore(
       gageOptionsList.value = [];
       gageTabData.value?.gages.forEach((gage_value) => {
         if (
-          selectedDomainValue.value === "" ||
+          selectedDomainValue.value === "" || selectedDomainValue.value === "All" ||
           gage_value.domain === selectedDomainValue.value
         ) {
           if (gage_value.headwater_calibration) {
@@ -177,7 +182,7 @@ export const useGageStore = defineStore(
       if (selectedGageValue.value)
         gagePayload.value["gage_id"] = selectedGageValue.value;
       if (selectedForcingValue.value)
-        gagePayload.value["forcing_source_requested"] = selectedForcingValue.value;
+        gagePayload.value["forcing_source"] = selectedForcingValue.value;
       if (selectedObservationalValue.value)
         gagePayload.value["observational_source"] = selectedObservationalValue.value;
       if (selectedGeopackageValue.value)

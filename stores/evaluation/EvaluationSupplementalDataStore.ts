@@ -263,7 +263,6 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * @return {any}
    */
   const queryGetLogData = async (
-    log_category: string,
     log_name: string,
     validation_run_id: number,
     start?: number,
@@ -277,7 +276,6 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
       },
       body: JSON.stringify({
         validation_run_id: validation_run_id,
-        log_category: log_category,
         log_name: log_name,
         start: start !== undefined ? start : 0,
         limit: limit !== undefined ? limit : 1000

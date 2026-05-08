@@ -145,8 +145,7 @@ export interface UserCalibrationRunData {
   submit_date: string; // e.g. "2024-09-13T05:50:22.334Z"
   last_updated_on: string;
   gage: GageData;
-  forcing_source_requested: string;
-  forcing_source_actual: string;
+  forcing_source: string;
   forcing_user_dir: string;
   forcing_dir_path: string;
   observational_source: string;
@@ -161,10 +160,10 @@ export interface UserCalibrationRunData {
     modules: {
       [key: string]: string;
     }
+    split_logs_by_module: boolean;
   }
   modules: string[];
   job_name: string;
-  is_aet_rootzone: boolean;
   formulation_warning?: FormulationWarning;
   use_sloth: boolean;
   sloth_parameters: SlothParameterData[];
@@ -237,6 +236,12 @@ export interface UserCalibrationRunOptimizationInputData {
   value: number;
 }
 
+export interface ModulePropertyData {
+  module: string;
+  property_name: number;
+  property_value: string;
+}
+
 export interface SlothParameterData {
   param_name: string;
   param_count: number;
@@ -274,13 +279,14 @@ export interface SaveGageTabPayload {
   calibration_run_id?: number;
   job_name?: string;
   gage_id?: string;
-  forcing_source_requested?: string;
+  forcing_source?: string;
   observational_source?: string;
   geopackage_source?: string;
 }
 
 export interface GageData {
   gage_id: string;
+  domain?: DomainValueData;
   agency: string;
   station_name: string;
   latitude: number;
@@ -296,6 +302,7 @@ export interface DomainValueData {
 
 export interface ForcingSourceValueData {
   name: string;
+  display_name: string;
   description: string;
   is_active: boolean;
 }
@@ -336,8 +343,8 @@ export interface FormulationModuleData {
 
 export interface SaveFormulationTabPayload {
   calibration_run_id?: number;
-  is_aet_rootzone?: boolean;
   modules?: string[];
+  module_properties: ModulePropertyData[];
   use_sloth?: boolean;
   sloth_parameters?: SlothParameterData[];
 }
@@ -401,15 +408,6 @@ export interface module_params {
   minimum: number;
   maximum: number;
   intial_value: 0;
-}
-
-export interface ModuleParameter {
-  name: string;
-  data_type: string;
-  description: string;
-  minimum: number;
-  maximum: number;
-  initial_value: number;
 }
 
 export interface SaveTuningTabParameter {
@@ -718,6 +716,12 @@ export type ForecastConfiguration = {
   fcst_timestep: number;
 };
 
+export type ColdStartRun = {
+  cold_start_status: string;
+  cold_start_date: string;
+  cold_start_submit_date: string;
+}
+
 export type CalibrationRunsForForecast = CalibrationRunForForecast[];
 
 export type CalibrationRunForForecast = {
@@ -741,12 +745,62 @@ export type CalibrationRunForForecast = {
   forecast_status: string;
   configuration: string;
   cycle_date: string;
-  cold_start_date: string;
+  cold_start?: ColdStartRun;
   logging_config: {
     logging_enabled: boolean;
     modules: {
       [key: string]: string;
     }
+    split_logs_by_module: boolean;
+  }
+};
+
+export type HindcastConfiguration = {
+  name: string;
+  data_sources: string;
+  time_range: string;
+  is_active: boolean;
+  availability_lag: number;
+  domain: string;
+  cycle_start: number;
+  cycle_end: number;
+  cycle_freq: number;
+  fcst_win: number;
+  fcst_timestep: number;
+};
+
+export type CalibrationRunsForHindcast = CalibrationRunForHindcast[];
+
+export type CalibrationRunForHindcast = {
+  calibration_run_id: number;
+  gage_id: string;
+  domain_name: string;
+  job_genesis: string;
+  created_at: string;
+  status: string;
+  calibration_start_period: string;
+  calibration_end_period: string;
+  job_name: string;
+  submit_date: string;
+  objective_function: string;
+  optimization_algorithm: string;
+  validations: CalibrationJobValidationItem[];
+  is_archived: boolean;
+  is_locked: boolean;
+  is_downloadable: boolean;
+  hindcast_run_id: number;
+  hindcast_status: string;
+  configuration: string;
+  cycle_date: string;
+  cold_start?: ColdStartRun;
+  interval_cycle: number;
+  num_iterations: number;
+  logging_config: {
+    logging_enabled: boolean;
+    modules: {
+      [key: string]: string;
+    }
+    split_logs_by_module: boolean;
   }
 };
 
@@ -757,11 +811,7 @@ export interface ForecastJob {
   cycle_date: string;
   gage_id: string;
   forecast_status: string;
-  cold_start?: {
-    cold_start_status: string;
-    cold_start_date: string;
-    cold_start_submit_date: string;
-  }
+  cold_start?: ColdStartRun;
   submit_date: string;
   failure_messages: any;
 }
@@ -771,10 +821,32 @@ export type ForecastJobs = {
   total_count?: number;
 }
 
+export interface HindcastJob {
+  calibration_run_id: number;
+  hindcast_run_id: number;
+  configuration: string;
+  cycle_date: string;
+  gage_id: string;
+  hindcast_status: string;
+  cold_start?: ColdStartRun;
+  cold_start_run_id?: number;
+  interval_cycle: number;
+  num_iterations: number;
+  submit_date: string;
+  failure_messages: any;
+}
+
+export type HindcastJobs = {
+  hindcast_jobs: HindcastJob[];
+  total_count?: number;
+}
+
 export interface VerificationJob {
   verification_run_id: number;
   forecast_run?: ForecastJob;
   forecast_run_id?: number;
+  hindcast_run?: HindcastJob;
+  hindcast_run_id?: number;
   yaml_config_data: DynamicObject;
   submit_date: string;
   run_start: string;
@@ -808,7 +880,7 @@ export type GageResetData = {
   };
   geopackage_source: string;
   observational_source: string;
-  forcing_source_requested: string;
+  forcing_source: string;
   geopackage_image_url: string;
 }
 

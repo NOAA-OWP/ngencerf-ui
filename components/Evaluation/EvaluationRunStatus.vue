@@ -3,6 +3,11 @@
     <div class="grid grid-rows-3 pr-3">
       <div class="row-span-2">
         <div id="ResultsDisplay">
+          <div v-if="!iterationValidationRunId || !validationStatus" class="w-full">
+            <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
+              Click Run to submit and run the validation.
+            </p>
+          </div>
           <div class="grid grid-cols-5">
             <div class="col-span-2">
               <table aria-describedby="Validation Run Time & Iteration">
@@ -73,13 +78,14 @@
                       </span>
 
                       <span v-else>
-                        <Button v-if="!isStartHidden()" class="ngenButtonDiv-green h-8 font-normal" @click="startRun()"
-                          title="Run Button" aria-label="Run Button">
+                        <Button v-if="!runButtonDisabled" class="ngenButtonDiv-green h-8 font-normal" @click="startRun()"
+                          title="Run Button" :disabled="runButtonDisabled" aria-label="Run Button">
                           Run
                         </Button>
-                        <Button v-if="!isCancelHidden()" @click="cancelRun()"
-                          class="ngenButtonDiv-red h-8 hidden font-normal" title="Cancel Button"
-                          aria-label="Cancel Button">Cancel
+                        <Button v-if="!cancelButtonDisabled" @click="cancelRun()"
+                          class="ngenButtonDiv-red h-8 hidden font-normal" title="Cancel Button" aria-label="Cancel Button"
+                          :disabled="cancelButtonDisabled">
+                          Cancel
                         </Button>
                       </span>
                       <!--BUTTONS - END-->
@@ -94,11 +100,11 @@
       </div>
     </div>
 
-    <div v-if="failureMessages">
-      <div style="display:flex; margin-top: 1em;"  aria-label="Failure Message" title="Failure Message">
+    <div v-if="failureMessages && failureMessages.length > 0">
+      <div style="display:flex; margin-top: 1em;"  aria-label="Messages" title="Messages">
         <div class="text-right font-bold" style="width: 155px;">
           <label class="text-right whitespace-nowrap" for="failureMessage" style="width: 155px;padding-top:1px;">
-            Failure Message
+            {{ failureMessages.length > 1 ? 'Messages' : 'Message' }}
           </label>
         </div>
         <div class="pl-5" style="width: 100%;">
@@ -109,44 +115,17 @@
       </div>
     </div>
 
-    <div id="LogDisplayArea" class="p-2"
-      v-if="selectedLogCategory !== '' && selectedLogFilePath !== ''">
-      <div class="pl-4">
-        <table width="100%" summary="Validation Log and File Path">
-          <caption class="sr-only">Validation Log and File Path table</caption>
-          <thead class="sr-only">
-            <tr>
-              <th scope="col" style="min-width: 185px;">Validation Log Label</th>
-              <th scope="col">Validation Log Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="font-size: 0.9em;">
-              <td class="pr-2 pt-3"><b>Log Name</b></td>
-              <td class="pt-3">Validation</td>
-            </tr>
-            <tr v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
-              <td class="pr-2 pt-3"><b>Log File Path</b></td>
-              <td class="pt-3">{{ selectedLogFilePath }}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="pt-4">
-          <div class="pagination-box" v-if="selectedLogDisplay">
-            <div class="pagination-rows">Rows {{ selectedLogStartRow }} to {{ selectedLogEndRow }} of {{
-              selectedLogTotalSize }}</div>
-            <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
-          </div>
-          <div v-else>
-            Log file unavailable
-          </div>
-        </div>
-
-        <div id="selectedLogDisplay" v-if="selectedLogDisplay" class="p-2 gray-border overflow-scroll">
-          <div v-html="selectedLogDisplay" class="whitespace-nowrap"></div>
-        </div>
+    <!-- DISPLAY LOGS -->
+    <div v-if="iterationValidationRunId && validationStatus" class="pl-6 pt-4">
+      <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
+      <div class="inline-block w-2/3">
+        <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
+          v-model="selectedLogCategory" :options="logListOptions" option-label="display_name" optionValue="name">
+        </Select>
       </div>
+    </div>
+    <div v-show="logListOptions.length > 0">
+      <LogDisplay/>
     </div>
   </div>
 </template>
@@ -158,35 +137,36 @@ import { useToast } from 'primevue/usetoast';
 import type { CalibrationGetStatusValidationItem } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
+import LogDisplay from "../Common/LogDisplay.vue";
 import Paging from "../Common/Paging.vue";
 
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
 import { useEvaluationSupplementalDataStore } from "@/stores/evaluation/EvaluationSupplementalDataStore";
+import { useLogStore } from '@/stores/common/LogStore';
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 
 const toast = useToast();
 
+const runButtonDisabled = ref<boolean>(true);
+const cancelButtonDisabled = ref<boolean>(true);
+
 const { evaluateValidationRunId, evaluateIterationRunId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const { startTime, runningTime, validationStatus, iterationValidationRunId, displayValidationId, validationRunningTimeIntervalId, validationStatusCheckingIntervalId, evaluateDisplayIterationNumber, runStatusTabVisible, failureMessages } = storeToRefs(useEvaluationRunStatusStore());
 const { executeIterationValidationRun, queryIterationValidationRunStatus, isValidationRunStopped, executeCancelIterationValidationRun, loadValidationStatusInformation, updateRunningTime, hardResetEvaluationRunStatusStore } = useEvaluationRunStatusStore();
-const { queryGetLogData } = useEvaluationSupplementalDataStore();
 
-const logDataPageSize = ref<number>(1000);
-const selectedLogCategory = ref<string>('validation');
-const selectedLogName = ref<string>('ngen-cal stdout');
-const selectedLogDisplay = ref<string>('');
-const selectedLogTotalSize = ref<number>(0);
-const selectedLogCurrentPage = ref<number>(1);
-const selectedLogTotalPages = ref<number>(1);
-const selectedLogStartRow = ref<number>(1);
-const selectedLogEndRow = ref<number>(logDataPageSize.value);
-const selectedLogFilePath = ref<string>('');
-const autoScrollLog = ref<boolean>(false);
+const {
+  selectedLogCategory,
+  logListOptions
+} = storeToRefs(useLogStore());
+const {
+  populateLogListOptions,
+  resetUserLogRefs
+} = useLogStore();
 
 onMounted(async () => {
   hilightTab(EvaluationTabs.tab_runStatus);
@@ -207,42 +187,32 @@ onMounted(async () => {
   if (evaluateValidationRunId.value > 0 && evaluateIterationRunId.value === 0) {
     iterationValidationRunId.value = evaluateValidationRunId.value;
     await loadValidationStatusInformation(evaluateValidationRunId.value);
-    if (iterationValidationRunId.value > 0 && validationStatus.value !== '') {
-      updateLogDisplay();
+    runButtonDisabled.value = true;
+    cancelButtonDisabled.value = validationStatus.value === "" || (validationStatus.value !== "" && isValidationRunStopped(validationStatus.value));
+    if (iterationValidationRunId.value > 0) {
+      populateLogListOptions();
     }
   } else {
     // this condition assume we have evaluateIterationRunId value which also assume user want to run a new validation
     // this condition is specifically use to handle user click on Run/Status tab which can not reset certain value until user land on the tab
     evaluateValidationRunId.value = displayValidationId.value = 0;
     runningTime.value = startTime.value = "";
+    runButtonDisabled.value = false;
+    cancelButtonDisabled.value = true;
   }
 });
 
-const isStartHidden = (): boolean => {
-  let hidden = false;
-  if (validationStatus.value !== "") {
-    hidden = true;
-  }
-  return hidden;
-}
-
-const isCancelHidden = (): boolean => {
-  let hidden = false;
-  if (validationStatus.value === "" || (validationStatus.value !== "" && isValidationRunStopped(validationStatus.value))) {
-    hidden = true;
-  }
-  return hidden;
-}
-
 const startRun = async () => {
+  runButtonDisabled.value = true;
   toast.removeAllGroups();
 
   executeIterationValidationRun().then((response) => {
     if (response.status === 201) {
       validationStatus.value = response?._data?.status;
-      failureMessages.value = response?._data?.failure_messages;
+      failureMessages.value = response?._data?.failure_messages ?? undefined;
       iterationValidationRunId.value = displayValidationId.value = response?._data.validation_run_id;
       startTime.value = response?._data?.submit_date;
+      populateLogListOptions();
       if (validationRunningTimeIntervalId.value) {
         clearInterval(validationRunningTimeIntervalId.value);
       }
@@ -250,60 +220,16 @@ const startRun = async () => {
         updateRunningTime()
       }, 1000) as unknown as number;
     } else {
+      runButtonDisabled.value = false;
+      cancelButtonDisabled.value = true;
       const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Create Validation', life: ToastTimeout.timeoutWarn };
       toast.add(tMsg); addToastRecord(tMsg);
     }
   });
 }
 
-const updateLogDisplay = () => {
-  if (iterationValidationRunId.value > 0) {
-    if (selectedLogDisplay.value === '') {
-      // only scroll to the bottom of the log if it's being displayed for the first time
-      autoScrollLog.value = true;
-    }
-    queryGetLogData(
-      selectedLogCategory.value, // log_category
-      selectedLogName.value, // log_name
-      iterationValidationRunId.value, // validation_run_id
-      selectedLogStartRow.value - 1, // start
-      logDataPageSize.value // limit
-    ).then(response => {
-      if (response?._data?.log_data) {
-        let logText = '';
-        for (let t = 0; t < response?._data.log_data.length; t++) {
-          logText += response?._data.log_data[t] + '<br/>\n';
-        }
-        selectedLogDisplay.value = logText;
-        selectedLogTotalSize.value = response?._data.pagination_metadata?.count;
-        selectedLogTotalPages.value = 1;
-        selectedLogEndRow.value = response?._data.pagination_metadata?.count;
-        if (logDataPageSize.value < selectedLogTotalSize.value) {
-          selectedLogStartRow.value = (selectedLogTotalSize.value - logDataPageSize.value) + 1;
-        } else {
-          selectedLogStartRow.value = 1;
-        }
-        selectedLogFilePath.value = response?._data.log_path;
-        if (document.getElementById('selectedLogDisplay')) {
-          nextTick(async () => {
-            document.getElementById('selectedLogDisplay').style.height = (((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
-            - (document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top) + 'px');
-            if (autoScrollLog.value) {
-              document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
-              autoScrollLog.value = false;
-            }
-          });
-        }
-      } else {
-        selectedLogFilePath.value = '';
-        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
-    })
-  }
-}
-
 watch(validationStatus, async (newStatus, initialStatus) => {
+  cancelButtonDisabled.value = newStatus === "" || (newStatus !== "" && isValidationRunStopped(newStatus));
   if (newStatus !== null && !isValidationRunStopped(newStatus)) {
     if (validationStatusCheckingIntervalId.value) {
       clearInterval(validationStatusCheckingIntervalId.value);
@@ -320,7 +246,7 @@ watch(validationStatus, async (newStatus, initialStatus) => {
           validationRunningTimeIntervalId.value = undefined;
         }
       })
-      updateLogDisplay();
+      populateLogListOptions();
     }, 10000) as unknown as number;
   } else {
     // this is for value assignment is only for running job that is now done/stopped
@@ -332,29 +258,21 @@ watch(validationStatus, async (newStatus, initialStatus) => {
   }
 });
 
-// Watch for page number changes in logs
-watch(selectedLogCurrentPage, async () => {
-  if (isNaN(selectedLogCurrentPage.value) || selectedLogCurrentPage.value < 1 || selectedLogCurrentPage.value > selectedLogTotalPages.value) {
-    console.log('ERROR: Page number ' + selectedLogCurrentPage.value + ' out of bounds');
-  } else {
-    selectedLogStartRow.value = (logDataPageSize.value * (selectedLogCurrentPage.value - 1)) + 1;
-    if (selectedLogCurrentPage.value === selectedLogTotalPages.value) {
-      selectedLogEndRow.value = selectedLogTotalSize.value;
-    } else {
-      selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
-    }
-    updateLogDisplay();
-  }
-});
-
 const cancelRun = async () => {
+  cancelButtonDisabled.value = true;
   executeCancelIterationValidationRun().then(response => {
-    validationStatus.value = response?._data.status;
-    failureMessages.value = response?._data?.failure_messages;
-    clearInterval(validationStatusCheckingIntervalId.value);
-    clearInterval(validationRunningTimeIntervalId.value);
-    validationStatusCheckingIntervalId.value = undefined;
-    validationRunningTimeIntervalId.value = undefined;
+    if (response.status === 200) {
+      validationStatus.value = response?._data.status;
+      failureMessages.value = response?._data?.failure_messages ?? undefined;
+      clearInterval(validationStatusCheckingIntervalId.value);
+      clearInterval(validationRunningTimeIntervalId.value);
+      validationStatusCheckingIntervalId.value = undefined;
+      validationRunningTimeIntervalId.value = undefined;
+    } else {
+      cancelButtonDisabled.value = false;
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error cancelling Validation run', life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+    }
   })
 }
 
@@ -371,7 +289,11 @@ const navigateToEvaluation = (event: any) => {
 
 onUnmounted(() => {
   runStatusTabVisible.value = false;
+  runButtonDisabled.value = true;
+  cancelButtonDisabled.value = true;
   failureMessages.value = undefined;
+  logListOptions.value = [];
+  resetUserLogRefs();
 })
 </script>
 

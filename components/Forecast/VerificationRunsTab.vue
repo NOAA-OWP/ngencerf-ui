@@ -20,11 +20,12 @@
       </div>
       <div id="verificationRunList">
         <div id="VerTable">
-          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
-            :show-gage="false" :show-modules="false" :show-archived="false"
+          <JobFilterDialog id="JobFilterDialog" job-type="Verification" :disable-all="false" 
+            :show-modules="false" :show-archived="false"
             :totalSize="verificationRunListTotalSize" :totalPages="verificationRunListTotalPages"
             v-model:currentPage="verificationRunListCurrentPage"
-            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
+            @UpdateGageList="updateGageList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="vrContextMenu"
@@ -46,7 +47,12 @@
             v-model:selection="selectedVerificationJob" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onVerificationRowSelect" @rowUnselect="onVerificationRowUnSelect"
             @rowContextmenu="onRowContextMenu" class="boxed">
-            <Column :pt="ptColumn" field="verification_run_id" header="Job ID" sortable>
+            <Column :pt="ptColumn" field="verification_run_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Verification Job ID</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.verification_run_id"
                   :aria-label="'Job ID ' + slotProps.data.verification_run_id"
@@ -55,7 +61,12 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="forecast_run_id" header="Forecast Job ID" sortable>
+            <Column :pt="ptColumn" field="forecast_run_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Forecast Job ID</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.forecast_run_id" :aria-label="'Forecast Job ID ' + slotProps.data.forecast_run_id"
                   :title="'Forecast Job ID ' + slotProps.data.forecast_run_id">
@@ -104,8 +115,10 @@ import { useToast } from "primevue/usetoast";
 import type { DataTableContextMenuOption, VerificationJob } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 
-import { useVerificationStore } from "@/stores/verification/VerificationStore";
+import { useForecastStore } from "~/stores/forecast/ForecastStore";
+import { useVerificationStore } from "~/stores/forecast/VerificationStore";
 import { generalStore } from "~/stores/common/GeneralStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
@@ -116,10 +129,14 @@ import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 const { isLoading } = storeToRefs(generalStore());
+const { uiGageList } = storeToRefs(useUserDataStore());
+
+const { resetFilters } = useForecastStore();
 
 const verificationStore = useVerificationStore();
 const {
   verificationJobs,
+  verificationJobType,
   verificationRunListPageSize,
   verificationRunListCurrentPage,
   verificationRunListTotalPages,
@@ -127,8 +144,7 @@ const {
   verificationRunListStartRow,
   verificationRunListEndRow,
   verificationRunListSort,
-  selectedVerificationJob,
-  verificationJobId
+  selectedVerificationJob
 } = storeToRefs(verificationStore);
 
 const {
@@ -136,7 +152,7 @@ const {
   setSelectedVerificationRowData,
   getVerificationJobs,
   deleteVerificationJob,
-  resetFilters
+  fetchVerificationGageList
 } = useVerificationStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
@@ -193,7 +209,7 @@ const onRowContextMenu = (event: any) => {
 onMounted(() => {
   isLoading.value = true;
 
-  hilightTab(VerificationTabs.tab_verificationJobs);
+  hilightTab(ForecastTabs.tab_verificationJobs);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
@@ -203,11 +219,17 @@ onMounted(() => {
     verificationRunListCurrentPage.value = 1;
 
     // load verificationJobs
+    verificationJobType.value = 'forecast';
     await getVerificationJobs();
+    updateGageList();
   });
 
   isLoading.value = false;
 })
+
+const updateGageList = async() => {
+  uiGageList.value = await fetchVerificationGageList();
+}
 
 const onVerificationRowSelect = async (event: DataTableRowClickEvent) => {
   const rowData = event.data as VerificationJob;
@@ -260,12 +282,12 @@ const acceptDelete = (selectedRunId: number) => {
 const navigateToVerificationJobStatus = () => {
   isLoading.value = true;
   nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Verification Run/Status Tab"]');
 
     if (e) {
       e.click();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Verification Run/Status Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
     isLoading.value = false;
   });
@@ -274,12 +296,12 @@ const navigateToVerificationJobStatus = () => {
 const navigateToVerificationResults = () => {
   isLoading.value = true;
   nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Results Tab"]');
+    const e: HTMLElement | null = document.querySelector('.tabs[title="Verification Results Tab"]');
 
     if (e) {
       e.click();
     } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Verification Results Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
     isLoading.value = false;
   });

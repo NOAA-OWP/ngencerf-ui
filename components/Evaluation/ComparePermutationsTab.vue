@@ -315,11 +315,11 @@ const getPlotTableData = async () => {
         for (let r = 0; r < plotTables.value[t].table_data.length; r++) {
           Object.keys(plotTables.value[t].table_data[r]).forEach(key => {
             if (plotTables.value[t].table_data[r][key] === null || plotTables.value[t].table_data[r][key] === '') {
-              plotTables.value[t].table_data[r][key] = 'N/A';
+              plotTables.value[t].table_data[r][key] = '';
             } else if (!isNaN(parseFloat(plotTables.value[t].table_data[r][key])) && isFinite(plotTables.value[t].table_data[r][key]) && plotTables.value[t].table_data[r][key].toString().indexOf('.') > 0) {
               // attempt to round to 5 digits - just display as is if there are any problems doing this
               try {
-                plotTables.value[t].table_data[r][key] = Number(plotTables.value[t].table_data[r][key].toFixed(5));
+                plotTables.value[t].table_data[r][key] = Number(plotTables.value[t].table_data[r][key]).toFixed(5);
               } catch (error) {
                 console.error('Error rounding value ' + plotTables.value[t].table_data[r][key] + ': ', error);
               }
