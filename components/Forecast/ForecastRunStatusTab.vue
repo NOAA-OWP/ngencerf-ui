@@ -278,9 +278,12 @@ const {
   resetUserLogRefs
 } = useLogStore();
 
+const isMounted = ref(false);
+
 onMounted(async () => {
   toast.removeAllGroups(); // clear all toast messages
   isLoading.value = false; // set isLoading to false
+  isMounted.value = true;
 
   // scroll to top of the page
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
@@ -414,6 +417,12 @@ const startForecastRun = async () => {
   );
 
   if (createAndRunForecastJobResponse.status >= 200 && createAndRunForecastJobResponse.status < 300) {
+    // If the job runs successfully, we only need to set refs and start intervals for display purposes.
+    // If they have left the tab before a success response comes back from the server, just stop here.
+    if (!isMounted.value) {
+      return;
+    }
+
     forecastJobId.value = createAndRunForecastJobResponse._data.forecast_run_id;
     await loadForecastRunStatusTabData();
 
@@ -508,6 +517,7 @@ const goToSetupForecastTab = () => {
 
 onUnmounted(() => {
   // make sure page clears all log data when the user leaves
+  isMounted.value = false;
   runButtonDisabled.value = true;
   cancelButtonDisabled.value = true;
   hardResetForecastStore();

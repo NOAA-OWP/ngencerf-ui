@@ -163,8 +163,11 @@ const {
   resetUserLogRefs
 } = useLogStore();
 
+const isMounted = ref(false);
+
 onMounted(async() => {
   hilightTab(HindcastTabs.tab_verificationRunStatus);
+  isMounted.value = true;
 
   clearInterval(verificationStatusCheckingInterval.value);
   clearInterval(verificationRunningTimeInterval.value);
@@ -207,6 +210,12 @@ const startVerificationJob = async () => {
   runButtonDisabled.value = true;
   createAndRunVerificationJob().then((response) => {
     if (response.status >= 200 && response.status < 300) {
+      // If the job runs successfully, we only need to set refs and start intervals for display purposes.
+      // If they have left the tab before a success response comes back from the server, just stop here.
+      if (!isMounted.value) {
+        return;
+      }
+      
       verificationJobId.value = response._data.verification_run_id;
       verificationJobStatus.value = response._data.status;
       failureMessages.value = response._data.failure_messages ?? undefined;
@@ -287,6 +296,7 @@ const goNextTab = () => {
 }
 
 onUnmounted(() => {
+  isMounted.value = false;
   runButtonDisabled.value = true;
   cancelButtonDisabled.value = true;
   clearInterval(verificationStatusCheckingInterval.value);

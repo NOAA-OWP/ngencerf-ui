@@ -243,7 +243,9 @@ const {
   calibrationRunsForHindcastListTotalSize,
   calibrationRunsForHindcastListStartRow,
   calibrationRunsForHindcastListEndRow,
-  calibrationRunsForHindcastListSort 
+  calibrationRunsForHindcastListSort,
+  selectedHindcastJob,
+  hindcastJobStatus
 } = storeToRefs(HindcastStore);
 const { 
   getCalibrationJobsForHindcast, 
@@ -307,6 +309,10 @@ const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId, fetchHindcas
 
 onMounted(async () => {
   isLoading.value = true;
+  hindcastJobId.value = undefined;
+  calibrationRunForHindcast.value = undefined;
+  selectedHindcastJob.value = undefined;
+  hindcastJobStatus.value = undefined; 
   calibrationRunsForHindcastListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals

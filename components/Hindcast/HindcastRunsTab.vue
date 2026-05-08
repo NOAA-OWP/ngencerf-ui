@@ -211,7 +211,8 @@ const {
   hindcastRunListStartRow,
   hindcastRunListEndRow,
   hindcastRunListSort,
-  selectedHindcastJob
+  selectedHindcastJob,
+  hindcastJobStatus
 } = storeToRefs(HindcastStore);
 
 const {
@@ -280,8 +281,14 @@ const onRowContextMenu = (event: any) => {
   }
 };
 
+const isMounted = ref(false);
+
 onMounted(async () => {
   isLoading.value = true;
+  hindcastJobId.value = undefined;
+  calibrationRunForHindcast.value = undefined;
+  selectedHindcastJob.value = undefined;
+  hindcastJobStatus.value = undefined; 
   hindcastRunListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals

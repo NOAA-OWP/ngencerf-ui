@@ -289,9 +289,12 @@ const {
   resetUserLogRefs
 } = useLogStore();
 
+const isMounted = ref(false);
+
 onMounted(async () => {
   toast.removeAllGroups(); // clear all toast messages
   isLoading.value = false; // set isLoading to false
+  isMounted.value = true;
 
   // scroll to top of the page
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
@@ -436,6 +439,12 @@ const startHindcastRun = async () => {
   );
 
   if (createAndRunHindcastJobResponse.status >= 200 && createAndRunHindcastJobResponse.status < 300) {
+    // If the job runs successfully, we only need to set refs and start intervals for display purposes.
+    // If they have left the tab before a success response comes back from the server, just stop here.
+    if (!isMounted.value) {
+      return;
+    }
+    
     hindcastJobId.value = createAndRunHindcastJobResponse._data.hindcast_run_id;
     await loadHindcastRunStatusTabData();
 
@@ -529,6 +538,7 @@ const goToSetupHindcastTab = () => {
 
 onUnmounted(() => {
   // make sure page clears all log data when the user leaves
+  isMounted.value = false;
   runButtonDisabled.value = true;
   cancelButtonDisabled.value = true;
   logListOptions.value = [];

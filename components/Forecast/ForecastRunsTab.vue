@@ -211,7 +211,8 @@ const {
   forecastRunListStartRow,
   forecastRunListEndRow,
   forecastRunListSort,
-  selectedForecastJob
+  selectedForecastJob,
+  forecastJobStatus
 } = storeToRefs(forecastStore);
 
 const {
@@ -283,6 +284,9 @@ const onRowContextMenu = (event: any) => {
 onMounted(async () => {
   isLoading.value = true;
   forecastJobId.value = undefined;
+  calibrationRunForForecast.value = undefined;
+  selectedForecastJob.value = undefined;
+  forecastJobStatus.value = undefined;
   forecastRunListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals
