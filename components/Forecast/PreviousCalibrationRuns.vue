@@ -244,7 +244,8 @@ const {
   calibrationRunsForForecastListStartRow,
   calibrationRunsForForecastListEndRow,
   calibrationRunsForForecastListSort,
-  selectedForecastJob
+  selectedForecastJob,
+  forecastJobStatus
 } = storeToRefs(forecastStore);
 const { 
   getCalibrationJobsForForecast, 
@@ -311,6 +312,7 @@ onMounted(async () => {
   forecastJobId.value = undefined;
   calibrationRunForForecast.value = undefined;
   selectedForecastJob.value = undefined;
+  forecastJobStatus.value = undefined; 
   calibrationRunsForForecastListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals
