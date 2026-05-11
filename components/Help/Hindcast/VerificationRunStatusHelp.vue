@@ -1,11 +1,8 @@
 <template>
     <div class="_help-page">
-        <div class="_help-title">Verification - Run/Status Tab</div>
+        <div class="_help-title">Hindcast - Verification Run/Status Tab</div>
         <div class="_help-subtitle">
-            This tab provides the ability to run the Verification.<br />
-            First the real-time forcing data will be downloaded,
-            which can take several minutes.<br />
-            Once the forcing data is ready the Verification will automatically start.
+            This tab provides the ability to run the Verification.
         </div>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
@@ -24,8 +21,8 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="td1">Forecast Job ID</td>
-                    <td class="td2">Forecast Job ID as the basis for the Verification run.</td>
+                    <td class="td1">Hindcast Job ID</td>
+                    <td class="td2">Hindcast Job ID as the basis for the Verification run.</td>
                 </tr>
                 <tr>
                     <td class="td1">Verification Job ID</td>

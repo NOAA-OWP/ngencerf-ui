@@ -1,6 +1,6 @@
 <template>
     <div class="_help-page">
-        <div class="_help-title">Forecast - Calibration Runs Tab</div>
+        <div class="_help-title">Hindcast - Calibration Runs Tab</div>
         <p id="help-subtitle" class="_help-subtitle">
             Displays table of calibration jobs.<br />
             <br />
@@ -52,7 +52,7 @@
         <p class="text-center">Sort table by clicking on the sort icon in a column.</p>
         <br />
         <p class="text-center"><strong>Right Click Actions</strong></p>
-        <table class="_help-table" aria-describedby="Forecast Calibration Runs Tab Help Table">
+        <table class="_help-table" aria-describedby="Hindcast Calibration Runs Tab Help Table">
             <thead>
                 <tr>
                     <th class="td1">Action</th>
@@ -61,7 +61,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="td1">Run New Forecast</td>
+                    <td class="td1">Run New Hindcast</td>
                     <td class="td2">Run a new foreast using this calibration as the basis for the job.</td>
                 </tr>
                 <tr>
@@ -87,7 +87,7 @@
                     <td class="td1">Archive</td>
                     <td class="td2">Archive the selected calibration job(s).
                         Archived jobs will not longer appear in any Calibration Runs table.<br /><br />Archived jobs 
-                        cannot be used directly to run a forecast. To use one, open the Calibration workflow and 
+                        cannot be used directly to run a hindcast. To use one, open the Calibration workflow and 
                         unarchive the job from the Calibration Runs tab.
                     </td>
                 </tr>

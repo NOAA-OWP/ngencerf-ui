@@ -1,6 +1,6 @@
 <template>
   <div class="_help-page">
-    <div class="_help-title">Verification - Results Tab</div>
+    <div class="_help-title">Hindcast - Verification Results Tab</div>
     <p id="help-subtitle" class="_help-subtitle">
       Displays results for the selected Verification run.
     </p>
@@ -29,8 +29,8 @@
           <td class="td2">This Verification job ID.</td>
         </tr>
         <tr>
-            <td class="td1">Elapsed Time</td>
-            <td class="td2">Time elapsed since the job was submitted. Time is in days, HH:MM:SS</td>
+          <td class="td1">Elapsed Time</td>
+          <td class="td2">Time elapsed since the job was submitted. Time is in days, HH:MM:SS</td>
         </tr>
       </tbody>
     </table>

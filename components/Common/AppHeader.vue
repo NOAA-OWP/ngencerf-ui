@@ -98,16 +98,16 @@
                                 <span v-if="getEvaluationTabIndex() === 1">
                                     <LazyEvaluationCalibrationRunsHelp />
                                 </span>
-                                <span v-if="getEvaluationTabIndex() === 2">
+                                <span v-else-if="getEvaluationTabIndex() === 2">
                                     <LazyEvaluationEvaluatesHelp />
                                 </span>
-                                <span v-if="getEvaluationTabIndex() === 3">
+                                <span v-else-if="getEvaluationTabIndex() === 3">
                                     <LazyEvaluationComparePermutationsHelp />
                                 </span>
-                                <span v-if="getEvaluationTabIndex() === 4">
+                                <span v-else-if="getEvaluationTabIndex() === 4">
                                     <LazyEvaluationCalibrationSelectAltInterationssHelp />
                                 </span>
-                                <span v-if="getEvaluationTabIndex() === 5">
+                                <span v-else-if="getEvaluationTabIndex() === 5">
                                     <LazyEvaluationRunStatusHelp />
                                 </span>
                             </div>
@@ -118,37 +118,58 @@
                                 <span v-if="getForecastTabIndex() === 1">
                                     <LazyForecastCalibrationRunsHelp />
                                 </span>
-                                <span v-if="getForecastTabIndex() === 2">
+                                <span v-else-if="getForecastTabIndex() === 2">
                                     <LazyForecastForecastRunsHelp />
                                 </span>
-                                <span v-if="getForecastTabIndex() === 3">
+                                <span v-else-if="getForecastTabIndex() === 3">
                                     <LazyForecastSetupForecastHelp />
                                 </span>
-                                <span v-if="getForecastTabIndex() === 4">
+                                <span v-else-if="getForecastTabIndex() === 4">
                                     <LazyForecastRunStatusHelp />
                                 </span>
-                                <span v-if="getForecastTabIndex() === 5">
+                                <span v-else-if="getForecastTabIndex() === 5">
                                     <LazyForecastResultsHelp />
+                                </span>
+                                <span v-else-if="getForecastTabIndex() === 6">
+                                    <LazyForecastVerificationRunsHelp />
+                                </span>
+                                <span v-else-if="getForecastTabIndex() === 7">
+                                    <LazyForecastVerificationRunStatusHelp />
+                                </span>
+                                <span v-else-if="getForecastTabIndex() === 8">
+                                    <LazyForecastVerificationResultsHelp />
                                 </span>
                             </div>
                         </div>
 
-                        <!-- <div v-else-if="location.name === 'Verification'" class="py-10 px-1">
+                        <div v-else-if="location.name === 'Hindcast'" class="py-10 px-1">
                             <div v-if="getMenuIndex() === 4">
                                 <span v-if="getHindcastTabIndex() === 1">
-                                    <LazyVerificationForecastRunsHelp />
+                                    <LazyHindcastCalibrationRunsHelp />
                                 </span>
-                                <span v-if="getHindcastTabIndex() === 2">
-                                    <LazyVerificationVerificationRunsHelp />
+                                <span v-else-if="getHindcastTabIndex() === 2">
+                                    <LazyHindcastHindcastRunsHelp />
                                 </span>
-                                <span v-if="getHindcastTabIndex() === 3">
-                                    <LazyVerificationtRunStatusHelp />
+                                <span v-else-if="getHindcastTabIndex() === 3">
+                                    <LazyHindcastSetupHindcastHelp />
                                 </span>
-                                <span v-if="getHindcastTabIndex() === 4">
-                                    <LazyVerificationResultsHelp />
+                                <span v-else-if="getHindcastTabIndex() === 4">
+                                    <LazyHindcastRunStatusHelp />
+                                </span>
+                                <span v-else-if="getHindcastTabIndex() === 5">
+                                    <LazyHindcastResultsHelp />
+                                </span>
+                                <span v-else-if="getHindcastTabIndex() === 6">
+                                    <LazyHindcastVerificationRunsHelp />
+                                </span>
+                                <span v-else-if="getHindcastTabIndex() === 7">
+                                    <LazyHindcastVerificationRunStatusHelp />
+                                </span>
+                                <span v-else-if="getHindcastTabIndex() === 8">
+                                    <LazyHindcastVerificationResultsHelp />
                                 </span>
                             </div>
-                        </div> -->
+                        </div>
 
                     </div>
                 </div>
@@ -205,16 +226,22 @@ const LazyEvaluationRunStatusHelp = defineAsyncComponent(() => import("@/compone
 // Forecast Workflow Help Files
 const LazyForecastCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/CalibrationRunsHelp.vue"));
 const LazyForecastForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ForecastRunsHelp.vue"));
-const LazyForecastResultsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
 const LazyForecastSetupForecastHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/SetupForecastHelp.vue"));
 const LazyForecastRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/RunStatusHelp.vue"));
+const LazyForecastResultsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
+const LazyForecastVerificationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/VerificationRunsHelp.vue"));
+const LazyForecastVerificationRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/VerificationRunStatusHelp.vue"));
+const LazyForecastVerificationResultsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/VerificationResultsHelp.vue"));
 
-// Forecast Workflow Help Files
-// const LazyVerificationForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/ForecastRunsHelp.vue"));
-// const LazyVerificationVerificationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/VerificationRunsHelp.vue"));
-// const LazyVerificationtRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Verification/RunStatusHelp.vue"));
-// const LazyVerificationResultsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/ResultsHelp.vue"));
-
+// Hindcast Workflow Help Files
+const LazyHindcastCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/CalibrationRunsHelp.vue"));
+const LazyHindcastHindcastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/HindcastRunsHelp.vue"));
+const LazyHindcastSetupHindcastHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/SetupHindcastHelp.vue"));
+const LazyHindcastRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/RunStatusHelp.vue"));
+const LazyHindcastResultsHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/ResultsHelp.vue"));
+const LazyHindcastVerificationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/VerificationRunsHelp.vue"));
+const LazyHindcastVerificationRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/VerificationRunStatusHelp.vue"));
+const LazyHindcastVerificationResultsHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/VerificationResultsHelp.vue"));
 
 const { popupActive } = storeToRefs(generalStore());
 

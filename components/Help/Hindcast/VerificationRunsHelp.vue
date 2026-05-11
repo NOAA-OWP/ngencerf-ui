@@ -1,11 +1,11 @@
 <template>
     <div class="_help-page">
-        <div class="_help-title">Verification - Verification Runs Tab</div>
+        <div class="_help-title">Hindcast - Verification Runs Tab</div>
         <p id="help-subtitle" class="_help-subtitle">
             Displays table of previous verification runs with some basic details.
         </p>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
-            WARNING: Clicking the browser refresh button takes you to the Forecast Runs tab.
+            WARNING: Clicking the browser refresh button takes you to the Hindcast Runs tab.
         </p>
        <hr class="my-6 border-black" />
 
@@ -65,12 +65,12 @@
                 </tr>
                 <tr>
                     <td class="td1">View Results</td>
-                    <td class="td2">View results from this forecast run.</td>
+                    <td class="td2">View results from this hindcast run.</td>
                 </tr>
                 <tr>
                     <td class="td1">Delete</td>
                     <td class="td2">Selecting this action will <strong>permanently delete the chosen calibration job</strong> along 
-                        with all associated validation, forecast, and verification jobs. All references to this 
+                        with all associated validation, forecast, hindcast, and verification jobs. All references to this 
                         job will also be removed from the database. <strong>This action cannot be undone.</strong> 
                         After deletion, you will remain on the current page.
                     </td>
