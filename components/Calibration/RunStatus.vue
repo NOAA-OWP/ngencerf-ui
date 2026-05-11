@@ -439,8 +439,11 @@ const populatePlotAndLogListOptions = async (include_plots: boolean=true) => {
   }
 };
 
+const isMounted = ref(false);
+
 onMounted(async () => {
   isLoading.value = true;
+  isMounted.value = true;
 
   toast.removeAllGroups();
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
@@ -581,6 +584,11 @@ const startRun = async () => {
 
     // nominal case
     if (runCalibrationResponse.status >= 200 && runCalibrationResponse.status < 300) {
+      // If the job runs successfully, we only need to set refs and start intervals for display purposes.
+      // If they have left the tab before a success response comes back from the server, just stop here.
+      if (!isMounted.value) {
+        return;
+      }
       // only update refs if calibration_run_id is still the same - i.e. if the user hasn't left the page
       if (userCalibrationRunData?.value?.calibration_run_id === runCalibrationResponse?._data?.calibration_run_id) {
         if (runCalibrationResponse?._data?.status) {
@@ -1092,6 +1100,7 @@ const gotoEvaluation = () => {
 
 onUnmounted(() => {
   // make sure page clears all selected plots/tables when the user leaves
+  isMounted.value = false;
   runButtonDisabled.value = true;
   cancelButtonDisabled.value = true;
   iteration.value = undefined;
