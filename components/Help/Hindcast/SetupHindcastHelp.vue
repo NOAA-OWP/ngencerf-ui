@@ -23,7 +23,7 @@
 
                 <ul class="list-disc list-outside space-y-0 ml-6">
                     <li><strong>Saved State</strong><span class="required-asterisk" aria-hidden="true">*</span></li>
-                    <li><strong>Cycle Date<span class="required-asterisk" aria-hidden="true"> (will be set automatically)</li>
+                    <li><strong>Cycle Date</strong> (will be set automatically)</li>
                     <li><strong>Interval Cycle<span class="required-asterisk" aria-hidden="true">*</span></strong></li>
                     <li><strong>Number of Intervals<span class="required-asterisk" aria-hidden="true">*</span></strong></li>
                 </ul>
