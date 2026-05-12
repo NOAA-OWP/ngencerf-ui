@@ -69,6 +69,21 @@
                     </td>
                 </tr>
                 <tr>
+                    <td class="td1">Advance Interval</td>
+                    <td class="td2">Number of hours to advance.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td1">Number of Intervals</td>
+                    <td class="td2">Number of times to advance.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td2"><span class="font-normal">For example</span></td>
+                    <td class="td2">An Advance Interval of 6 hours with 12 Intervals yields outputs every 6 hours across a 72-hour period.
+                    </td>
+                </tr>
+                <tr>
                     <td class="td1">Status</td>
                     <td class="td2">
                         Ready - Click Run to start.<br />

@@ -29,13 +29,14 @@
                     <td class="td2">This Verification Job ID.</td>
                 </tr>
                 <tr>
-                    <td class="td1">Submit Time</td>
-                    <td class="td2">Date/Time the job was submitted to run.
+                    <td class="td1">Configuration</td>
+                    <td class="td2">Configuration selected for the forecast run.
                     </td>
                 </tr>
                 <tr>
-                    <td class="td1">Elapsed Time</td>
-                    <td class="td2">Time elapsed since the job was submitted. Time is in days, HH:MM:SS</td>
+                    <td class="td1">Cycle Date</td>
+                    <td class="td2">Cycle Date selected for the forecast run.
+                    </td>
                 </tr>
                 <tr>
                     <td class="td1">Status</td>
@@ -45,6 +46,15 @@
                         Verification Running<br />
                         Done
                     </td>
+                </tr>
+                <tr>
+                    <td class="td1">Submit Time</td>
+                    <td class="td2">Date/Time the job was submitted to run.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td1">Elapsed Time</td>
+                    <td class="td2">Time elapsed since the job was submitted. Time is in days, HH:MM:SS</td>
                 </tr>
                 <tr>
                     <td class="td1">Results Pathname</td>

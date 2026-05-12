@@ -22,11 +22,36 @@
       <tbody>
         <tr>
           <td class="td1">Display</td>
-          <td class="td2">Select a plot to display.</td>
+          <td class="td2">Select a plot or log to display.</td>
+        </tr>
+        <tr>
+            <td class="td1">Forecast Job ID</td>
+            <td class="td2">Forecast Job ID as the basis for the Verification run.</td>
         </tr>
         <tr>
           <td class="td1">Verification Job ID</td>
           <td class="td2">This Verification job ID.</td>
+        </tr>
+        <tr>
+            <td class="td1">Configuration</td>
+            <td class="td2">Configuration selected for the forecast run.
+            </td>
+        </tr>
+        <tr>
+            <td class="td1">Cycle Date</td>
+            <td class="td2">Cycle Date selected for the forecast run.
+            </td>
+        </tr>
+        <tr>
+            <td class="td1">Status</td>
+            <td class="td2">
+                Done
+            </td>
+        </tr>
+        <tr>
+            <td class="td1">Submit Time</td>
+            <td class="td2">Date/Time the job was submitted to run.
+            </td>
         </tr>
         <tr>
           <td class="td1">Elapsed Time</td>
