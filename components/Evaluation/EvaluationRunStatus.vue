@@ -168,8 +168,11 @@ const {
   resetUserLogRefs
 } = useLogStore();
 
+const isMounted = ref(false);
+
 onMounted(async () => {
   hilightTab(EvaluationTabs.tab_runStatus);
+  isMounted.value = true;
 
   runStatusTabVisible.value = true;
 
@@ -208,6 +211,11 @@ const startRun = async () => {
 
   executeIterationValidationRun().then((response) => {
     if (response.status === 201) {
+      // If the job runs successfully, we only need to set refs and start intervals for display purposes.
+      // If they have left the tab before a success response comes back from the server, just stop here.
+      if (!isMounted.value) {
+        return;
+      }
       validationStatus.value = response?._data?.status;
       failureMessages.value = response?._data?.failure_messages ?? undefined;
       iterationValidationRunId.value = displayValidationId.value = response?._data.validation_run_id;
@@ -288,6 +296,7 @@ const navigateToEvaluation = (event: any) => {
 }
 
 onUnmounted(() => {
+  isMounted.value = false;
   runStatusTabVisible.value = false;
   runButtonDisabled.value = true;
   cancelButtonDisabled.value = true;
