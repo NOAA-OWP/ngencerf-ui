@@ -37,9 +37,9 @@
             </h2>
         </div>
         <h1 class="mb-6 text-3xl font-bold text-center relative">
-            Forecast Configuration Selection
+            Forecast Configuration Selection {{ forecastJobStatus }}
         </h1>
-        <p  v-if="!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)"
+        <p v-if="!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)"
             class="prompt-txt mt-2 text-center">
             Select a configuration, choose Cycle Date/Hour and optional Cold Start Date, then click Next.
         </p>
@@ -208,7 +208,7 @@ const coldStartHourList = ref<number[]>(Array.from({ length: 24 }, (_, index) =>
  * Disable row if forecast configuration is not active
  */
 const rowClass = (data: any) => {
-    return [{ 'pointer-events-none': (forecastJobStatus.value && forecastJobStatus.value !== 'Ready')}];
+    return [{ 'pointer-events-none': (calibrationRunForForecast?.value?.forecast_status && calibrationRunForForecast?.value?.forecast_status !== 'Ready')}];
 };
 
 /**
@@ -216,7 +216,7 @@ const rowClass = (data: any) => {
  */
 const rowStyle = (data: any) => {
     return {
-        color: (forecastJobStatus.value && forecastJobStatus.value !== 'Ready') ? 'grey' : 'black'
+        color: calibrationRunForForecast?.value?.forecast_status && calibrationRunForForecast?.value?.forecast_status !== 'Ready' ? 'grey' : 'black'
     };
 };
 

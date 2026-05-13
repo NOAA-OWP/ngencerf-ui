@@ -259,12 +259,11 @@ const coldStartHour = ref<number>();
 const coldStartHourList = ref<number[]>(Array.from({ length: 24 }, (_, index) => index));
 
 let intervalCycleListOptions = [1,3,6,12,18,24,36,48,60,72,84,96,108,120,180,240]
-
 /**
  * Disable row if hindcast configuration is not active
  */
 const rowClass = (data: any) => {
-    return [{ 'pointer-events-none': (hindcastJobStatus.value && hindcastJobStatus.value !== 'Ready')}];
+    return [{ 'pointer-events-none': (calibrationRunForHindcast?.value?.hindcast_status && calibrationRunForHindcast?.value?.hindcast_status !== 'Ready')}];
 };
 
 /**
@@ -272,7 +271,7 @@ const rowClass = (data: any) => {
  */
 const rowStyle = (data: any) => {
     return {
-        color: (hindcastJobStatus.value && hindcastJobStatus.value !== 'Ready') ? 'grey' : 'black'
+        color: calibrationRunForHindcast?.value?.hindcast_status && calibrationRunForHindcast?.value?.hindcast_status !== 'Ready' ? 'grey' : 'black'
     };
 };
 
