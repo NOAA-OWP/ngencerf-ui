@@ -248,7 +248,7 @@ const {
   coldStartJobStatus,
 } = storeToRefs(useHindcastStore());
 
-const { loadHindcastTab, getColdStartJobsForConfiguration } = useHindcastStore();
+const { loadHindcastTab, getColdStartJobsForConfiguration, createAndRunHindcastJob } = useHindcastStore();
 
 const minCycleDate = ref<any>();
 const maxCycleDate = ref<any>();
@@ -472,50 +472,76 @@ const getIntervalCycleList = () => {
 /**
  * Go to the Status Run tab
  */
-const goToRunStatusTab = () => {
-    if (!calibrationRunForHindcast.value?.hindcast_status || ['Saved','Ready'].includes(calibrationRunForHindcast.value?.hindcast_status)) {
-      let alerts = [];
-      if (!hindcastConfiguration.value) {
-        alerts.push('You must select a configuration and then set the Cycle Date/Hour.');
-      }
-      if (!useSavedState.value) {
-        if (!coldStartDate.value || (!coldStartHour.value && coldStartHour.value !== 0)) {
-          alerts.push('Invalid Cold Start Date chosen. Make sure to choose a date and an hour.');
-        } else {
-          cycleDate.value = cycleDate.value.set({ hour: cycleHour.value, minute: 0, second: 0 });
-          if (coldStartDate.value) {
-            coldStartDate.value = coldStartDate.value.set({ hour: coldStartHour.value ? coldStartHour.value : 0, minute: 0, second: 0 });
-          }
-          if (coldStartDate.value && coldStartDate.value >= cycleDate.value) {
-            alerts.push('Cold Start Date must be before the Cycle Date.');
-          }
-          // validate the day/hour to make sure it is within the availability window
-          // TO DO: Factor the advance interval/number of intervals into this, or use server-side validation
-          let latestHindcastDate = maxCycleDate.value.minus({ hours: hindcastConfiguration.value.availability_lag})
-          if (latestHindcastDate < cycleDate.value) {
-              alerts.push('Hindcast data is not yet be available for your chosen cycle date.');
-          }
+const goToRunStatusTab = async() => {
+  toast.removeAllGroups();
+  if (!calibrationRunForHindcast.value?.hindcast_status || ['Saved','Ready'].includes(calibrationRunForHindcast.value?.hindcast_status)) {
+    let alerts = [];
+    if (!hindcastConfiguration.value) {
+      alerts.push('You must select a configuration and then set the Cycle Date/Hour.');
+    }
+    if (!useSavedState.value) {
+      if (!coldStartDate.value || (!coldStartHour.value && coldStartHour.value !== 0)) {
+        alerts.push('Invalid Cold Start Date chosen. Make sure to choose a date and an hour.');
+      } else {
+        cycleDate.value = cycleDate.value.set({ hour: cycleHour.value, minute: 0, second: 0 });
+        if (coldStartDate.value) {
+          coldStartDate.value = coldStartDate.value.set({ hour: coldStartHour.value ? coldStartHour.value : 0, minute: 0, second: 0 });
         }
-        if (!cycleDate.value || (!cycleHour.value && cycleHour.value !== 0)) {
-          alerts.push('Invalid Cycle Date chosen. Make sure to choose a date within the available date range, and an hour that is available for your chosen configuration.');
+        if (coldStartDate.value && coldStartDate.value >= cycleDate.value) {
+          alerts.push('Cold Start Date must be before the Cycle Date.');
         }
-      } else if (!coldStartJobId.value) {
-        alerts.push('You must choose a saved state.');
+        // validate the day/hour to make sure it is within the availability window
+        let latestHindcastDate = maxCycleDate.value.minus({ hours: hindcastConfiguration.value.availability_lag})
+        if (latestHindcastDate < cycleDate.value) {
+          alerts.push('Hindcast data is not yet available for your chosen cycle date.');
+        }
       }
-      if (!intervalCycle.value) { 
-        alerts.push('Advance Interval must be chosen.');
+      if (!cycleDate.value || (!cycleHour.value && cycleHour.value !== 0)) {
+        alerts.push('Invalid Cycle Date chosen. Make sure to choose a date within the available date range, and an hour that is available for your chosen configuration.');
       }
-      if (!numIterations.value) { 
-        alerts.push('Number of Intervals must be indicated.');
-      }
-      if (alerts.length > 0) {
-        const alert = window.alert(alerts.join('\n'));
+    } else if (!coldStartJobId.value) {
+      alerts.push('You must choose a saved state.');
+    } else {
+      calibrationRunForHindcast.value.cold_start = coldStartRunsForHindcast.value.find(run => run.cold_start_run_id === coldStartJobId.value);
+      cycleDate.value = calibrationRunForHindcast.value.cycle_date;
+      coldStartDate.value = calibrationRunForHindcast.value.cold_start.cold_start_date;
+    }
+    if (!intervalCycle.value) { 
+      alerts.push('Advance Interval must be chosen.');
+    }
+    if (!numIterations.value) { 
+      alerts.push('Number of Intervals must be indicated.');
+    }
+    if (alerts.length > 0) {
+      let summary = 'Hindcast Setup Error';
+      let message = alerts.join('\n');
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: summary, detail: message, life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+      return false;
+    } else {
+      //Input has passed frontend validation - use the server to validate
+      const validateHindcastJobResponse = await createAndRunHindcastJob(
+        calibrationRunForHindcast?.value?.calibration_run_id as number, 
+        hindcastConfiguration?.value?.name as string,
+        cycleDate.value,
+        coldStartDate.value,
+        coldStartJobId.value,
+        intervalCycle.value,
+        numIterations.value,
+        true // validate_only
+      );
+      if (validateHindcastJobResponse.status < 200 || validateHindcastJobResponse.status >= 300) {
+        let summary = 'Hindcast Setup Error';
+        let message = validateHindcastJobResponse?._data?.errors ? validateHindcastJobResponse._data.errors.join('\n') : '';
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: summary, detail: message, life: ToastTimeout.timeoutError };
+        toast.add(tMsg); addToastRecord(tMsg);
         return false;
       }
     }
-    const allTabs = document.getElementsByClassName("tabs");
-    const e = allTabs[HindcastTabs.tab_hindcastRunStatus] as HTMLElement;
-    e.click();
+  }
+  const allTabs = document.getElementsByClassName("tabs");
+  const e = allTabs[HindcastTabs.tab_hindcastRunStatus] as HTMLElement;
+  e.click();
 };
 </script>
 

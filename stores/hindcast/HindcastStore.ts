@@ -378,45 +378,53 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
     coldStartDate: DateTime | null,
     coldStartJobId: number | null,
     intervalCycle: number,
-    numIterations: number
+    numIterations: number,
+    validate_only: boolean=false
   ): Promise<any> => {
-    const rawLogLevels = toRaw(logLevels.value);
+    let requestBody = {
+      calibration_run_id: calibrationRunId, 
+      configuration_name: hindcastConfigurationName,
+      cycle_date: (!coldStartJobId && cycleDate) ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) : null,
+      cold_start_date: (!coldStartJobId && coldStartDate) ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : null,
+      cold_start_run_id: coldStartJobId ?? null,
+      interval_cycle: intervalCycle,
+      num_iterations: numIterations,
+      validate_only: validate_only
+    };
 
-    // transform module ref values to their actual values to be sent to the backend
-    const serializedModules: Record<string, LogLevel> | undefined =
-      Object.entries(rawLogLevels).reduce((acc, [key, val]) => {
-        if (val && typeof val === 'object' && 'value' in val) {
-          acc[key] = val.value;
-        }
-        return acc;
-      }, {} as Record<string, LogLevel>);
+    if (!validate_only) {
+      const rawLogLevels = toRaw(logLevels.value);
+
+      // transform module ref values to their actual values to be sent to the backend
+      const serializedModules: Record<string, LogLevel> | undefined =
+        Object.entries(rawLogLevels).reduce((acc, [key, val]) => {
+          if (val && typeof val === 'object' && 'value' in val) {
+            acc[key] = val.value;
+          }
+          return acc;
+        }, {} as Record<string, LogLevel>);
+      
+      requestBody.logging_config = {
+        logging_enabled: hindcastJobNgenGlobalLogging.value,
+        split_logs_by_module: hindcastJobLogFileMode.value,
+        ...(serializedModules && {
+          // add ngenLogLevel and forcingLogLevel to beginning of the object
+          modules: {
+            'ngen': ngenLogLevel.value,
+            'forcing': forcingLogLevel.value,
+            ...serializedModules
+          }
+        })
+      }
+    }
+    
     return makeProtectedApiCall<CalibrationStatus>(`${ngencerfBaseUrl}/calibration/create_and_run_hindcast/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({
-        calibration_run_id: calibrationRunId, 
-        configuration_name: hindcastConfigurationName,
-        cycle_date: (!coldStartJobId && cycleDate) ? formatISOStringOrDateToYYYYMMDDHHMM(cycleDate) : null,
-        cold_start_date: (!coldStartJobId && coldStartDate) ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : null,
-        cold_start_run_id: coldStartJobId ?? null,
-        interval_cycle: intervalCycle,
-        num_iterations: numIterations,
-        logging_config: {
-          logging_enabled: hindcastJobNgenGlobalLogging.value,
-          split_logs_by_module: hindcastJobLogFileMode.value,
-          ...(serializedModules && {
-            // add ngenLogLevel and forcingLogLevel to beginning of the object
-            modules: {
-              'ngen': ngenLogLevel.value,
-              'forcing': forcingLogLevel.value,
-              ...serializedModules
-            }
-          })
-        },
-      })
+      body: JSON.stringify(requestBody)
     });
   };
 
