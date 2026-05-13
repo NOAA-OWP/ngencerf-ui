@@ -52,7 +52,7 @@
             <span class="font-medium">Modules:</span>
             {{ getModuleList() }}
           </div>
-          <div v-if="moduleProperties.length" aria-label="Module Properties"
+          <div v-if="moduleProperties.some(module => module.properties.some(property => property.data_type !== 'boolean' || property.value && property.value !== 'false'))" aria-label="Module Properties"
             title="Module Properties">
             <span class="font-medium">Module Properties:</span>
             <div v-for="module in moduleProperties">
@@ -271,7 +271,7 @@ const forcingSourceDisplay = computed(() => {
   return getForcingOptionsList?.value?.find(option => option.name === calData?.value?.forcing_source)?.display_name;
 });
 
-onMounted(async() => {
+const updateCalibrationJobDetails = async() => {
   setUserSelection();
   // make sure module properties are loaded
   if (!moduleProperties.value || moduleProperties.value.length === 0) {
@@ -281,7 +281,17 @@ onMounted(async() => {
   if (!userSelectedCalibrationTuningParameters.value || userSelectedCalibrationTuningParameters.value.length === 0) {
     await loadTuningTabStaticData();
   }
+}
+
+onMounted(async() => {
+  updateCalibrationJobDetails();
 })
+
+watch(userCalibrationRunData, async () => {
+  if (userCalibrationRunData?.value?.calibration_run_id) {
+    updateCalibrationJobDetails();
+  }
+}) 
 
 </script>
 

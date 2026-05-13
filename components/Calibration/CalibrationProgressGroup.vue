@@ -99,15 +99,6 @@ onMounted(async() => {
   if (userCalibrationRunData.value) {
     // check to see if formulation is calibratable
     setUserSelection();
-    formulationIsCalibratable.value = false;
-    if (selectedModuleValues.value.length > 0) {
-      loadFormulationTabData().then(response => {
-        moduleProperties.value = response._data?.module_properties?.modules ?? [];
-        if (!response._data.formulation_errors) {
-          formulationIsCalibratable.value = true;
-        }
-      });
-    }
     tuningParametersAreValid.value = false;
     if (userCalibrationRunData?.value.parameters_selected && !userCalibrationRunData?.value.modules?.includes('LSTM')) {
       validateTuningParameters().then(response => {

@@ -85,6 +85,15 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
       JSON.parse(
         JSON.stringify(userCalibrationRunData.value?.sloth_parameters)
       ) ?? [];
+    formulationIsCalibratable.value = false;
+    if (selectedModuleValues.value.length > 0) {
+      loadFormulationTabData().then(response => {
+        moduleProperties.value = response._data?.module_properties?.modules ?? [];
+        if (!response._data.formulation_errors) {
+          formulationIsCalibratable.value = true;
+        }
+      });
+    }
   };
 
   /**
