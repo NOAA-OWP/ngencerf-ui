@@ -427,6 +427,7 @@ const createColdStartAndHindcastStatusInterval = () => {
  * Start the hindcast run
  */
 const startHindcastRun = async () => {
+  toast.removeAllGroups();
   runButtonDisabled.value = true;
   const createAndRunHindcastJobResponse = await createAndRunHindcastJob(
     calibrationRunForHindcast?.value?.calibration_run_id as number, 
@@ -485,7 +486,9 @@ const startHindcastRun = async () => {
   } else {
     runButtonDisabled.value = false;
     cancelButtonDisabled.value  = true;
-    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: createAndRunHindcastJobResponse?._data?.message ?? `Unable to run hindcast job`, life: ToastTimeout.timeoutError };
+    let summary = createAndRunHindcastJobResponse?._data?.message ?? `Unable to run hindcast job`;
+    let message = createAndRunHindcastJobResponse?._data?.errors ? createAndRunHindcastJobResponse._data.errors.join('\n') : '';
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: summary, detail: message, life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 };
