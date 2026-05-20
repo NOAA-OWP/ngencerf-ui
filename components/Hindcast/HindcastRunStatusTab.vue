@@ -442,7 +442,7 @@ const startHindcastRun = async () => {
   if (createAndRunHindcastJobResponse.status >= 200 && createAndRunHindcastJobResponse.status < 300) {
     // If the job runs successfully, we only need to set refs and start intervals for display purposes.
     // If they have left the tab before a success response comes back from the server, just stop here.
-    if (!isMounted.value || calibrationRunForHindcast.value) {
+    if (!isMounted.value || !calibrationRunForHindcast.value) {
       return;
     }
     
