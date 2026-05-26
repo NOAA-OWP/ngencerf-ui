@@ -4,16 +4,16 @@
       <div v-if="selectedLogList.length > 1" style="font-size: 0.9em;">
         <span class="font-bold pr-2 pt-3">Select {{ selectedLogCategoryDisplay }} Log: </span>
         <Select id="selectedLogOptions" class="p-select" style="width: auto; min-width: 254px;" v-model="selectedLogName" :options="selectedLogList"
-          optionLabel="name" optionValue="name">
+          optionLabel="display_name" optionValue="name">
         </Select>
       </div>
       <div v-if="selectedLogFilePath !== '' && selectedLogList.length === 1" style="font-size: 0.9em;">
         <span class="font-bold">Log Name: </span>
-        {{ selectedLogName }}
+        {{ selectedLogName.split('/').at(-1).split('.')[0] }}
       </div>
       <div v-if="selectedLogFilePath !== ''" style="font-size: 0.9em;">
         <span class="font-bold">Log File Path: </span>
-        <span class="whitespace-nowrap overflow-auto">{{ selectedLogFilePath }}</span>
+        <span class="whitespace-nowrap overflow-auto">{{ selectedLogName }}</span>
       </div>
 
       <div v-if="selectedLogDisplay" class="mt-2">
@@ -22,6 +22,9 @@
             selectedLogTotalSize }}</div>
           <Paging v-model:currentPage="selectedLogCurrentPage" :totalPages=selectedLogTotalPages />
         </div>
+      </div>
+      <div v-else-if="selectedLogDisplay === ''">
+        Log file is empty
       </div>
       <div v-else>
         Log file unavailable
@@ -66,6 +69,7 @@ const {
   selectedLogStatus
 } = storeToRefs(useLogStore());
 const {
+  queryGetLogData,
   updateLogRefs
 } = useLogStore();
 
@@ -98,9 +102,6 @@ watch(selectedLogName, async () => {
           - ((document.getElementById('selectedLogDisplay') as HTMLElement).getBoundingClientRect().top + 10)) + 'px');
         document.getElementById('selectedLogDisplay').scrollTop = document.getElementById('selectedLogDisplay').scrollHeight;
       });
-    } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
-      toast.add(tMsg); addToastRecord(tMsg);
     }
   }
 });
@@ -117,7 +118,6 @@ watch(selectedLogCurrentPage, async () => {
       selectedLogEndRow.value = (selectedLogStartRow.value + logDataPageSize.value) - 1;
     }
     const response: any = await queryGetLogData(
-      selectedLogCategory.value, // log_category,
       selectedLogName.value, // log_name
       selectedLogStartRow.value - 1, // start
       logDataPageSize.value // limit

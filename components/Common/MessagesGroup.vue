@@ -31,13 +31,10 @@
         </div>
 
         <div class="col-span-2">
-          <div v-if="calData?.forcing_source_requested" :aria-label="'Forcing Data ' + calData?.forcing_source_requested"
-            :title="'Forcing Data ' + calData?.forcing_source_requested"><span class="font-medium">Forcing Source: </span>
-            <span v-if="(calData?.forcing_source_actual && calData.forcing_source_actual != calData?.forcing_source_requested)">
-              {{ calData?.forcing_source_actual }} ({{ calData?.forcing_source_requested }} Was Requested)
-            </span>
-            <span v-else>
-              {{ calData?.forcing_source_requested }}
+          <div v-if="forcingSourceDisplay" :aria-label="'Forcing Data ' + forcingSourceDisplay"
+            :title="'Forcing Data ' + forcingSourceDisplay"><span class="font-medium">Forcing Source: </span>
+            <span>
+              {{ forcingSourceDisplay }}
             </span>
           </div>
           <div v-if="calData?.observational_source" :aria-label="'Observational Data ' + calData?.observational_source"
@@ -51,12 +48,33 @@
       <div class="grid grid-cols=1 gap=1 text-sm">
         <div class="col-span-1">
           <div v-if="calData?.modules?.length" :aria-label="'Modules ' + getModuleList()"
-            :title="'Modules ' + getModuleList()"><span class="font-medium">Modules:
-            </span>{{ getModuleList() }}</div>
-          <div v-if="calData?.modules?.includes('CFE-S') || calData?.modules?.includes('CFE-X')" :aria-label="'CFE AET Rootzone ' + (calData?.is_aet_rootzone ? 'Yes' : 'No')"
-            :title="'CFE AET Rootzone ' + (calData?.is_aet_rootzone ? 'Yes' : 'No')">
-            <span class="font-medium">CFE AET Rootzone:
-            </span>{{ (calData?.is_aet_rootzone ? 'Yes' : 'No') }}</div>
+            :title="'Modules ' + getModuleList()">
+            <span class="font-medium">Modules:</span>
+            {{ getModuleList() }}
+          </div>
+          <div v-if="moduleProperties.some(module => module.properties.some(property => property.data_type !== 'boolean' || property.value && property.value !== 'false'))" aria-label="Module Properties"
+            title="Module Properties">
+            <span class="font-medium">Module Properties:</span>
+            <div v-for="module in moduleProperties">
+              <div v-if="module.properties.some(property => property.data_type !== 'boolean' || property.value && property.value !== 'false')">
+                <span class="font-bold">&middot; {{ module.name }}&nbsp;</span> 
+                <span v-for="property in module.properties">
+                  <span v-if="property.data_type !== 'boolean' || property.value && property.value !== 'false'">
+                    {{ property.display_name }}: 
+                    <span v-if="property.data_type === 'boolean'">
+                      True
+                    </span>
+                    <span v-else-if="property.choices">
+                      {{ (property.choices.find(choice => choice.value === property.value))?.label }}
+                    </span>
+                    <span v-else>
+                      {{ property.value }}
+                    </span>
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -175,6 +193,12 @@
               NGen Global Logging:</span>
             {{ calibrationJobNgenGlobalLogging ? 'ENABLED' : 'DISABLED' }}</div>
         </div>
+        <div class="col-span-2">
+          <div :aria-label="'Log File Mode ' + calibrationJobLogFileMode"
+            :title="'Log File Mode ' + calibrationJobLogFileMode"><span class="font-medium">
+              Log File Mode:</span>
+            {{ calibrationJobLogFileMode ? 'Split by Module' : 'Unified' }}</div>
+        </div>
         <div v-if="calData?.last_updated_on" class="col-span-2">
           <div :aria-label="'Last Updated At ' + formatDate(calData?.last_updated_on)"
             :title="'Last Updated At ' + formatDate(calData?.last_updated_on)"><span class="font-medium">
@@ -191,15 +215,22 @@
 import { storeToRefs } from 'pinia';
 
 import { useUserDataStore } from '@/stores/common/UserDataStore';
+import { useGageStore } from "@/stores/calibration/GageStore";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
 import { useRunStatusStore } from '@/stores/calibration/RunStatusStore';
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 
-const { userCalibrationRunData, calibrationJobNgenGlobalLogging } = storeToRefs(useUserDataStore());
+const { 
+  userCalibrationRunData, 
+  calibrationJobNgenGlobalLogging, 
+  calibrationJobLogFileMode 
+} = storeToRefs(useUserDataStore());
 const calData = ref(userCalibrationRunData);
-const { fetchFormulationModuleOptions } = useFormulationStore();
+const { getForcingOptionsList } = storeToRefs(useGageStore());
+const { moduleProperties, selectedModuleValues } = storeToRefs(useFormulationStore());
+const { updateFormulationValidRefs, fetchFormulationModuleOptions, setUserSelection } = useFormulationStore();
 const {
   userSelectedCalibrationTuningParameters,
   selectedOutputVariableToCalibrate,
@@ -216,11 +247,11 @@ const componentProps = withDefaults(defineProps<{
 
 const getModuleList = () => {
   let modules = "";
-  calData.value?.modules.forEach(element => {
+  selectedModuleValues.value.forEach(element => {
     let module_option = fetchFormulationModuleOptions.find(module => module.name === element);
     if (module_option) {
-      modules += module_option.display_name;
-      if (calData.value?.modules[calData.value?.modules.length - 1] !== element) {
+      modules += module_option.name;
+      if (selectedModuleValues.value[selectedModuleValues.value.length - 1] !== element) {
         modules += ", ";
       }
     }
@@ -236,12 +267,31 @@ const formatDate = (d: any) => {
   }
 };
 
-onMounted(async() => {
+const forcingSourceDisplay = computed(() => {
+  return getForcingOptionsList?.value?.find(option => option.name === calData?.value?.forcing_source)?.display_name;
+});
+
+const updateCalibrationJobDetails = async() => {
+  setUserSelection();
+  // make sure module properties are loaded
+  if (!moduleProperties.value || moduleProperties.value.length === 0) {
+    await updateFormulationValidRefs();
+  }
   // make sure tuning parameters are loaded
   if (!userSelectedCalibrationTuningParameters.value || userSelectedCalibrationTuningParameters.value.length === 0) {
     await loadTuningTabStaticData();
   }
+}
+
+onMounted(async() => {
+  updateCalibrationJobDetails();
 })
+
+watch(userCalibrationRunData, async () => {
+  if (userCalibrationRunData?.value?.calibration_run_id) {
+    updateCalibrationJobDetails();
+  }
+}) 
 
 </script>
 

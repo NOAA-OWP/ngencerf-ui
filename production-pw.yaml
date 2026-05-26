@@ -2,11 +2,15 @@ name: ngencerf-ui
 
 services:
   ngencerf-app:
-    extends:
-      file: compose.yaml
-      service: ngencerf-app
-    image: registry.sh.nextgenwaterprediction.com/ngwpc/nwm-ngen/ngencerf_ui:prod
-    pull_policy: always
-    build: 
+    build:
+      context: .
       dockerfile: ./Dockerfile.production-pw
-
+      args:
+        NGENCERF_BASE_URL: https://${pw_platform_host}${basepath}/api/
+    image: ghcr.io/ngwpc/ngencerf-ui:${NGENCERF_UI_TAG:-latest}
+    ports:
+      - "${ngencerf_port}:3000"
+    environment:
+      - NUXT_HOST=0.0.0.0
+      - NUXT_PORT=3000
+      - NUXT_APP_BASE_URL=${basepath}/

@@ -1,13 +1,13 @@
 <template>
-  <VerificationLayout>
+  <HindcastLayout>
     <slot />
-  </VerificationLayout>
+  </HindcastLayout>
 </template>
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
 
-import VerificationLayout from "@/layouts/VerificationLayout.vue";
+import HindcastLayout from "@/layouts/HindcastLayout.vue";
 
 import { generalStore } from "~/stores/common/GeneralStore";
 
@@ -17,7 +17,7 @@ onMounted(() => {
   popupActive.value = false;
   nextTick(() => {
     const allTabs = document.getElementsByClassName("tabs");
-    const e = allTabs[VerificationTabs.tab_forecastRuns] as HTMLElement;
+    const e = allTabs[HindcastTabs.tab_calibrationRuns] as HTMLElement;
     if (e) {
       e.click();
     }

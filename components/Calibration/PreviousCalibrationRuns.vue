@@ -22,7 +22,7 @@
               @ResetFilters="resetFilters()" @BulkJobAction="bulkJobAction()" :showBulkActions="showBulkActions" 
               :selected-jobs="selectedMultipleCalibrationRuns" :all-jobs="allCalibrationRuns" :visible-jobs="visibleCalibrationRuns"
               @SelectAllJobs="selectAllJobs()" @SelectVisibleJobs="selectVisibleJobs()" @DeselectAllJobs="deselectAllJobs()"
-              ref="jobFilterRef" />
+              @UpdateGageList="updateGageList()" ref="jobFilterRef" />
             
             <ConfirmDialog></ConfirmDialog>
 
@@ -277,6 +277,7 @@ const { getMenuIndex, addToastRecord } = generalStore();
 const { 
   userCalibrationJobsListData, 
   userCalibrationRunData, 
+  uiGageList,
   includeArchivedJobs,
   selectedBulkJobAction,
   calibrationRunListPageSize,
@@ -291,6 +292,7 @@ const {
   queryUserCalibrationRunData, 
   fetchUserCalibrationJobsListData, 
   fetchUserCalibrationJobsListIDsOnly,
+  fetchGageList,
   clearUserCalibrationRunData,
   resetFilters
 } = useUserDataStore();
@@ -419,6 +421,7 @@ onMounted(async () => {
     hardResetRunStatusStore();
     clearUserCalibrationRunData();
     await fetchUserCalibrationJobsListData();
+    updateGageList();
     visibleCalibrationRuns.value = userCalibrationJobsListData.value.map(job => job.calibration_run_id);
     if (calibrationRunListTotalPages.value > 1) {
       allCalibrationRuns.value = await fetchUserCalibrationJobsListIDsOnly();
@@ -488,6 +491,10 @@ const highlightSelectedRows = () => {
       dtRows[r].classList.remove('p-datatable-row-selected');
     }
   }
+}
+
+const updateGageList = async() => {
+  uiGageList.value = await fetchGageList();
 }
 
 /**
@@ -1155,7 +1162,7 @@ const downloadSelectedCalibrationData = async (selectedCalibrationRun: any) => {
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id;
   if (selectedCalibrationRun.value.is_downloadable) {
     //isLoading.value = true;
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and will be prompted to save when the file is ready.', life: ToastTimeout.timeoutInfo };
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and the file will be saved when ready.', life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
     nextTick(async () => {
       try {

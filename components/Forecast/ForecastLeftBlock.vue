@@ -10,13 +10,22 @@
         <ForecastRunsTab />
       </span>
       <span v-else-if="activeTab === 3">
-       <SetupForecastTab />
+        <SetupForecastTab />
       </span>
       <span v-else-if="activeTab === 4">
-        <RunStatusTab />
+        <ForecastRunStatusTab />
       </span>
       <span v-else-if="activeTab === 5">
-        <ResultsTab />
+        <ForecastResultsTab />
+      </span>
+      <span v-if="activeTab === 6">
+        <VerificationRunsTab />
+      </span>
+      <span v-else-if="activeTab === 7">
+        <VerificationRunStatusTab />
+      </span>
+      <span v-else-if="activeTab === 8">
+        <VerificationResultsTab />
       </span>
     </div>
   </div>
@@ -29,8 +38,11 @@ import Tabs from '@/components/Common/Tabs.vue'
 import PreviousCalibrationRuns from '@/components/Forecast/PreviousCalibrationRuns.vue';
 import ForecastRunsTab from './ForecastRunsTab.vue';
 import SetupForecastTab from './SetupForecastTab.vue';
-import RunStatusTab from './RunStatusTab.vue';
-import ResultsTab from './ResultsTab.vue';
+import ForecastRunStatusTab from './ForecastRunStatusTab.vue';
+import ForecastResultsTab from './ForecastResultsTab.vue';
+import VerificationRunsTab from "./VerificationRunsTab.vue"
+import VerificationRunStatusTab from "./VerificationRunStatusTab.vue"
+import VerificationResultsTab from "./VerificationResultsTab.vue"
 
 const { getForecastTabIndex, setForecastTabIndex } = generalStore();
 

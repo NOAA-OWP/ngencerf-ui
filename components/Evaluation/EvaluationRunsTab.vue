@@ -108,7 +108,8 @@
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" :show-status="false" :show-archived="false"
           :totalSize="evaluationRunListTotalSize" :totalPages="evaluationRunListTotalPages"
           v-model:currentPage="evaluationRunListCurrentPage"
-          @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
+          @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
+          @UpdateGageList="updateGageList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -403,13 +404,14 @@ const {
   clearUserCalibrationRunData,
   setSelectedCalibrationRunId,
   fetchValidationRunListByCalibrationRun,
-  resetFilters
+  resetFilters,
+  fetchGageList
 } = evaluationCalibrationRunStore;
 
 const { validationStatusCheckingIntervalId, validationRunningTimeIntervalId } = storeToRefs(useEvaluationRunStatusStore());
 const { hardResetEvaluationRunStatusStore } = useEvaluationRunStatusStore();
 
-const { userCalibrationRunData, gotoCalibrationRunId, includeArchivedJobs } = storeToRefs(useUserDataStore());
+const { userCalibrationRunData, gotoCalibrationRunId, includeArchivedJobs, uiGageList } = storeToRefs(useUserDataStore());
 
 const { isLoading, calibrationJobId } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
@@ -433,6 +435,7 @@ onMounted(async() => {
   hardResetEvaluationRunStatusStore();
 
   await fetchUserValidatedCalibrationJobsListData();
+  updateGageList();
 
   if(gotoCalibrationRunId.value) {
     userSelectedEvalCalibrationRunId.value = gotoCalibrationRunId.value;
@@ -509,6 +512,10 @@ const refreshJobList = async () => {
   isLoading.value = true;
   await fetchUserValidatedCalibrationJobsListData();
   isLoading.value = false;
+}
+
+const updateGageList = async() => {
+  uiGageList.value = await fetchGageList();
 }
 
 // A method to convert the binary value (boolean) to a sortable format
@@ -859,7 +866,7 @@ const downloadSelectedCalibrationData = async () => {
   const selectedRunId = selectedCalibrationRun.value.calibration_run_id;
   if (selectedCalibrationRun.value.is_downloadable) {
     //isLoading.value = true;
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and will be prompted to save when the file is ready.', life: ToastTimeout.timeoutInfo };
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and the file will be saved when ready.', life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
     nextTick(async () => {
       try {

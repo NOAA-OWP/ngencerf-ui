@@ -37,9 +37,9 @@
             </h2>
         </div>
         <h1 class="mb-6 text-3xl font-bold text-center relative">
-            Forecast Configuration Selection
+            Forecast Configuration Selection {{ forecastJobStatus }}
         </h1>
-        <p  v-if="!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)"
+        <p v-if="!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)"
             class="prompt-txt mt-2 text-center">
             Select a configuration, choose Cycle Date/Hour and optional Cold Start Date, then click Next.
         </p>
@@ -116,14 +116,14 @@
             :teleport="true" utc='preserve' 
             :disabled="!forecastConfiguration"/>
         </div>
-        <div class="text-nowrap text-right font-bold p-1 required-label">Cycle Date</div>
+        <div class="text-nowrap text-right font-bold p-1">
+          Cold Start Hour
+        </div>
         <div class="text-nowrap p-1">
-          <VueDatePicker v-model="cycleDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-            @update:model-value="convertCycleDateStringToDateTimeObject" :enable-time-picker="false"
-            :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
-            :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
-            :teleport="true" utc='preserve' 
-            :disabled="!forecastConfiguration"/>
+          <Select id="coldStartHour" v-model="coldStartHour" :options="coldStartHourList" default="12" 
+            aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
+            class="!w-24" :disabled="!forecastConfiguration">
+          </Select>
         </div>
         <div>
           <span v-if="cycleDate && (cycleHour || cycleHour === 0) && forecastConfiguration">
@@ -135,20 +135,22 @@
             </div>
           </span>
         </div>
-        <div class="text-nowrap text-right font-bold p-1">
-          Cold Start Hour
-        </div>
+        <div class="text-nowrap text-right font-bold p-1 required-label">Cycle Date</div>
         <div class="text-nowrap p-1">
-          <Select id="coldStartHour" v-model="coldStartHour" :options="coldStartHourList" default="12" 
-            aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
-            :disabled="!forecastConfiguration">
-          </Select>
+          <VueDatePicker v-model="cycleDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+            @update:model-value="convertCycleDateStringToDateTimeObject" :enable-time-picker="false"
+            :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
+            :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
+            :teleport="true" utc='preserve' 
+            :disabled="!forecastConfiguration"/>
         </div>
-        <div class="text-nowrap text-right font-bold p-1 required-label">Cycle Hour</div>
+        <div class="text-nowrap text-right font-bold p-1 required-label">
+          Cycle Hour
+        </div>
         <div class="text-nowrap p-1">
           <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
             aria-label="Cycle Hour Select" title="Cycle Hour Select"
-            :disabled="!forecastConfiguration">
+            class="!w-24" :disabled="!forecastConfiguration">
           </Select>
         </div>
       </div>
@@ -177,7 +179,7 @@ const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
-const showMessagesGroup = ref<Boolean>(false);
+const showMessagesGroup = ref<boolean>(false);
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { fetchUserCalibrationRunData } = useUserDataStore();
@@ -206,7 +208,7 @@ const coldStartHourList = ref<number[]>(Array.from({ length: 24 }, (_, index) =>
  * Disable row if forecast configuration is not active
  */
 const rowClass = (data: any) => {
-    return [{ 'pointer-events-none': (forecastJobStatus.value && forecastJobStatus.value !== 'Ready')}];
+    return [{ 'pointer-events-none': (calibrationRunForForecast?.value?.forecast_status && calibrationRunForForecast?.value?.forecast_status !== 'Ready')}];
 };
 
 /**
@@ -214,7 +216,7 @@ const rowClass = (data: any) => {
  */
 const rowStyle = (data: any) => {
     return {
-        color: (forecastJobStatus.value && forecastJobStatus.value !== 'Ready') ? 'grey' : 'black'
+        color: calibrationRunForForecast?.value?.forecast_status && calibrationRunForForecast?.value?.forecast_status !== 'Ready' ? 'grey' : 'black'
     };
 };
 
@@ -342,7 +344,7 @@ const goToRunStatusTab = () => {
         }
     }
     const allTabs = document.getElementsByClassName("tabs");
-    const e = allTabs[ForecastTabs.tab_runStatus] as HTMLElement;
+    const e = allTabs[ForecastTabs.tab_forecastRunStatus] as HTMLElement;
     e.click();
 };
 </script>

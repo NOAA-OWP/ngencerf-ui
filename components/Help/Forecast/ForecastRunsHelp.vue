@@ -69,7 +69,7 @@
                 </tr>
                 <tr>
                     <td class="td1">Run New Forecast</td>
-                    <td class="td2">Run a new foreast using the same calibration as the basis for the job.</td>
+                    <td class="td2">Run a new forecast using the same calibration as the basis for the job.</td>
                 </tr>
                 <tr>
                     <td class="td1">View Calibration Details</td>

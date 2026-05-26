@@ -12,18 +12,18 @@
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
-          <div v-if="logList.length > 0" class="inline-block">
-            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
-            <div class="inline-block w-2/3">
-              <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
-                v-model="selectedLogCategory" :options="logList" option-label="display_name" optionValue="name">
-              </Select>
-            </div>
-          </div>
-          <div v-else-if="!forecastJobId || !overallColdStartForecastStatus" class="w-full">
+          <div v-if="!forecastJobId || !overallColdStartForecastStatus" class="w-full">
             <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
               Click Run to submit and run the forecast.
             </p>
+          </div>
+          <div v-else-if="logListOptions.length > 0" class="inline-block">
+            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
+            <div class="inline-block w-2/3">
+              <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
+                v-model="selectedLogCategory" :options="logListOptions" option-label="display_name" optionValue="name">
+              </Select>
+            </div>
           </div>
           
           <div class="grid auto-cols-max grid-cols-3 gap=1 text-sm text-left mt-2">
@@ -74,21 +74,21 @@
               </div>
               <div class="mt-2 mb-2">
                 <!--BUTTONS - START-->
-                <span v-if="!forecastJobStatus || (!coldStartJobStatus && forecastJobStatus === 'Ready')">
+                <span v-if="!runButtonDisabled && !forecastJobId">
                   <Button class="ngenButtonDiv ml-6 font-normal px-4" title="Previous Button" aria-label="Previous Button"
                     @click="goToSetupForecastTab()">
                     Previous
                   </Button>
                 </span>
-                <span v-if="!forecastJobStatus || forecastJobStatus === 'Ready'">
+                <span v-if="!runButtonDisabled">
                   <Button class="ngenButtonDiv-green ml-6 font-normal px-4" title="Run Button" aria-label="Run Button"
-                    @click="startForecastRun()">
+                    @click="startForecastRun()" :disabled="runButtonDisabled">
                     Run
                   </Button>
                 </span>
-                <span v-if="['Submitted','Running'].includes(coldStartJobStatus) || ['Submitted','Running'].includes(forecastJobStatus)">
-                  <Button class="ngenButtonDiv-red ml-6 font-normal px-4" title="Cancel Button" @click="cancelForecastRun()"
-                    aria-label="Cancel Button">
+                <span v-if="!cancelButtonDisabled">
+                  <Button class="ngenButtonDiv-red ml-6 font-normal px-4" title="Cancel Button" aria-label="Cancel Button" 
+                    @click="cancelForecastRun()" :disabled="cancelButtonDisabled">
                     Cancel
                   </Button>
                 </span>
@@ -106,15 +106,10 @@
                 <span class="font-bold">Results Pathname: </span>
                 <span class="whitespace-nowrap overflow-auto">{{ resultsPathname }}</span>
               </div>
-            </div>
-          </div>
-            
-          <div>
-            <div v-if="failureMessages" class="text-left pl-3 text-nowrap" style="font-size:0.9em;">
-              <label for="status">Failure Message </label>
-              <div class="pl-5" style="width: 100%;">
-                <span v-for="message in failureMessages">
-                  {{ message }}<br/>
+              <div v-if="failureMessages && failureMessages.length > 0">
+                <span class="font-bold">{{ failureMessages.length > 1 ? 'Messages' : 'Message' }}: </span>
+                <span v-for="failure_message in failureMessages">
+                  {{ failure_message.message }}<br/>
                 </span>
               </div>
             </div>
@@ -141,6 +136,21 @@
               class="flex items-center gap-1">
               <input type="radio" :value="val" v-model="forecastJobNgenGlobalLogging" />
               <span>{{ label }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div :class="[
+        'mb-4',
+        { 'opacity-50 pointer-events-none': !forecastJobNgenGlobalLogging }
+      ]">
+        <div class="inline-flex flex-col items-center mb-2">
+          <p class="font-semibold mb-2">Log File Mode</p>
+          <div class="flex gap-6">
+            <label v-for="[label, val] in [['Unified', false], ['Split by Module', true]]" :key="label as string"
+              class="flex items-center gap-1">
+              <input type="radio" :value="val" v-model="forecastJobLogFileMode" :disabled="!forecastJobNgenGlobalLogging"/>
+              <span class="whitespace-nowrap">{{ label }}</span>
             </label>
           </div>
         </div>
@@ -217,14 +227,16 @@ import { useLogStore } from '@/stores/common/LogStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 import { isValidDate } from '@/utils/CommonHelpers';
-import { calculateElapsedTime, sumAndFormatElapsedTimes } from '@/utils/TimeHelpers';
+import { calculateElapsedTime } from '@/utils/TimeHelpers';
 
 const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
-const showMessagesGroup = ref<Boolean>(false);
+const runButtonDisabled = ref<boolean>(true);
+const cancelButtonDisabled = ref<boolean>(true);
+const showMessagesGroup = ref<boolean>(false);
 
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const { userCalibrationRunData, ngenLogLevel, forcingLogLevel, logLevels } = storeToRefs(useUserDataStore());
@@ -247,34 +259,38 @@ const {
   calibrationRunForForecast,
   overallColdStartForecastStatus,
   forecastJobNgenGlobalLogging,
+  forecastJobLogFileMode
 } = storeToRefs(useForecastStore());
 const {
   loadForecastRunStatusTabData,
   createAndRunForecastJob,
   cancelForecastJob,
   getStatus,
-  hardResetForecastRunStatusStore
+  hardResetForecastStore
 } = useForecastStore();
 
 const {
   selectedLogCategory,
-  logList
+  logListOptions
 } = storeToRefs(useLogStore());
 const {
   populateLogListOptions,
   resetUserLogRefs
 } = useLogStore();
 
+const isMounted = ref(false);
+
 onMounted(async () => {
   toast.removeAllGroups(); // clear all toast messages
   isLoading.value = false; // set isLoading to false
+  isMounted.value = true;
 
   // scroll to top of the page
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
   // highlight the tab when selected
-  hilightTab(ForecastTabs.tab_runStatus);
+  hilightTab(ForecastTabs.tab_forecastRunStatus);
 
   clearInterval(forecastJobStatusIntervalId.value);
   clearInterval(elapsedTimeIntervalId.value);
@@ -323,9 +339,13 @@ onMounted(async () => {
   if (!coldStartDate.value && calibrationRunForForecast?.value?.cold_start?.cold_start_date) {
     coldStartDate.value = calibrationRunForForecast.value.cold_start.cold_start_date;
   }
+  
+  runButtonDisabled.value = !['Unknown','Ready'].includes(overallColdStartForecastStatus.value);
+  cancelButtonDisabled.value = !runButtonDisabled.value || (!['Submitted','Running'].includes(coldStartJobStatus.value) && !['Submitted','Running'].includes(forecastJobStatus.value));
 
   watch(overallColdStartForecastStatus, (newColdStartForecastStatus, oldColdStartForecastStatus) => {
-    if (forecastJobId.value && 
+     cancelButtonDisabled.value = !runButtonDisabled.value || (!['Submitted','Running'].includes(coldStartJobStatus.value) && !['Submitted','Running'].includes(forecastJobStatus.value));
+     if (forecastJobId.value && 
       ( 
         coldStartJobStatus.value === 'Running' ||
         forecastJobStatus.value === 'Running' ||
@@ -356,7 +376,7 @@ const createElapsedTimeInterval = () => {
     // continue incrementing elapsedTime every second while coldStartJobStatus is Submitted
     // or forecastJobStatus is Submitted or Running
     if (['Submitted','Running'].includes(coldStartJobStatus.value ?? '') || ['Submitted', 'Running'].includes(forecastJobStatus.value ?? '')) {
-      elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date());
+      elapsedTime.value = formatDuration(calculateElapsedTime(submitTimeDate.value as Date, new Date()));
     } else {
       clearInterval(elapsedTimeIntervalId.value);
       elapsedTimeIntervalId.value = undefined;
@@ -371,7 +391,8 @@ const createElapsedTimeInterval = () => {
 const createColdStartAndForecastStatusInterval = () => {
   clearInterval(forecastJobStatusIntervalId.value);
   forecastJobStatusIntervalId.value = setInterval(async () => {
-    loadForecastRunStatusTabData();
+    await loadForecastRunStatusTabData();
+    await populateLogListOptions();
     // if cold start and forecast job are not Submitted or Running, clear the interval
     if (!['Submitted', 'Running'].includes(coldStartJobStatus.value ?? '') && !['Submitted', 'Running'].includes(forecastJobStatus.value ?? ''))
     {
@@ -387,7 +408,7 @@ const createColdStartAndForecastStatusInterval = () => {
  * Start the forecast run
  */
 const startForecastRun = async () => {
-  calibrationRunForForecast.value.forecast_status = 'Submitted';
+  runButtonDisabled.value = true;
   const createAndRunForecastJobResponse = await createAndRunForecastJob(
     calibrationRunForForecast?.value?.calibration_run_id as number, 
     forecastConfiguration?.value?.name as string,
@@ -396,6 +417,12 @@ const startForecastRun = async () => {
   );
 
   if (createAndRunForecastJobResponse.status >= 200 && createAndRunForecastJobResponse.status < 300) {
+    // If the job runs successfully, we only need to set refs and start intervals for display purposes.
+    // If they have left the tab before a success response comes back from the server, just stop here.
+    if (!isMounted.value || !calibrationRunForForecast.value) {
+      return;
+    }
+
     forecastJobId.value = createAndRunForecastJobResponse._data.forecast_run_id;
     await loadForecastRunStatusTabData();
 
@@ -404,6 +431,14 @@ const startForecastRun = async () => {
 
     if (createAndRunForecastJobResponse?._data?.submit_date) {
       submitTimeDate.value = new Date(createAndRunForecastJobResponse?._data?.submit_date);
+      calibrationRunForForecast.value.cycle_date = cycleDate.value;
+      if (coldStartDate.value) {
+        calibrationRunForForecast.value.cold_start = {
+          cold_start_date: coldStartDate.value,
+          cold_start_status: 'Submitted',
+          cold_start_submit_date: createAndRunForecastJobResponse._data.submit_date
+        };
+      }
 
       if (isValidDate(submitTimeDate.value)) {
         submitTime.value = formatDateForRunOnString(submitTimeDate.value);
@@ -412,19 +447,24 @@ const startForecastRun = async () => {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'submit_date from server could not be converted to a Date object', life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
-  } else {
+  } else if (createAndRunForecastJobResponse?._data?.forecast_run_id) {
+    // job was created, but we got a bad response from the server
+    forecastJobId.value = createAndRunForecastJobResponse._data.forecast_run_id;
     const getStatusResponse = await getStatus();
-    const forecasts: any[] = getStatusResponse?._data?.forecasts;
-    const forecast = forecasts?.find((f: any) => f.forecast_run_id === forecastJobId.value);
 
-    if (forecast) {
-      forecastJobStatus.value = forecast?.status;
-      coldStartJobStatus.value = forecast?.cold_start?.status;
-      failureMessages.value = forecast?.failure_messages;
+    if (getStatusResponse?._data?.status) {
+      forecastJobStatus.value = getStatusResponse._data.status;
+      coldStartJobStatus.value = getStatusResponse._data?.cold_start?.status ?? undefined;
+      failureMessages.value = getStatusResponse._data?.failure_messages ?? undefined;
     } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: `Unable to run forecast job`, life: ToastTimeout.timeoutError };
+      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: getStatusResponse?._data?.message ?? `Error when running forecast job`, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
+  } else {
+    runButtonDisabled.value = false;
+    cancelButtonDisabled.value  = true;
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: createAndRunForecastJobResponse?._data?.message ?? `Unable to run forecast job`, life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
 };
 
@@ -432,12 +472,14 @@ const startForecastRun = async () => {
  * Cancel the forecast run
  */
 const cancelForecastRun = async () => {
+  cancelButtonDisabled.value = true;
   try {
+    cancelButtonDisabled.value = true;
     const cancelForecastJobResponse = await cancelForecastJob();
 
     if (cancelForecastJobResponse?._data?.status) {
       forecastJobStatus.value = cancelForecastJobResponse._data.status;
-      failureMessages.value = cancelForecastJobResponse._data.failure_messages;
+      failureMessages.value = cancelForecastJobResponse._data.failure_messages ?? undefined;
 
       if (forecastJobStatus.value !== 'Cancelled') {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Forecast status not set to Cancelled after clicking CANCEL', life: ToastTimeout.timeoutError };
@@ -449,6 +491,7 @@ const cancelForecastRun = async () => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
   } catch (error) {
+    cancelButtonDisabled.value = false;
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Error cancelling Forecast job', life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   }
@@ -459,7 +502,7 @@ const cancelForecastRun = async () => {
  */
 const goToResultsTab = () => {
   const allTabs = document.getElementsByClassName("tabs");
-  const e = allTabs[ForecastTabs.tab_results] as HTMLElement;
+  const e = allTabs[ForecastTabs.tab_forecastResults] as HTMLElement;
   e.click();
 };
 
@@ -474,8 +517,11 @@ const goToSetupForecastTab = () => {
 
 onUnmounted(() => {
   // make sure page clears all log data when the user leaves
-  hardResetForecastRunStatusStore();
-  logList.value = [];
+  isMounted.value = false;
+  runButtonDisabled.value = true;
+  cancelButtonDisabled.value = true;
+  hardResetForecastStore();
+  logListOptions.value = [];
   forecastJobStatus.value = undefined;
   coldStartJobStatus.value = undefined;
   resetUserLogRefs();

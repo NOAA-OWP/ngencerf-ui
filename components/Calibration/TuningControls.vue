@@ -364,7 +364,7 @@ const {
 
 const { getAccessToken } = userDataStore;
 const { userCalibrationRunData } = storeToRefs(userDataStore);
-const { loadTuningTabStaticData, saveTuningTabData } = tuningStore;
+const { loadTuningTabStaticData, saveTuningTabData, validateTuningParameters } = tuningStore;
 const {
   tuningStore_data_loading,
   loadTuningTabData,
@@ -384,13 +384,14 @@ const {
   automatic_validation,
   calibratableParametersHaveChanged,
   tuningDataHasChanged,
-  saveTuningTabRequestBody
+  saveTuningTabRequestBody,
+  tuningParametersAreValid
 } = storeToRefs(tuningStore);
 
 const toast = useToast();
 const selectedParameter = ref<any>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
-const isInitialSetupDone = ref<Boolean>(false);
+const isInitialSetupDone = ref<boolean>(false);
 const selectedTuningParameterData = ref();
 const tuningContextMenu = ref();
 
@@ -432,6 +433,21 @@ onMounted(async () => {
     if (edsErrorMessage) {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'EDS Error', detail: edsErrorMessage, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
+    }
+
+    if (userSelectedCalibrationTuningParameters.value.length > 0 && !userCalibrationRunData?.value?.modules?.includes('LSTM')) {
+      validateTuningParameters().then(response => {
+        if (response._data.parameter_warnings) {
+          tuningParametersAreValid.value = false;
+          toast.removeAllGroups();
+          response._data.parameter_warnings.forEach((err: any) => {
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Tuning Parameters Warning', detail: err, life: ToastTimeout.timeoutWarn };
+            toast.add(tMsg); addToastRecord(tMsg);
+          });
+        } else {
+          tuningParametersAreValid.value = true;
+        }
+      });
     }
 
     // set calibration times
@@ -1113,6 +1129,16 @@ const saveTuningData = () => {
           life: ToastTimeout.timeoutSuccess
         };
         toast.add(tMsg); addToastRecord(tMsg);
+      }
+      if (saveTuningTabResponse._data.parameter_warnings) {
+        tuningParametersAreValid.value = false;
+        toast.removeAllGroups();
+        saveTuningTabResponse._data.parameter_warnings.forEach((err: any) => {
+          const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Tuning Parameters Warning', detail: err, life: ToastTimeout.timeoutWarn };
+          toast.add(tMsg); addToastRecord(tMsg);
+        });
+      } else {
+        tuningParametersAreValid.value = true;
       }
       updateJobData();
       calibratableParametersHaveChanged.value = false;

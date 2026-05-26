@@ -134,9 +134,9 @@ export function calculateTimeRange(
  * Calculates the elapsed time between two Date objects
  * @param start_time Date object representing the start time
  * @param end_time Date object representing the end time
- * @returns {string} string of the elapsed time in 'hh:mm:ss or 'd 'Days,' hh:mm:ss' format
+ * @returns {Duration} duration of the elapsed time
  */
-export function calculateElapsedTime(start_time: Date, end_time: Date): string {
+export function calculateElapsedTime(start_time: Date, end_time: Date): Duration {
   const start = DateTime.fromJSDate(start_time);
   const end = DateTime.fromJSDate(end_time);
   
@@ -146,8 +146,8 @@ export function calculateElapsedTime(start_time: Date, end_time: Date): string {
   // Floor the seconds to remove fractions
   diffDuration = diffDuration.set({ seconds: Math.floor(diffDuration.seconds) });
   
-  // return a formatted string in 'hh:mm:ss' or 'd 'Days,' hh:mm:ss' format
-  return formatDuration(diffDuration);
+  // return a duration to be formatted later
+  return diffDuration;
 };
 
 /**
@@ -179,31 +179,17 @@ export function formatElapsedTime(elapsedTime: string): string {
  * @param elapsedTimesArray array of strings in the format 'hh:mm:ss' or 'hh:mm:ss.ssssss'
  * @returns {string} string representation of a Duration object in 'hh:mm:ss or 'd 'Days,' hh:mm:ss' format
  */
-export function sumAndFormatElapsedTimes(elapsedTimesArray: string[]): string {
+export function sumAndFormatElapsedTimes(elapsedTimesArray: Duration[]): string {
   // initialize the sum of durations
   let durationsSum: any = null;
 
   // iterate through the array of elapsed times
   elapsedTimesArray.forEach((elapsedTime) => {
-    let days = 0;
-    if (elapsedTime.split(' ').length > 1) {
-      days = parseInt(elapsedTime.split(' ')[0]);
-    }
-    // account for possibility of days showing up first separated by a space for values >= 24 hours
-    const [hours, minutes, rawSeconds] = elapsedTime.split(' ').length > 1 ? elapsedTime.split(' ')[1].split(':') : elapsedTime.split(':');
-    const seconds = Number(rawSeconds?.split('.')[0]); // remove decimal part safely
-
-    const duration = Duration.fromObject({
-      hours: days > 0 ? parseInt(hours) + (days*24): parseInt(hours) || 0,
-      minutes: parseInt(minutes) || 0,
-      seconds: Math.floor(seconds), // ignore milliseconds
-    });
-
     // add the duration to the sum
     if (!durationsSum) {
-      durationsSum = duration;
+      durationsSum = elapsedTime;
     } else {
-      durationsSum = durationsSum.plus(duration);
+      durationsSum = durationsSum.plus(elapsedTime);
     }
   });
 
@@ -221,7 +207,7 @@ export function formatDuration(duration: any): string {
   let totalSeconds = Math.floor(duration.seconds);
   let totalMinutes = duration.minutes + Math.floor(totalSeconds / 60);
   let totalHours = duration.hours + Math.floor(totalMinutes / 60);
-  let totalDays = Math.floor(duration.days);
+  let totalDays = Math.floor(duration.days) + Math.floor(totalHours / 24);
 
   // normalize the values
   const seconds = totalSeconds % 60;
@@ -237,3 +223,43 @@ export function formatDuration(duration: any): string {
   }
   return daysPart + Duration.fromObject({ hours, minutes, seconds }).toFormat("hh:mm:ss");
 };
+
+/**
+ * Format Date object to a string for display in Observable Plot ticks
+ * @param d Date object
+ * @param i iteration number
+ * @param ticks Array of dates to be used as ticks by Observable plot
+ * @returns {string} string representation of a date object
+ */
+export function formatDateTicks(d: Date, i: any, ticks: any): string {
+  let md = d.toLocaleDateString("en-US", {month: "short", day: "numeric", timeZone: "UTC"});
+  let m = d.toLocaleDateString("en-US", {month: "short", timeZone: "UTC"});
+  let y = d.getUTCFullYear();
+  let hmz = d.toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "UTC"}) + 'Z';
+  // compare to previous date
+  let prevDate = i > 0 ? ticks[i-1] : new Date('1/1/1900');
+  if (d.getUTCMonth() !== prevDate.getUTCMonth()) {
+    if (ticks.some(date => date.getUTCDate() !== 1)) {
+      // we have dates that are not all on the 1st of the month
+      // show month + day, line break, year
+      return `${md}\n${y}`;
+    } else {
+      // all of our dates are on the first of the month
+      // show month, line break, year
+      return `${m}\n${y}`;
+    }
+  }
+  if (d.getUTCDate() !== prevDate.getUTCDate()) {
+    if (i === 0 || (d - prevDate) / (1000 * 60 * 60) < 24) {
+      // dates are less than a day apart
+      // show time, line break, month + day
+      return `${hmz}\n${md}`;
+    } else {
+      // dates are at least a day apart
+      // show month + day
+      return `${md}`;
+    }
+  }
+  // default is just to show time
+  return `${hmz}`;
+}

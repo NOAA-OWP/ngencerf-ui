@@ -1,11 +1,8 @@
 <template>
     <div class="_help-page">
-        <div class="_help-title">Verification - Run/Status Tab</div>
+        <div class="_help-title">Forecast - Verification Run/Status Tab</div>
         <div class="_help-subtitle">
-            This tab provides the ability to run the Verification.<br />
-            First the real-time forcing data will be downloaded,
-            which can take several minutes.<br />
-            Once the forcing data is ready the Verification will automatically start.
+            This tab provides the ability to run the Verification.
         </div>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
@@ -32,13 +29,14 @@
                     <td class="td2">This Verification Job ID.</td>
                 </tr>
                 <tr>
-                    <td class="td1">Submit Time</td>
-                    <td class="td2">Date/Time the job was submitted to run.
+                    <td class="td1">Configuration</td>
+                    <td class="td2">Configuration selected for the forecast run.
                     </td>
                 </tr>
                 <tr>
-                    <td class="td1">Elapsed Time</td>
-                    <td class="td2">Time elapsed since the job was submitted. Time is in days, HH:MM:SS</td>
+                    <td class="td1">Cycle Date</td>
+                    <td class="td2">Cycle Date selected for the forecast run.
+                    </td>
                 </tr>
                 <tr>
                     <td class="td1">Status</td>
@@ -48,6 +46,15 @@
                         Verification Running<br />
                         Done
                     </td>
+                </tr>
+                <tr>
+                    <td class="td1">Submit Time</td>
+                    <td class="td2">Date/Time the job was submitted to run.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td1">Elapsed Time</td>
+                    <td class="td2">Time elapsed since the job was submitted. Time is in days, HH:MM:SS</td>
                 </tr>
                 <tr>
                     <td class="td1">Results Pathname</td>

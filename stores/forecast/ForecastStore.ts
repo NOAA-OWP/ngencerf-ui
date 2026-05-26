@@ -17,7 +17,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const { 
     userCalibrationRunData, 
     uiGageId, 
-    uiGageList, 
+    uiDomainName,
     createdAtStart,
     createdAtEnd,
     minCreatedAt,
@@ -75,6 +75,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   const selectedForecastJob = ref<ForecastJob>();
 
   const forecastJobNgenGlobalLogging = ref<boolean>(true);
+  const forecastJobLogFileMode = ref<boolean>(false);
+
   /**
    * Compute resultsPathname based on userCalibrationRunData.value.job_data_dir
    */
@@ -139,6 +141,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         direction: forecastRunListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+        gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
         date_filter:
             (createdAtStart.value && createdAtEnd.value) ? {
               start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
@@ -251,8 +255,8 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         }
         if (isValidDate(submitTimeDate.value)) {
           submitTime.value = formatDateForRunOnString(submitTimeDate.value);
-          if (overallColdStartForecastStatus.value === 'Done' && getStatusResponse?._data?.run_end) {
-            elapsedTime.value = calculateElapsedTime(submitTimeDate.value as Date, new Date(getStatusResponse._data.run_end as string));
+          if (!['Submitted','Running'].includes(forecastJobStatus.value) && !['Submitted','Running'].includes(coldStartJobStatus.value)) {
+            setElapsedTime(getStatusResponse?._data);
           }
         } else {
           errorMessages.push(`Invalid submit date: ${getStatusResponse?._data?.submit_date}`);
@@ -268,17 +272,24 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    * Set elapsedTime
    */
   const setElapsedTime = (forecastJob: any): void => {
-    const elapsedTimeArray: string[] = [];
+    const elapsedTimeArray: Duration[] = [];
 
-    if (forecastJob?.cold_start_run?.elapsed_time) {
-      elapsedTimeArray.push(forecastJob?.cold_start_run?.elapsed_time);
+    // sum and format forecast and cold start elapsed times
+    if (forecastJob.cold_start_run?.submit_date && forecastJob.cold_start_run?.run_end) {
+      elapsedTimeArray.push(calculateElapsedTime(
+        new Date(forecastJob.cold_start_run.submit_date as string), 
+        new Date(forecastJob.cold_start_run.run_end as string)
+      ));
     }
-    if (forecastJob?.elapsed_time) {
-      elapsedTimeArray.push(forecastJob?.elapsed_time);
+    if (forecastJob?.submit_date && forecastJob?.run_end) {
+      elapsedTimeArray.push(calculateElapsedTime(
+        new Date(forecastJob.submit_date as string), 
+        new Date(forecastJob.run_end as string)
+      ));
     }
     
     // sum and format forecast and cold start elapsed times
-    elapsedTime.value = sumAndFormatElapsedTimes(elapsedTimeArray);
+    elapsedTime.value = elapsedTimeArray.length > 0 ? sumAndFormatElapsedTimes(elapsedTimeArray) : '00:00:00';
   };
 
   /**
@@ -349,6 +360,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         cold_start_date: coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) : null,
         logging_config: {
           logging_enabled: forecastJobNgenGlobalLogging.value,
+          split_logs_by_module: forecastJobLogFileMode.value,
           ...(serializedModules && {
             // add ngenLogLevel and forcingLogLevel to beginning of the object
             modules: {
@@ -405,6 +417,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         direction: calibrationRunsForForecastListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
         gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
         date_filter:
             (createdAtStart.value && createdAtEnd.value) ? {
@@ -433,8 +446,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
           } : {}
         ,
         include_archived: false
-      },
-      get_gages: uiGageList.value.length === 0
+      }
     }
     const runListDataResult = await makeProtectedApiCall<CalibrationRunsForForecast>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_forecast/`, {
       method: "POST",
@@ -451,10 +463,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     calibrationRunsForForecastListStartRow.value = (calibrationRunsForForecastListPageSize.value * (calibrationRunsForForecastListCurrentPage.value - 1)) + 1;
     calibrationRunsForForecastListEndRow.value = Math.min(calibrationRunsForForecastListStartRow.value + (calibrationRunsForForecastListPageSize.value - 1), calibrationRunsForForecastListTotalSize.value);
     
-    if (runListDataResult?._data?.gages) {
-      uiGageList.value = runListDataResult?._data?.gages;
-      uiGageList.value.sort();
-    }
     if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
       minCreatedAt.value = runListDataResult?._data?.date_range[0];
       maxCreatedAt.value = runListDataResult?._data?.date_range[1];
@@ -464,6 +472,64 @@ export const useForecastStore = defineStore('ForecastStore', () => {
       maxJobId.value = runListDataResult?._data?.id_range[1];
     }
   };
+
+  /**
+   * fetch list of gage IDs for calibration runs
+   * @return {void}
+   */
+  async function fetchGageList() {
+    // only apply domain and archived filters
+    let requestBody = {
+      domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+      include_archived: false
+    }
+    const gageListResult =
+      await makeProtectedApiCall<any>(
+        `${ngencerfBaseUrl}/calibration/get_calibration_gages_for_forecast/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+    
+    if (gageListResult?._data?.gages) {
+      return gageListResult._data.gages.sort();
+    }
+    return [];
+  }
+
+  /**
+   * fetch list of gage IDs for forecast runs
+   * @return {void}
+   */
+  async function fetchForecastGageList() {
+    // only apply domain and archived filters
+    let requestBody = {
+      domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+      include_archived: false
+    }
+    const gageListResult =
+      await makeProtectedApiCall<any>(
+        `${ngencerfBaseUrl}/calibration/get_forecast_gages/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+    
+    if (gageListResult?._data?.gages) {
+      return gageListResult._data.gages.sort();
+    }
+    return [];
+  }
 
   /**
    * Call get_status endpoint with calibrationRunForForecast.value.calibration_run_id
@@ -579,9 +645,9 @@ export const useForecastStore = defineStore('ForecastStore', () => {
   }
 
   /**
-   * Hard Reset Run/Status Store
+   * Hard Reset Forecast Store
    */
-  const hardResetForecastRunStatusStore = (): void => {
+  const hardResetForecastStore = (): void => {
     forecastJobStatus.value = "";
     coldStartJobStatus.value = "";
     elapsedTime.value = undefined;
@@ -598,12 +664,14 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     }
 
     forecastJobNgenGlobalLogging.value = true;
+    forecastJobLogFileMode.value = false;
   };
 
   /**
    * reset job filters
    */
   const resetFilters = () => {
+    uiDomainName.value = 'All';
     uiGageId.value = 'All';
     statusTypeFilterList.value = [];
     createdAtStart.value = null;
@@ -655,6 +723,7 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     selectedForecastJob,
     overallColdStartForecastStatus,
     forecastJobNgenGlobalLogging,
+    forecastJobLogFileMode,
     getForecastJobs,
     loadForecastRunStatusTabData,
     loadForecastResultsTabData,
@@ -674,8 +743,10 @@ export const useForecastStore = defineStore('ForecastStore', () => {
     setSelectedForecastRunId,
     resetSelectedForecastRunData,
     setSelectedForecastRowData,
-    hardResetForecastRunStatusStore,
-    resetFilters
+    hardResetForecastStore,
+    resetFilters,
+    fetchGageList,
+    fetchForecastGageList
   };
 });
 

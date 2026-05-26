@@ -1,13 +1,13 @@
 <template>
-  <div id="VerificationRunStatusPage">
+  <div id="VerificationResultsPage">
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
-          <div v-if="logList.length > 1" class="inline-block">
+          <div v-if="logListOptions.length > 1" class="inline-block">
             <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
-                v-model="selectedLogCategory" :options="logList" option-label="display_name" optionValue="name">
+                v-model="selectedLogCategory" :options="logListOptions" option-label="display_name" optionValue="name">
               </Select>
             </div>
           </div>
@@ -20,8 +20,8 @@
           <div class="grid auto-cols-max grid-cols-3 gap=1 text-sm text-left mt-2">
             <div class="col-span-1">
               <div>
-                <span class="font-medium">Forecast Job ID: </span>
-                {{ forecastJobId ?? '-'.repeat(15) }}
+                <span class="font-medium">Hindcast Job ID: </span>
+                {{ hindcastJobId ?? '-'.repeat(15) }}
               </div>
               <div>
                 <span class="font-medium">Verification Job ID: </span>
@@ -31,11 +31,11 @@
             <div class="col-span-1">
               <div>
                 <span class="font-medium">Configuration: </span>
-                {{ selectedVerificationJob?.forecast_run?.configuration ?? 'Unknown' }}
+                {{ selectedVerificationJob?.hindcast_run?.configuration ?? 'Unknown' }}
               </div>
               <div>
                 <span class="font-medium">Cycle Date: </span>
-                {{ (selectedVerificationJob?.forecast_run?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedVerificationJob.forecast_run.cycle_date) + ' UTC' : 'None') }}
+                {{ (selectedVerificationJob?.hindcast_run?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedVerificationJob.hindcast_run.cycle_date) + ' UTC' : 'None') }}
               </div>
             </div>
             <div class="col-span-1">
@@ -90,25 +90,27 @@ const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 const toast = useToast();
 
-import { useForecastStore } from "@/stores/forecast/ForecastStore";
-const forecastStore = useForecastStore();
+import { useHindcastStore } from "@/stores/hindcast/HindcastStore";
+const hindcastStore = useHindcastStore();
 
-import { useVerificationStore } from "@/stores/verification/VerificationStore";
+import { useVerificationStore } from "~/stores/forecast/VerificationStore";
 const verificationStore = useVerificationStore();
 
 const { calibrationJobId } = storeToRefs(generalStore());
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { fetchUserCalibrationRunData } = useUserDataStore();
 
-const { forecastJobId } = storeToRefs(forecastStore);
-const { getStatus } = forecastStore;
+const { 
+  hindcastJobId,
+  submitTime,
+  submitTimeDate,
+  elapsedTime
+} = storeToRefs(hindcastStore);
+const { getStatus } = hindcastStore;
 
 const { 
   verificationJobId, 
   selectedVerificationJob, 
-  submitTime,
-  submitTimeDate,
-  elapsedTime,
   verificationJobStatus,
   verificationPlotNames
 } = storeToRefs(verificationStore);
@@ -120,7 +122,6 @@ const {
 
 const {
   selectedLogCategory,
-  logList,
   logListOptions
 } = storeToRefs(useLogStore());
 const {
@@ -133,14 +134,14 @@ const verificationPlotFileUrl = ref<string | undefined>();
 
 import { hilightTab } from '@/composables/TabHilight';
 onMounted(async() => {
-  hilightTab(VerificationTabs.tab_results);
+  hilightTab(HindcastTabs.tab_verificationResults);
 
   getVerificationStatus().then((response) => {
     if ( response._data.status ) {
       verificationJobStatus.value = response._data.status;
-      selectedVerificationJob.value.forecast_run = response._data?.forecast_run;
-      if (response._data?.forecast_run?.forecast_run_id) {
-        forecastJobId.value = response._data.forecast_run.forecast_run_id;
+      selectedVerificationJob.value.hindcast_run = response._data?.hindcast_run;
+      if (response._data?.hindcast_run?.hindcast_run_id) {
+        hindcastJobId.value = response._data.hindcast_run.hindcast_run_id;
       }
       if (response._data?.calibration_run_id) {
         calibrationJobId.value = response._data.calibration_run_id;
@@ -165,7 +166,6 @@ onMounted(async() => {
   }
 
   await populateLogListOptions(verificationPlotNames.value);
-  selectedLogCategory.value = verificationPlotDefault.value;
 })
 
 function capitalCaseNonNumeric(str: string) {
@@ -186,7 +186,6 @@ watch(selectedLogCategory, async () => {
 onUnmounted(() => {
   verificationPlotNames.value = [];
   verificationPlotFileUrl.value = undefined;
-  logList.value = [];
   logListOptions.value = [];
   resetUserLogRefs();
 })

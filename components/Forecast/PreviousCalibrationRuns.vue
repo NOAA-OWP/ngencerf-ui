@@ -23,11 +23,12 @@
 
       <div id="calibrationRunsForForecastList">
         <div id="CalTable" class="w-max mx-auto">
-          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
+          <JobFilterDialog id="JobFilterDialog" job-type="Calibration" :disable-all="false" 
             :show-status="false" :show-modules="false" :show-archived="false"
             :totalSize="calibrationRunsForForecastListTotalSize" :totalPages="calibrationRunsForForecastListTotalPages"
             v-model:currentPage="calibrationRunsForForecastListCurrentPage"
-            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
+            @UpdateGageList="updateGageList()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -49,11 +50,16 @@
             v-model:selection="calibrationRunForForecast" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onCalibrationRunForForecastRowSelect" @rowUnselect="onCalibrationRunForForecastRowUnSelect"
             @rowContextmenu="onRowContextMenu" class="boxed">
-            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable>
+            <Column :pt="ptColumn" field="calibration_run_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Calibration</span><br /><span>Job ID</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.calibration_run_id"
-                  :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
-                  :title="'Job ID ' + slotProps.data.calibration_run_id">
+                  :aria-label="'Calibration Job ID ' + slotProps.data.calibration_run_id"
+                  :title="'Calibration Job ID ' + slotProps.data.calibration_run_id">
                   {{ slotProps.data.calibration_run_id }}
                   <span v-if="slotProps.data.is_locked" class="pi pi-lock"></span>
                 </span>
@@ -237,13 +243,16 @@ const {
   calibrationRunsForForecastListTotalSize,
   calibrationRunsForForecastListStartRow,
   calibrationRunsForForecastListEndRow,
-  calibrationRunsForForecastListSort 
+  calibrationRunsForForecastListSort,
+  selectedForecastJob,
+  forecastJobStatus
 } = storeToRefs(forecastStore);
 const { 
   getCalibrationJobsForForecast, 
   resetUserSelectedForecastCalibrationRun, 
-  hardResetForecastRunStatusStore,
-  resetFilters
+  hardResetForecastStore,
+  resetFilters,
+  fetchGageList
 } = forecastStore;
 
 
@@ -292,19 +301,22 @@ const {
   fetchUserValidatedCalibrationJobsListData,
 } = evaluationCalibrationRunStore;
 
-const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+const { userCalibrationRunData, uiGageList } = storeToRefs(useUserDataStore());
 
 const { calibrationRunsForForecast, calibrationRunForForecast, forecastRunGageList } = storeToRefs(useForecastStore());
 
-const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId } = useForecastStore();
+const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId, fetchForecastGageList } = useForecastStore();
 
 onMounted(async () => {
   isLoading.value = true;
   forecastJobId.value = undefined;
+  calibrationRunForForecast.value = undefined;
+  selectedForecastJob.value = undefined;
+  forecastJobStatus.value = undefined; 
   calibrationRunsForForecastListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals
-  hardResetForecastRunStatusStore();
+  hardResetForecastStore();
 
   hilightTab(ForecastTabs.tab_calibrationRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
@@ -316,9 +328,14 @@ onMounted(async () => {
     resetUserSelectedEvalCalibrationRun();
     resetUserSelectedForecastCalibrationRun();
     await getCalibrationJobsForForecast();
+    updateGageList();
     isLoading.value = false;
   });
 });
+
+const updateGageList = async() => {
+  uiGageList.value = await fetchGageList();
+}
 
 // watch for sort order change - reset current page to 1
 watch(calibrationRunsForForecastListSort, () => {
@@ -540,7 +557,7 @@ const exportSelectedCalibrationData = async () => {
   const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
   if (calibrationRunForForecast.value?.is_downloadable) {
     //isLoading.value = true;
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Results Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and will be prompted to save when the file is ready.', life: ToastTimeout.timeoutInfo };
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Results Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and the file will be saved when ready.', life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
     nextTick(async () => {
       try {
