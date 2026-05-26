@@ -503,7 +503,7 @@ const goToRunStatusTab = async() => {
       alerts.push('You must choose a saved state.');
     } else {
       calibrationRunForHindcast.value.cold_start = coldStartRunsForHindcast.value.find(run => run.cold_start_run_id === coldStartJobId.value);
-      cycleDate.value = calibrationRunForHindcast.value.cycle_date;
+      cycleDate.value = calibrationRunForHindcast.value.cold_start.cold_start_cycle_date;
       coldStartDate.value = calibrationRunForHindcast.value.cold_start.cold_start_date;
     }
     if (!intervalCycle.value) { 
