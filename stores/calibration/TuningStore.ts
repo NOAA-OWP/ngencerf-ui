@@ -45,12 +45,16 @@ export const useTuningStore = defineStore(
     const tuningStore_data_loading = ref(true);
     const saveTuningTabRequestBody = ref<any>({});
 
-   
+    const selectedOutputVariableToCalibrate = ref<string>("Streamflow");
+    const calibratableParametersHaveChanged = ref<boolean>(false);
+    const tuningDataHasChanged = ref<boolean>(false);
+    const tuningParametersAreValid = ref<boolean>(false);
+
     /**
      * Load Tuning Tab data
      * @returns {Promise<any>}
      */
-    async function loadTuningTabStaticData(): Promise<any> {
+    async function loadTuningTabStaticData(forceReset: boolean=false): Promise<any> {
       tuningStore_data_loading.value = true;
       loadTuningTabData.value = await makeProtectedApiCall<any>(
         `${ngencerfBaseUrl}/calibration/load_tuning_tab/`,
@@ -96,7 +100,8 @@ export const useTuningStore = defineStore(
       // set calibration tuning parameters data table with user-selected parameters set to true if not already set, but without the user_selected_for_tuning flag
       if (
         !userSelectedCalibrationTuningParameters.value ||
-        userSelectedCalibrationTuningParameters.value.length === 0
+        userSelectedCalibrationTuningParameters.value.length === 0 ||
+        forceReset
       ) {
         userSelectedCalibrationTuningParameters.value =
           calibrationTuningParameters.value
@@ -111,6 +116,26 @@ export const useTuningStore = defineStore(
       }
 
       return loadTuningTabData.value;
+    }
+
+    /**
+     * return validate tuning parameters response from the server
+     * @returns {GeneralApiSaveResponse}
+     */
+    async function validateTuningParameters() {
+      return await makeProtectedApiCall<GeneralApiSaveResponse>(
+        `${ngencerfBaseUrl}/calibration/validate_parameters/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            calibration_run_id: calibrationJobId.value
+          }),
+        }
+      );
     }
 
     /**
@@ -187,16 +212,21 @@ export const useTuningStore = defineStore(
       simEndTime,
       calStartTime,
       calEndTime,
-      calibrationTuningParameters,
-      userSelectedCalibrationTuningParameters,
-      automatic_validation,
       avSimStartTime,
       avSimEndTime,
       avCalStartTime,
       avCalEndTime,
       rangeDateFrom,
       rangeDateTo,
+      selectedOutputVariableToCalibrate,
+      calibrationTuningParameters,
+      userSelectedCalibrationTuningParameters,
+      automatic_validation,
+      calibratableParametersHaveChanged,
+      tuningDataHasChanged,
       saveTuningTabRequestBody,
+      tuningParametersAreValid,
+      validateTuningParameters,
       saveTuningTabData,
       clearCalibratableParameters,
       hardResetTuningTimeConrols,

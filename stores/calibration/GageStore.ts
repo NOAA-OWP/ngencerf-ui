@@ -15,7 +15,7 @@ import type {
   GeneralErrorResponse,
   SaveGageTabResponse,
   SaveGageTabPayload,
-} from "@/composables/NextGenModel";
+} from "@/composables/NgencerfModels";
 
 export const useGageStore = defineStore(
   "GageStore",
@@ -23,11 +23,13 @@ export const useGageStore = defineStore(
     /**
      * ref section
      */
-    const { calibrationJobId } = storeToRefs(generalStore());
+    const { calibrationJobId, gageDataSourceHasChanged } = storeToRefs(generalStore());
     const { ngencerfBaseUrl } = useBackendConfig();
     const { getAccessToken } = useUserDataStore();
     const userDataStore = useUserDataStore();
     const { userCalibrationRunData } = storeToRefs(userDataStore);
+  
+    const jobNameInput = ref<string>("");
 
     const domainOptionsList = ref<SelectOption[]>([]);
     const gageOptionsList = ref<SelectOption[]>([]);
@@ -55,8 +57,7 @@ export const useGageStore = defineStore(
           headers: {
             Authorization: `Bearer ${getAccessToken()}`,
             "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ calibration_run_id: calibrationJobId.value }),
+          }
         }
       ).then((gageTabDataResult) => {
         gageTabData.value = gageTabDataResult?._data ?? undefined;
@@ -91,12 +92,17 @@ export const useGageStore = defineStore(
      * @returns {SelectOption[]}
      */
     const getDomainOptionsList = computed(() => {
-      domainOptionsList.value = [];
+      domainOptionsList.value = [{
+        name: '',
+        display_name: 'All',
+        selected: false,
+        groups: [],
+      }];
       if (gageTabData?.value?.domain_values.length) {
         gageTabData.value?.domain_values.forEach((domain_value) => {
           domainOptionsList.value.push({
             name: domain_value.name,
-            description: domain_value.description,
+            display_name: domain_value.display_name,
             selected: false,
             groups: [],
           });
@@ -113,7 +119,7 @@ export const useGageStore = defineStore(
       gageOptionsList.value = [];
       gageTabData.value?.gages.forEach((gage_value) => {
         if (
-          selectedDomainValue.value === "" ||
+          selectedDomainValue.value === "" || selectedDomainValue.value === "All" ||
           gage_value.domain === selectedDomainValue.value
         ) {
           if (gage_value.headwater_calibration) {
@@ -147,20 +153,24 @@ export const useGageStore = defineStore(
      *  @returns {void}
      */
     async function fetchSelectedGageData(): Promise<void> {
-      const selectedGageDataResponse = await makeProtectedApiCall<GageData>(
-        `${ngencerfBaseUrl}/calibration/get_gage/`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${getAccessToken()}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            gage_id: selectedGageValue.value,
-          }),
-        }
-      );
-      gageData.value = selectedGageDataResponse?._data ?? undefined;
+      if (selectedGageValue.value && selectedGageValue.value != '') {
+        const selectedGageDataResponse = await makeProtectedApiCall<GageData>(
+          `${ngencerfBaseUrl}/calibration/get_gage/`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${getAccessToken()}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              gage_id: selectedGageValue.value,
+            }),
+          }
+        );
+        gageData.value = selectedGageDataResponse?._data ?? undefined;
+      } else {
+        gageData.value = undefined;
+      }
     }
 
     /**
@@ -168,6 +178,7 @@ export const useGageStore = defineStore(
      * @returns {SaveGageTabResponse}
      */
     async function saveGageTabData() {
+      gagePayload.value.job_name = jobNameInput.value ?? "";
       if (selectedGageValue.value)
         gagePayload.value["gage_id"] = selectedGageValue.value;
       if (selectedForcingValue.value)
@@ -226,7 +237,7 @@ export const useGageStore = defineStore(
         },
         body: formData,
       });
-
+      gageDataSourceHasChanged.value = true;
       return saveUserForcingFilesResponse;
     }
 
@@ -245,7 +256,7 @@ export const useGageStore = defineStore(
         },
         body: formData,
       });
-
+      gageDataSourceHasChanged.value = true;
       return saveUserObservationalFilesResponse;
     }
 
@@ -260,7 +271,7 @@ export const useGageStore = defineStore(
         },
         body: formData,
       });
-
+      gageDataSourceHasChanged.value = true;
       return saveUserGeopackageFilesResponse;
     }
 
@@ -269,10 +280,11 @@ export const useGageStore = defineStore(
      * @returns {void}
      */
     const setUserSelection = (): void => {
+      jobNameInput.value = userCalibrationRunData?.value?.job_name ?? "";
       selectedDomainValue.value = getSavedDomainValue.value ?? ""
       selectedGageValue.value = userCalibrationRunData.value?.gage?.gage_id ?? ""
-      selectedForcingValue.value =  !userCalibrationRunData.value?.external_data_status.observational && getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
-      selectedObservationalValue.value = !userCalibrationRunData.value?.external_data_status.forcing && getObservationalOptionsList.value ? getObservationalOptionsList.value [0].name : "";
+      selectedForcingValue.value =  !userCalibrationRunData.value?.external_data_status.forcing && getForcingOptionsList.value ? getForcingOptionsList.value[0].name : "";
+      selectedObservationalValue.value = !userCalibrationRunData.value?.external_data_status.observational && getObservationalOptionsList.value ? getObservationalOptionsList.value [0].name : "";
       selectedGeopackageValue.value = !userCalibrationRunData.value?.external_data_status.geopackage && getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : "";
       gageData.value = userCalibrationRunData.value?.gage ?? undefined
     }
@@ -297,6 +309,7 @@ export const useGageStore = defineStore(
      * @returns {void}
      */
     const resetGageStore = (): void => {
+      jobNameInput.value = "";
       selectedDomainValue.value = "";
       selectedForcingValue.value = "";
       selectedGageValue.value = "";
@@ -314,6 +327,7 @@ export const useGageStore = defineStore(
       getSavedDomainValue,
       selectedGeopackageValue,
       gageTabData,
+      jobNameInput,
       getDomainOptionsList,
       getGageOptionsList,
       getForcingOptionsList,

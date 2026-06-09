@@ -5,14 +5,16 @@ import { DateTime } from "luxon";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
+import { useEvaluationCalibrationRunStore } from "@/stores/evaluation/EvaluationCalibrationRunStore";
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useApiErrorResponsePreprocess } from "@/composables/ValidationHandlers";
 import { formatISOStringOrDateToYYYYMMDD } from '@/utils/TimeHelpers';
 
 export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplementalDataStore', () => {
-  const { calibrationJobId } = storeToRefs(generalStore());
+  const { calibrationJobId, evaluateValidationRunId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+  const { selectedCalibrationCompareRuns } = storeToRefs(useEvaluationCalibrationRunStore());
   const { getAccessToken } = useUserDataStore();
 
 
@@ -32,80 +34,127 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     'Validation Best Run',
     'Validation Alt Iteration X Run'
   ]);
-  const sweStartDateTime = ref<any>();
-  const minSweDateTime = ref<any>();
-  const sweEndDateTime = ref<any>();
-  const maxSweDateTime = ref<any>();
-  const sweTimeSeriesData = ref<any[]>([]);
+  const gridDisplayOptions = ref<any>([
+    {
+      "name": "Snow Water Equivalent", 
+      "abbr": "SWE",
+      "timeseries_endpoint": "get_swe_timeseries_data",
+      "images_endpoint": "get_swe_images_by_date"
+    },
+    {
+      "name": "Soil Moisture", 
+      "abbr": "SMAP",
+      "timeseries_endpoint": "get_soil_moisture_timeseries_data",
+      "images_endpoint": "get_soil_moisture_images_by_date"
+    }
+  ]);
+  const selectedGridDisplay = ref<any>({});
+  const gridStartDateTime = ref<any>();
+  const minGridDateTime = ref<any>();
+  const gridEndDateTime = ref<any>();
+  const maxGridDateTime = ref<any>();
+  const gridTimeSeriesData = ref<any[]>([]);
 
 
   const gridTypes = ref<string[]>([
     'Gridded',
     'Catchment Means'
   ]);
-  const selectedGridType = ref<string>();
-  const selectedSweDateTime = ref<any>();
-
-  const selectedSnodasLumpedMapUrl = ref<string>();
-  const selectedSnodasRawMapUrl = ref<string>();
-  const selectedSnodasSimMapUrl = ref<string>();
+  const selectedGridTypes = ref<string[]>([]);
+  const selectedGridDateTime = ref<any>();
+  const selectedGridImages = ref<any[]>([]);
 
   const isEvaluationLoading = ref<boolean>(false);
 
   const userTimeZone = DateTime.local().zoneName;
 
   /**
-   * set sweStartDateTime
+   * set gridStartDateTime
    */
-  const setSweStartDateTime = (): void => {
-    if (sweTimeSeriesData.value.length > 0) {
-      sweStartDateTime.value = DateTime.fromISO(sweTimeSeriesData.value[0].timestamp, { zone: 'utc' });
+  const setgridStartDateTime = (): void => {
+    if (gridTimeSeriesData.value.length > 0) {
+      gridStartDateTime.value = DateTime.fromISO(gridTimeSeriesData.value[0].timestamp, { zone: 'utc' });
     } else {
-      sweStartDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_start_time, { zone: 'utc' });
+      gridStartDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_start_time as string, { zone: 'utc' });
     }
     
     // this is used to set the min date for the date picker correctly
-    minSweDateTime.value = sweStartDateTime.value.setZone(userTimeZone, { keepLocalTime: true });
+    minGridDateTime.value = gridStartDateTime.value.setZone(userTimeZone, { keepLocalTime: true });
   };
 
   /**
-   * set sweEndDateTime
+   * set gridEndDateTime
    */
-  const setSweEndDateTime = (): void => {
-    if (sweTimeSeriesData.value.length > 0) {
-      sweEndDateTime.value = DateTime.fromISO(sweTimeSeriesData.value[sweTimeSeriesData.value.length - 1].timestamp, { zone: 'utc' });
+  const setgridEndDateTime = (): void => {
+    if (gridTimeSeriesData.value.length > 0) {
+      gridEndDateTime.value = DateTime.fromISO(gridTimeSeriesData.value[gridTimeSeriesData.value.length - 1].timestamp, { zone: 'utc' });
     } else {
-      sweEndDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_end_time, { zone: 'utc' });
+      gridEndDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_end_time as string, { zone: 'utc' });
     }
     
     // this is used to set the max date for the date picker correctly
-    maxSweDateTime.value = sweEndDateTime.value.setZone(userTimeZone, { keepLocalTime: true });
+    maxGridDateTime.value = gridEndDateTime.value.setZone(userTimeZone, { keepLocalTime: true });
   };
 
   /**
-   * get sweTimeRange
+   * getGridTimeRange
    */
-  const getSweTimeRange = (): string => {
-    return `Range: ${formatISOStringOrDateToYYYYMMDD(sweStartDateTime.value.toJSDate())} to ${formatISOStringOrDateToYYYYMMDD(sweEndDateTime.value.toJSDate())}`;
+  const getGridTimeRange = (): string => {
+    return `Range: ${formatISOStringOrDateToYYYYMMDD(gridStartDateTime.value)} to ${formatISOStringOrDateToYYYYMMDD(gridEndDateTime.value)}`;
   };
 
   /**
-   * Load SWE images
+   * Load Grid images
    */
-  const loadSweImages = async (validation_run_id: number, date: string): Promise<string[]> => {
-    const getSweImagesResponse = await getSweImagesByDate(validation_run_id, date);
+  const loadGridImages = async (validation_run_id: number, date: string): Promise<string[]> => {
+    const getGridImagesResponse = await getGridImagesByDate(validation_run_id, date);
 
-    if (getSweImagesResponse.status >= 200 && getSweImagesResponse.status < 300) {
-      if (getSweImagesResponse._data) {
-        selectedSnodasLumpedMapUrl.value = getSweImagesResponse?._data?.lumped_map;
-        selectedSnodasRawMapUrl.value = getSweImagesResponse?._data?.raw_map;
-        selectedSnodasSimMapUrl.value = getSweImagesResponse?._data?.sim_map;
+    if (getGridImagesResponse.status >= 200 && getGridImagesResponse.status < 300) {
+      if (getGridImagesResponse._data) {
+        selectedGridImages.value = [];
+        if (getGridImagesResponse?._data?.raw_map || getGridImagesResponse?._data?.lumped_map) {
+          let gridTypes = [];
+          if (getGridImagesResponse?._data?.raw_map) {
+            gridTypes.push({
+              "grid_name": "Gridded (Raw Values)",
+              "images": [
+                {"image_name": "Raw Map", "image_url": getGridImagesResponse?._data?.raw_map}
+              ]
+            });
+          }
+          if (getGridImagesResponse?._data?.lumped_map) {
+            gridTypes.push({
+              "grid_name": "Catchment Means",
+              "images": [
+                {"image_name": "Lumped Map", "image_url": getGridImagesResponse?._data?.lumped_map}
+              ]
+            });
+          }
+          selectedGridImages.value.push({
+            "category_name": selectedGridDisplay.value.abbr === 'SWE' ? "SNODAS": "SMAP",
+            "grid_types": gridTypes
+          });
+        }
+        if (getGridImagesResponse?._data?.sim_map) {
+          selectedGridImages.value.push({
+            "category_name": "Simulated",
+            "grid_types": [
+              {
+                "grid_name": "Catchment Means",
+                "images": [
+                  {"image_name": "Simulated Map", "image_url": getGridImagesResponse?._data?.sim_map}
+                ]
+              }
+            ]
+          });
+        }
+
         return [];
       } else {
-        return ['No data from get_swe_images_by_date endpoint'];
+        return ['No data from ' + selectedGridDisplay.value.images_endpoint + ' endpoint'];
       }
     } else {
-      return useApiErrorResponsePreprocess(getSweImagesResponse);
+      return useApiErrorResponsePreprocess(getGridImagesResponse);
     }
   };
 
@@ -128,7 +177,7 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   };
 
   /**
-  * Get Performance Metrics
+  * Get Performance Metrics for Calibration Job
   * @return {any}
   */
   const queryGetPerformanceMetrics = async (): Promise<any> => {
@@ -149,12 +198,54 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
       )
     });
   };
+  /**
+  * Get Performance Metrics for Validation Job
+  * @return {any}
+  */
+  const queryGetPerformanceMetricsForValidation = async (): Promise<any> => {
+    if (!evaluateValidationRunId.value) {
+      return null;
+    }
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_status/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          validation_run_id: evaluateValidationRunId.value,
+          include_performance_metrics: true
+        }
+      )
+    });
+  };
+
+
+  /**
+  * Get Performance Metrics for Comparison
+  * @return {any}
+  */
+  const queryGetPerformanceMetricsForComparison = async (): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_status_for_comparison/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(
+        {
+          calibration_run_ids: selectedCalibrationCompareRuns.value.map(run => run.calibration_run_id)
+        }
+      )
+    });
+  };
 
   /**
    * Get Calibration/Validation Log Names
    * @return {any}
    */
-  const queryGetLogNames = async (validation_run_id: number = 0): Promise<any> => {
+  const queryGetLogNames = async (validation_run_id: number): Promise<any> => {
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_names/`, {
       method: "POST",
       headers: {
@@ -172,9 +263,8 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * @return {any}
    */
   const queryGetLogData = async (
-    log_category: string,
     log_name: string,
-    validation_run_id: number = 0,
+    validation_run_id: number,
     start?: number,
     limit?: number
   ): Promise<any> => {
@@ -186,41 +276,45 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
       },
       body: JSON.stringify({
         validation_run_id: validation_run_id,
-        log_category: log_category,
         log_name: log_name,
-        start: start !== undefined ? start.toString() : '',
-        limit: limit !== undefined ? limit.toString() : ''
+        start: start !== undefined ? start : 0,
+        limit: limit !== undefined ? limit : 1000
       })
     });
   };
 
   /**
-   * get_snodas_images endpoint
+   * get grid images endpoint
    * @param {number} validation_run_id
    * @param {string} date
    * @return {any}
    */
-  const getSweImagesByDate = async (validation_run_id: number, date: string): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_swe_images_by_date/`, {
+  const getGridImagesByDate = async (validation_run_id: number, date: string): Promise<any> => {
+    const requestBody = {
+      validation_run_id: validation_run_id,
+    }
+    if (date.split(' ').length > 1) {
+      requestBody.datetime = date;
+    } else {
+      requestBody.date = date;
+    }
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/${selectedGridDisplay.value.images_endpoint}/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({
-        validation_run_id: validation_run_id,
-        date: date
-      })
+      body: JSON.stringify(requestBody)
     });
   };
 
   /**
-   * run_swe endpoint
+   * grid time series data endpoint
    * @param {number} validation_run_id
    * @return {any}
    */
-  const queryGetSWETimeseriesData = async (validation_run_id: number): Promise<any> => {
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_swe_timeseries_data/`, {
+  const queryGetGridTimeSeriesData = async (validation_run_id: number): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/${selectedGridDisplay.value.timeseries_endpoint}/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -239,28 +333,30 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     selectedPlotFilename,
     selectedPlotFileUrl,
     simulatedSources,
+    gridDisplayOptions,
+    selectedGridDisplay,
     gridTypes,
-    selectedGridType,
-    sweStartDateTime,
-    minSweDateTime,
-    maxSweDateTime,
-    sweEndDateTime,
-    selectedSweDateTime,
-    selectedSnodasLumpedMapUrl,
-    selectedSnodasRawMapUrl,
-    selectedSnodasSimMapUrl,
-    sweTimeSeriesData,
+    selectedGridTypes,
+    gridStartDateTime,
+    minGridDateTime,
+    maxGridDateTime,
+    gridEndDateTime,
+    selectedGridDateTime,
+    selectedGridImages,
+    gridTimeSeriesData,
     isEvaluationLoading,
-    setSweStartDateTime,
-    setSweEndDateTime,
-    getSweTimeRange,
+    setgridStartDateTime,
+    setgridEndDateTime,
+    getGridTimeRange,
     queryGetIterations,
     queryGetPerformanceMetrics,
+    queryGetPerformanceMetricsForValidation,
+    queryGetPerformanceMetricsForComparison,
     queryGetLogNames,
     queryGetLogData,
-    getSweImagesByDate,
-    loadSweImages,
-    queryGetSWETimeseriesData,
+    getGridImagesByDate,
+    loadGridImages,
+    queryGetGridTimeSeriesData,
   };
 });
 

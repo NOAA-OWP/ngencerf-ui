@@ -1,31 +1,85 @@
 <template>
-  <client-only>
-    <div class="h-full">
-      <div class="grid grid-rows-3 h-full">
-        <div class="row-span-1">
-          <div>
-            <AppHeader />
-          </div>
-        </div>
-        <div class="row-span-1">
-          <div id="CenterBox" class="bg-white mx-auto px-8 py-8 rounded-[10px] max-w-screen-lg">
-            <div class="mx-auto px-8 text-center text-2xl mt-8 mb-8 ">
-              <h1 class="text-4xl font-bold">Next Generation Water Prediction Capability</h1>
-              <div class="pt-8 pb-8">Welcome <strong>{{ getUserFullName() }}</strong></div>
-              <div>You have {{ runningCalibrationJobs }} current processes running</div>
-              <div>You have {{ savedCalibrationJobs }} calibration setups to complete</div>
+    <client-only>
+        <div class="min-h-screen">
+            <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
+
+            <!-- Header -->
+            <div>
+                <AppHeader />
             </div>
-          </div>
+
+            <!-- Middle: centers CenterBox -->
+            <div class="flex items-center justify-center px-4 py-8">
+
+                <div
+                id="CenterBox"
+                class="bg-white mx-auto px-6 py-8 rounded-[10px] max-w-screen-lg shadow-md"
+                >
+                    <!-- Page Title -->
+                    <div class="text-center mb-6">
+                        <h1 class="text-4xl font-bold">Next Generation Water Prediction Capability</h1>
+                        <div class="text-lg sm:text-xl text-gray-700 mt-2">
+                        Welcome <strong>{{ getUserFullName() }}</strong>
+                        </div>
+                    </div>
+
+                    <hr class="my-6 border-black" />
+
+                    <!-- Dashboard Section -->
+                    <div class="text-center font-bold text-2xl mb-4">Dashboard</div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+                        <!-- Running Processes Card -->
+                        <div class="bg-teal-100 text-teal-800 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer"
+                            @click="gotoCalibrationAndFilter({'status': 'Running'})">
+                            <i class="pi pi-sync text-teal-600 text-3xl mb-2"
+                                :class="{ 'pi-spin': runningCalibrationJobs > 0 }"></i>
+                                <div class="text-3xl sm:text-4xl font-extrabold text-teal-800">
+                                {{ runningCalibrationJobs }}
+                            </div>
+                            <div class="text-sm sm:text-base text-gray-700 mt-2">
+                                Calibrations Running
+                            </div>
+                        </div>
+
+                        <!-- Ready to Run Card -->
+                        <div class="bg-green-50 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer"
+                            @click="gotoCalibrationAndFilter({'status': 'Ready'})">
+                            <i class="pi pi-play-circle text-green-600 text-3xl mb-2"></i>
+                            <div class="text-3xl sm:text-4xl font-extrabold text-green-600">
+                                {{ readyCalibrationJobs }}
+                            </div>
+                            <div class="text-sm sm:text-base text-gray-700 mt-2">
+                                Calibrations Ready to Run
+                            </div>
+                        </div>
+
+                        <!-- Setups to Complete Card -->
+                        <div class="bg-amber-50 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer"
+                            @click="gotoCalibrationAndFilter({'status': 'Saved'})">
+                            <i class="pi pi-sliders-h text-amber-600 text-3xl mb-2"></i>
+                            <div class="text-3xl sm:text-4xl font-extrabold text-amber-600">
+                                {{ savedCalibrationJobs }}
+                            </div>
+                            <div class="text-sm sm:text-base text-gray-700 mt-2">
+                                Calibrations In Setup
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="row-span-1">
+                <AppFooter />
+            </div>
         </div>
-      </div>
-      <div class="row-span-1">
-        <AppFooter />
-      </div>
     </div>
-  </client-only>
+</client-only>
+
 </template>
 <script setup lang="ts">
-import { onMounted, nextTick } from "vue";
+import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 
 import AppHeader from '@/components/Common/AppHeader.vue';
@@ -38,30 +92,60 @@ import { useFormulationStore } from "@/stores/calibration/FormulationStore";
 import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
 import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
 import { useTuningStore } from "@/stores/calibration/TuningStore";
-
 import { generalStore } from "~/stores/common/GeneralStore";
-const gstore = generalStore();
-const { popupActive } = storeToRefs(gstore);
 
-const { resetGageStore } = useGageStore();
-const { resetFormulationStore } = useFormulationStore();
-const { resetOptimizationStore } = useOptimizationStore();
-const { hardResetRunStatusStore } = useRunStatusStore();
+import { useToast } from "primevue/usetoast";
+import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
+const toast = useToast();
+
+const { popupActive } = storeToRefs(generalStore());
+
+const { resetGageStore, loadGageTabStaticData } = useGageStore();
+const { resetFormulationStore, loadFormulationModels } = useFormulationStore();
 const { hardResetTuningStore } = useTuningStore();
+const { resetOptimizationStore, loadOptimizationTabStaticData } = useOptimizationStore();
+const { hardResetRunStatusStore } = useRunStatusStore();
+const { addToastRecord } = generalStore();
 
-const { savedCalibrationJobs, runningCalibrationJobs } = storeToRefs(useCalibrationJobStore());
-const { fetchUserCalibrationJobsListData, getUserName, getUserFullName} = useUserDataStore()
+const formulationStore = useFormulationStore;
+const { formulationTabData } = storeToRefs(formulationStore());
+const { statusTypeFilterList, preFilterList } = storeToRefs(useUserDataStore());
+const { fetchUserCalibrationJobCounts } = useUserDataStore();
 
-onMounted(() => {
+const { getUserFullName } = useUserDataStore()
+
+const runningCalibrationJobs = ref<number | null>(null);
+const readyCalibrationJobs = ref<number | null>(null);
+const savedCalibrationJobs = ref<number | null>(null);
+
+onMounted(async () => {
   popupActive.value = false;
-  nextTick(() => {
-    resetGageStore();
-    resetFormulationStore();
-    resetOptimizationStore();
-    hardResetRunStatusStore();
-    hardResetTuningStore();
-    fetchUserCalibrationJobsListData();
-  })
+  resetGageStore();
+  resetFormulationStore();
+  resetOptimizationStore();
+  hardResetRunStatusStore();
+  hardResetTuningStore();
+  await loadGageTabStaticData();
+  await loadFormulationModels();
+  await loadOptimizationTabStaticData();
+
+  const jobCounts = await fetchUserCalibrationJobCounts();
+  if (jobCounts?._data) {
+    runningCalibrationJobs.value = jobCounts._data.running_count;
+    readyCalibrationJobs.value = jobCounts._data.ready_count;
+    savedCalibrationJobs.value = jobCounts._data.saved_count;
+  } else {
+    toast.removeAllGroups();
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Server Error', detail: 'Unable to retrieve job counts from server', life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
+  }
 })
+
+const gotoCalibrationAndFilter = (filterList: DynamicObject={}) => {
+  preFilterList.value = filterList;
+  const e = document.getElementById('MainMenuCalibration');
+  e.click();
+}
 
 </script>

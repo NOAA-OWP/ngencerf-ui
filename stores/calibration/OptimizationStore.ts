@@ -8,7 +8,7 @@ import type {
   UserCalibrationRunOptimizationInputData,
   GeneralApiSaveResponse,
   SaveOptimizationPayload,
-} from "@/composables/NextGenModel";
+} from "@/composables/NgencerfModels";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "../common/GeneralStore";
@@ -46,6 +46,8 @@ export const useOptimizationStore = defineStore(
     const objectiveFunctionOptionsList = ref<SelectOption[]>([]);
     const showObjectiveFunctionPeakFlow = ref<boolean>(false);
     const showObjectiveFunctionStreamFlow = ref<boolean>(false);
+    const optMetDataHasChanged = ref<boolean>(false);
+    const algParamDataHasChanged = ref<boolean>(false);
 
     const saveOptMetPayload = ref<SaveOptimizationPayload>({});
 
@@ -62,15 +64,12 @@ export const useOptimizationStore = defineStore(
           headers: {
             Authorization: `Bearer ${getAccessToken()}`,
             "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ calibration_run_id: calibrationJobId.value }),
+          }
         }
       ).then((optimizationTabDataResult) => {
         optimizationTabData.value =
           optimizationTabDataResult?._data ?? undefined;
         optimizationStore_data_loading.value = false;
-
-        setUserSelection();
       });
     };
 
@@ -79,12 +78,26 @@ export const useOptimizationStore = defineStore(
         userCalibrationRunData.value?.streamflow_threshold ?? undefined;
       uiPeakFlowThreshold.value =
         userCalibrationRunData.value?.peak_flow_threshold ?? undefined;
-      uiObjectiveFunction.value =
-        userCalibrationRunData.value?.objective_function ?? "";
-      uiOptimization.value = userCalibrationRunData.value?.optimization ?? "";
-      uiPlotFrequency.value =
-        userCalibrationRunData.value?.save_plot_iteration_frequency ?? 0;
-      uiStopCriteria.value = userCalibrationRunData.value?.stop_criteria ?? 0;
+      if (userCalibrationRunData.value?.objective_function) {
+        uiObjectiveFunction.value = userCalibrationRunData.value.objective_function;
+      } else {
+        uiObjectiveFunction.value = userCalibrationRunData.value.objective_function = "";
+      }
+      if (userCalibrationRunData.value?.optimization) {
+        uiOptimization.value = userCalibrationRunData.value.optimization;
+      } else {
+        uiOptimization.value = userCalibrationRunData.value.optimization = "";
+      }
+      if (userCalibrationRunData.value?.save_plot_iteration_frequency) {
+        uiPlotFrequency.value = userCalibrationRunData.value.save_plot_iteration_frequency;
+      } else {
+        uiPlotFrequency.value = userCalibrationRunData.value.save_plot_iteration_frequency = 1;
+      }
+      if (userCalibrationRunData.value?.stop_criteria) {
+        uiStopCriteria.value = userCalibrationRunData.value.stop_criteria;
+      } else {
+        uiStopCriteria.value = userCalibrationRunData.value.stop_criteria = 2;
+      }
       uiOptimizationInputs.value = getOptimizationInputUserData.value ?? [];
     };
 
@@ -111,7 +124,8 @@ export const useOptimizationStore = defineStore(
       optimizationTabData.value?.metrics.forEach((metric_option) => {
         objectiveFunctionOptionsList.value.push({
           name: metric_option.name,
-          description: metric_option.name,
+          display_name: metric_option.display_name,
+          description: metric_option.display_name,
           selected: false,
           groups: [],
         });
@@ -137,11 +151,13 @@ export const useOptimizationStore = defineStore(
             name: data_input.name,
             value: data_input.default_value,
           };
-          let user_optimization_input = filterCalRunData(data_input.name);
+	  // Commenting out because we don't want to replace defaults with previous user selections
+	  // when switching optimization algorithm
+          /* let user_optimization_input = filterCalRunData(data_input.name);
 
           if (user_optimization_input && user_optimization_input.length !== 0) {
             data_item.value = user_optimization_input[0].value;
-          }
+          } */
 
           data_items.push(data_item);
         });
@@ -187,7 +203,29 @@ export const useOptimizationStore = defineStore(
         saveOptMetPayload.value["save_plot_iteration_frequency"] =
           uiPlotFrequency.value;
 
-      if (Object.keys(saveOptMetPayload.value).length > 0) {
+      let validationErrors = {};
+      if (Object.keys(saveOptMetPayload.value).length === 0) {
+        validationErrors['Tab Error'] = ["Please select at least 1 field before saving."];
+      } else {
+        if (!saveOptMetPayload.value?.stop_criteria) {
+          validationErrors['Calibration Stop Criteria'] = ["This value must be numeric."];
+        }
+        if (!saveOptMetPayload.value?.save_plot_iteration_frequency) {
+          validationErrors['Plot Generation Frequency'] = ["This value must be numeric."];
+        }
+      }
+      if (Object.keys(validationErrors).length > 0) {
+        return Promise.resolve({
+          _data: {
+            respone_type: "exception",
+            message: "Error saving Optimization Data",
+            validation_errors: validationErrors,
+            calibration_run_id: calibrationJobId.value,
+            status: "error",
+          },
+          status: 400,
+        });
+      } else {
         saveOptMetPayload.value["calibration_run_id"] = calibrationJobId.value;
         saveOptMetPayload.value["save_output_iteration"] = true;
         return await makeProtectedApiCall<GeneralApiSaveResponse>(
@@ -201,33 +239,14 @@ export const useOptimizationStore = defineStore(
             body: JSON.stringify(saveOptMetPayload.value),
           }
         );
-      } else {
-        return Promise.resolve({
-          _data: {
-            respone_type: "exception",
-            message: "Error saving Optimization Data",
-            validation_errors: {
-              "Tab Error": ["Please select at least 1 field before saving."],
-            },
-            calibration_run_id: calibrationJobId.value,
-            status: "error",
-          },
-          status: 400,
-        });
       }
     }
-
-    const getSelectedMetricInfo = computed(() => {
-      const selectedMetric = optimizationTabData.value?.metrics.filter(
-        (metric_data) => metric_data.name === uiObjectiveFunction.value
-      );
-      return selectedMetric;
-    });
 
     const resetOptimizationInputs = () => {
       uiOptimizationInputs.value.forEach((input_data) => {
         input_data.value = 0;
       });
+      optMetDataHasChanged.value = true;
     };
 
     /**
@@ -255,8 +274,8 @@ export const useOptimizationStore = defineStore(
       uiPeakFlowThreshold.value = undefined;
       uiObjectiveFunction.value = "";
       uiOptimization.value = "";
-      uiPlotFrequency.value = 0;
-      uiStopCriteria.value = 0;
+      uiPlotFrequency.value = 1;
+      uiStopCriteria.value = 2;
       uiOptimizationInputs.value = [];
     };
 
@@ -275,10 +294,12 @@ export const useOptimizationStore = defineStore(
       getObjectiveFunctionOptionsList,
       showObjectiveFunctionPeakFlow,
       showObjectiveFunctionStreamFlow,
-      getSelectedMetricInfo,
+      optMetDataHasChanged,
+      algParamDataHasChanged,
       getOptimizationInputUserData,
       saveOptimizationTabData,
       resetOptimizationInputs,
+      setUserSelection,
       resetUserSelectionOptimization,
       resetOptimizationStore,
       loadOptimizationTabStaticData,

@@ -3,18 +3,22 @@
  *  The General Store will be responsible for handling information OUTSIDE of the data needed for the back end.
  *  Data will include the current menu status and the current tab status for each of the 4 menu items
  */
-import { defineStore } from "pinia";
+import { defineStore, acceptHMRUpdate } from "pinia";
 
-import type { CombinedVerstionInfo, ToastRecord } from "@/composables/NextGenModel";
+import type { CombinedVersionInfo, ToastRecord } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
+import { getStorageKey } from "~/utils/Storage";
 
 export const generalStore = defineStore(
   "generalStore",
   () => {
+
+    const gitInfo = ref<Record<string, GitData>>({});
+
     const calibrationTabIndex = ref("1");
     const evaluationTabIndex = ref("1");
     const forecastTabIndex = ref("1");
-    const verificationTabIndex = ref("1");
+    const hindcastTabIndex = ref("1");
 
     const menuIndex = ref("1");
 
@@ -29,11 +33,13 @@ export const generalStore = defineStore(
     const evaluateValidationRunStatus = ref<string>("");
     // user seleted iteration run number for display only
     const evaluateDisplayIterationNumber = ref<number>(0);
+    // validation status for display only
+    const validationStatus = ref<string>( "" );
 
     // Has the user selected a previous calibration run for Evaluation?
     const evaluationRunSelected = ref(true);
 
-    const serverInfo = ref<CombinedVerstionInfo>();
+    const serverInfo = ref<CombinedVersionInfo>();
 
     const isLoading = ref<boolean>(false);
 
@@ -42,6 +48,8 @@ export const generalStore = defineStore(
 
     // This is set if the user changes the gage.  Resets when saved.
     const gageHasChanged = ref<boolean>(false);
+    // This is set if the user changes any of the data sources on the gage tab.  Resets when saved.
+    const gageDataSourceHasChanged = ref<boolean>(false);
     // This is set if the user changes the modules on the Formulation page
     const modulesHaveChanged = ref<boolean>(false);
 
@@ -61,7 +69,7 @@ export const generalStore = defineStore(
       return serverInfo.value;
     }
 
-    function setServerInfo(si: CombinedVerstionInfo) {
+    function setServerInfo(si: CombinedVersionInfo) {
       serverInfo.value = si;
     }
 
@@ -97,12 +105,12 @@ export const generalStore = defineStore(
       forecastTabIndex.value = tab.toString();
     }
 
-    //  Verification Tab index
-    function getVerificationTabIndex() {
-      return parseInt(verificationTabIndex.value);
+    //  Hindcast Tab index
+    function getHindcastTabIndex() {
+      return parseInt(hindcastTabIndex.value);
     }
-    function setVerificationTabIndex(tab: number) {
-      verificationTabIndex.value = tab.toString();
+    function setHindcastTabIndex(tab: number) {
+      hindcastTabIndex.value = tab.toString();
     }
 
     // Previous calibration run for Evaluation
@@ -117,9 +125,17 @@ export const generalStore = defineStore(
     function resetGeneralStore() {
       calibrationJobId.value = 0;
       popupActive.value = false;
+
+      // Also reset current menu/tab index so that user doesn't get redirected to a tab from the previous session
+      menuIndex.value = '1';
+      calibrationTabIndex.value = '1';
+      evaluationTabIndex.value = '1';
+      forecastTabIndex.value = '1';
+      hindcastTabIndex.value = '1';
     }
 
     return {
+      gitInfo,
       getMenuIndex,
       setMenuIndex,
       getCalibrationTabIndex,
@@ -128,8 +144,8 @@ export const generalStore = defineStore(
       setEvaluationTabIndex,
       getForecastTabIndex,
       setForecastTabIndex,
-      getVerificationTabIndex,
-      setVerificationTabIndex,
+      getHindcastTabIndex,
+      setHindcastTabIndex,
       getEvalRunSelected,
       setEvalRunSelected,
       calibrationJobId,
@@ -138,6 +154,7 @@ export const generalStore = defineStore(
       iterationValidationRunId,
       evaluateValidationRunStatus,
       evaluateDisplayIterationNumber,
+      validationStatus,
       calibrationTabIndex,
       evaluationTabIndex,
       forecastTabIndex,
@@ -146,8 +163,9 @@ export const generalStore = defineStore(
       getServerInfo,
       serverInfo,
       gageHasChanged,
+      gageDataSourceHasChanged,
       modulesHaveChanged,
-      verificationTabIndex,
+      hindcastTabIndex,
       menuIndex,
       evaluationRunSelected,
       isLoading,
@@ -159,7 +177,7 @@ export const generalStore = defineStore(
   },
   {
     persist: {
-      storage: piniaPluginPersistedstate.localStorage(),
+      key: getStorageKey("generalStore"),
     },
   }
 );

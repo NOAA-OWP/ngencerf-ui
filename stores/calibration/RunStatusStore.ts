@@ -2,21 +2,37 @@
 
 import { defineStore, storeToRefs } from "pinia";
 
-import type { CalibrationStatus, CalibrationPlotListNamesData, BestIterationData } from "@/composables/NextGenModel";
+import type {
+  CalibrationStatus,
+  CalibrationPlotListNamesData,
+  BestIterationData,
+  LogLevel
+} from "@/composables/NgencerfModels";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
 
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
-import { isValidDate, isCalibrationJobFinished, getValidControlAndValidBestStatus } from '@/utils/CommonHelpers';
-import { convertTimeZone } from '@/utils/TimeHelpers';
+import {
+  isValidDate,
+  isCalibrationJobFinished,
+  getValidControlAndValidBestStatus
+} from '@/utils/CommonHelpers';
+import { formatDateForRunOnString } from '@/utils/TimeHelpers';
 
 export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const { calibrationJobId } = storeToRefs(generalStore());
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
-  const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+  const {
+    userCalibrationRunData,
+    calibrationJobNgenGlobalLogging,
+    calibrationJobLogFileMode,
+    ngenLogLevel,
+    forcingLogLevel,
+    logLevels,
+  } = storeToRefs(useUserDataStore());
 
   // refs
   const calibrationElapsedTime = ref<string>();
@@ -25,9 +41,9 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
 
   const plotNames = ref({});
   const plotList = ref<any[]>([]);
-  const selectedPlotName = ref<string>();
-  const selectedPlotFilename = ref<string>();
-  const selectedPlotFileUrl = ref<string>();
+  const selectedPlotName = ref<string | null>(null);
+  const selectedPlotFilename = ref<string | null>(null);
+  const selectedPlotFileUrl = ref<string | null>(null);
   const iteration = ref<number>();
 
   const stopCriteria = ref<number>();
@@ -38,14 +54,27 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const validationControlStatus = ref<string>();
   const validationBestStatus = ref<string>();
   const validControlAndValidBestStatus = ref<string>();
-  const resultsPathname = ref<string>();
-  const validationBestAchieved = ref<BestIterationData>({ iteration: 0, isBest: false});
-;
+  const validationBestAchieved = ref<BestIterationData>({ iteration: 0, isBest: false });
+  const failureMessages = ref<any>();
+
+  /**
+   * Compute resultsPathname based on userCalibrationRunData.value.job_data_dir
+   */
+  const resultsPathname = computed<string>(() => {
+    if (userCalibrationRunData?.value?.job_data_dir) {
+      return userCalibrationRunData.value.job_data_dir;
+    } else {
+      return "";
+    }
+  });
+
   /**
    * Compute Overall Calibration Validation Status
    */
   const overallCalibrationValidationStatus = computed<string>(() => {
-    if (userCalibrationRunData?.value?.status !== 'Done') {
+    if (userCalibrationRunData?.value?.status === 'Validating and Preparing Job Data') {
+      return userCalibrationRunData.value.status;
+    } else if (userCalibrationRunData?.value?.status !== 'Done') {
       return `Calibration ${userCalibrationRunData?.value?.status}`;
     } else if (userCalibrationRunData?.value?.status === 'Done' && validationControlStatus?.value === 'Running') {
       return `Calibration Done, Validation Control Running`;
@@ -63,9 +92,9 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     return '';
   });
 
-   /** 
-   * Load RunStatusStore
-   */
+  /** 
+  * Load RunStatusStore
+  */
   const loadRunStatusStore = async (): Promise<void> => {
     // load stopCriteria, submitTimeDate, and submitTime from load_calibration_run
     stopCriteria.value = userCalibrationRunData?.value?.stop_criteria;
@@ -73,7 +102,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     if (isCalibrationJobFinished(userCalibrationRunData?.value?.status)) {
       submitTimeDate.value = new Date(userCalibrationRunData.value?.submit_date as string);
       if (isValidDate(submitTimeDate.value)) {
-        submitTime.value = convertTimeZone(submitTimeDate.value);
+        submitTime.value = formatDateForRunOnString(submitTimeDate.value);
       }
     }
 
@@ -84,7 +113,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     const validations = getStatusResponse?._data?.validations;
     const validControl = validations?.find((validation: any) => validation.validation_type === 'valid_control');
     const validBest = validations?.find((validation: any) => validation.validation_type === 'valid_best');
-    
+
     if (validControl?.status) {
       validationControlStatus.value = validControl.status;
     }
@@ -93,11 +122,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     }
     if (validationControlStatus?.value && validationBestStatus?.value) {
       validControlAndValidBestStatus.value = getValidControlAndValidBestStatus(validationControlStatus.value, validationBestStatus.value);
-
-      // get elapsed time from valid_best
-      if (validBest.elapsed_time) {
-        calibrationElapsedTime.value = validBest.elapsed_time;
-      }
     }
 
     // load plotNames and plotList from get_plot_names
@@ -107,10 +131,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     // load iteration from get_iteration.
     const getIterationResponse = await queryGetIteration();
     iteration.value = getIterationResponse?._data?.iteration;
-
-    // load resultsPathname from get_job_data_dir. Calibration must be Done, Running, or Failed to get resultsPathname
-    const getJobDataDirectoryResponse = await queryGetJobDataDirectory();
-    resultsPathname.value = getJobDataDirectoryResponse?._data?.data_dir;
   };
 
   /**
@@ -133,7 +153,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * @return {any}
    */
   const queryGetPlotNames = async (): Promise<any> => {
-    if(!calibrationJobId.value) {
+    if (!calibrationJobId.value) {
       return null;
     }
     return makeProtectedApiCall<CalibrationPlotListNamesData>(`${ngencerfBaseUrl}/calibration/get_plot_names/`, {
@@ -170,8 +190,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       params.set('calibration_run_id', calibration_run_id.toString());
     }
     if (include_data) {
-      params.set('start', start !== undefined ? start.toString() : '0');
-      params.set('limit', limit !== undefined ? limit.toString() : '1');
+      params.set('start', start !== undefined ? start : 0);
+      params.set('limit', limit !== undefined ? limit : 100);
     }
 
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_plot/?${params.toString()}`, {
@@ -186,15 +206,56 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   /**
    * Run Calibration
    * @return {any}
+   * NOTE: outside CalibrationJobStore, access logLevels WITH .value
+   * when a reactive property is imported into a different file,
+   * it becomes a ref object, so you need to access the value with .value
+   * https://vuejs.org/guide/essentials/reactivity-fundamentals.html#reactive
    */
   const runCalibrationJob = async (): Promise<any> => {
+    const rawLogLevels = toRaw(logLevels.value);
+
+    // transform module ref values to their actual values to be sent to the backend
+    const serializedModules: Record<string, LogLevel> | undefined =
+      Object.entries(rawLogLevels).reduce((acc, [key, val]) => {
+        if (val && typeof val === 'object' && 'value' in val) {
+          acc[key] = val.value;
+        }
+        return acc;
+      }, {} as Record<string, LogLevel>);
+
+    // store the payload body
+    const bodyData: {
+      calibration_run_id: number;
+      logging_config?: {
+        logging_enabled?: boolean;
+        modules?: Record<string, LogLevel>;
+        split_logs_by_module?: boolean;
+      }
+    } = {
+      calibration_run_id: calibrationJobId.value,
+      ...(calibrationJobNgenGlobalLogging.value !== undefined && {
+        logging_config: {
+          logging_enabled: calibrationJobNgenGlobalLogging.value,
+          split_logs_by_module: calibrationJobLogFileMode.value,
+          ...(serializedModules && {
+            // add ngenLogLevel and forcingLogLevel to beginning of the object
+            modules: {
+              'ngen': ngenLogLevel.value,
+              'forcing': forcingLogLevel.value,
+              ...serializedModules
+            }
+          })
+        },
+      })
+    };
+
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/run_calibration/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
+        "Content-Type": 'application/json',
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify(bodyData),
     });
   }
 
@@ -203,7 +264,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    * @returns {any}
    */
   const queryGetIteration = async (): Promise<any> => {
-    if(!calibrationJobId.value) {
+    if (!calibrationJobId.value) {
       return null;
     }
     return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_iteration/`, {
@@ -232,20 +293,82 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   };
 
   /**
-   * Get Job Data Directory
+   * Cancel Validation Job
    * @returns {any}
    */
-  const queryGetJobDataDirectory = async (): Promise<any> => {
-    if(!calibrationJobId.value) {
-      return null;
-    }
-    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_job_data_dir/`, {
+  const cancelValidationJob = async (validation_run_id: number): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/cancel_job/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({ validation_run_id: validation_run_id })
+    });
+  };
+  
+  /**
+    * Get Calibration Log Names
+    * @return {any}
+    */
+  const queryGetLogNames = async (calibration_run_id: number): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_names/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        calibration_run_id: calibration_run_id
+      })
+    });
+  };
+
+  /**
+    * Get Calibration Log Data
+    * @return {any}
+    */
+  const queryGetLogData = async (
+    log_name: string,
+    calibration_run_id: number,
+    start?: number,
+    limit?: number
+  ): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        log_name: log_name,
+        calibration_run_id: calibration_run_id,
+        start: start !== undefined ? start : 0,
+        limit: limit !== undefined ? limit : 1000
+      })
+    });
+  };
+
+  /** 
+   * Get Calibration Log Status
+   * @return {any}
+   */
+  const queryGetLogStatus = async (
+    calibration_run_id: number,
+    log_name: string,
+    byte_offset: number
+  ): Promise<any> => {
+    return makeProtectedApiCall<any>(`${ngencerfBaseUrl}/calibration/get_log_status/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify({
+        calibration_run_id: calibration_run_id,
+        log_name: log_name,
+        byte_offset: byte_offset,
+      })
     });
   };
 
@@ -258,14 +381,14 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     submitTime.value = "";
     plotNames.value = {};
     plotList.value = [];
-    selectedPlotName.value = "";
-    selectedPlotFilename.value = "";
-    selectedPlotFileUrl.value = "";
+    selectedPlotName.value = null;
+    selectedPlotFilename.value = null;
+    selectedPlotFileUrl.value = null;
     iteration.value = undefined;
     stopCriteria.value = undefined;
     stopCriteriaMet.value = false;
     validControlAndValidBestStatus.value = undefined;
-    resultsPathname.value = undefined;
+    validationBestAchieved.value = { iteration: 0, isBest: false };
 
     if (elapsedTimeIntervalId.value) {
       clearInterval(elapsedTimeIntervalId.value);
@@ -303,6 +426,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     validControlAndValidBestStatus,
     resultsPathname,
     overallCalibrationValidationStatus,
+    validationBestAchieved,
+    failureMessages,
     loadRunStatusStore,
     getValidControlAndValidBestStatus,
     queryGetCalibrationStatus,
@@ -310,10 +435,12 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     queryGetPlot,
     runCalibrationJob,
     queryGetIteration,
-    queryGetJobDataDirectory,
     cancelCalibrationJob,
-    hardResetRunStatusStore,
-    validationBestAchieved
+    cancelValidationJob,
+    queryGetLogNames,
+    queryGetLogData,
+    queryGetLogStatus,
+    hardResetRunStatusStore
   };
 });
 

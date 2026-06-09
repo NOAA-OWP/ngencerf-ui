@@ -2,9 +2,9 @@ name: ngencerf-ui
 
 services:
   ngencerf-app:
-    image: registry.sh.nextgenwaterprediction.com/ngwpc/nwm-ngen/ngencerf_ui:latest
+    image: ghcr.io/ngwpc/ngencerf-ui:${NGENCERF_UI_TAG:-latest}
     pull_policy: build
-    build: 
+    build:
       context: .
     ports:
       - "3000:3000"

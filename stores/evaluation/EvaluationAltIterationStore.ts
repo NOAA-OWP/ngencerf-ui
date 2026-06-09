@@ -9,7 +9,7 @@ import type {
   DynamicTableColumn,
   CalibrationRunIterationMetricData,
   CalibrationRunByIterationRetrospectiveData,
-} from "@/composables/NextGenModel";
+} from "@/composables/NgencerfModels";
 
 import { generalStore } from "../common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
@@ -22,27 +22,18 @@ export const useEvaluationAltIterationStore = defineStore(
   () => {
     const { ngencerfBaseUrl } = useBackendConfig();
     const { getAccessToken } = useUserDataStore();
-    const { userSelectedCalibrationIterationId } = storeToRefs(
-      useUserDataStore()
+    const { userSelectedCalibrationIterationId } = storeToRefs(useUserDataStore()
     );
     const { calibrationJobId } = storeToRefs(generalStore());
 
-    const calibrationRunDetailDataList = ref<
-      AlternativeIterationCalibrationRunData[]
-    >([]);
-    const tuningParametersDataList = ref<
-      AlternativeIterationTuningParameters[]
-    >([]);
+    const calibrationRunDetailDataList = ref<AlternativeIterationCalibrationRunData[]>([]);
+    const tuningParametersDataList = ref<AlternativeIterationTuningParameters[]>([]);
     const calibrationRunDetailDataListHeaders = ref<any[]>([]);
     const tuningParametersDataListHeaders = ref<any[]>([]);
     const calibrationRunDetailTableColumn = ref<DynamicTableColumn[]>([]);
     const tuningParametersTableColumn = ref<DynamicTableColumn[]>([]);
-    const computedCalibrationRunDetailDataList = ref<
-      AlternativeIterationCalibrationRunData[]
-    >([]);
-    const computedtuningParametersDataList = ref<
-      AlternativeIterationTuningParameters[]
-    >([]);
+    const computedCalibrationRunDetailDataList = ref<AlternativeIterationCalibrationRunData[]>([]);
+    const computedtuningParametersDataList = ref<AlternativeIterationTuningParameters[]>([]);
 
     const fetchCalibrationDataByIterationDataList = async () => {
       let headerRow = <DynamicTableColumnHeader[]>[];
@@ -73,10 +64,19 @@ export const useEvaluationAltIterationStore = defineStore(
             });
             retro_data.data.forEach(
               (data: CalibrationRunIterationMetricData) => {
-                headerRow.push({
-                  header: `${Number(data.metric_value).toFixed(4)}`,
+                let cell_value = '';
+                if (data.metric_value !== null) {
+                  const n = Number(data.metric_value);
+                  cell_value = Number.isFinite(n) ? n.toFixed(5) : '';
+                }
+                let headerCell = {
+                  header: cell_value,
                   colspan: 1,
-                });
+                  metric_name: data.metric_name,
+                  metric_display_name: data.metric_display_name,
+                  styles: []
+                }
+                headerRow.push(headerCell);
               }
             );
             calibrationRunDetailDataListHeaders.value.push(headerRow);
@@ -136,19 +136,33 @@ export const useEvaluationAltIterationStore = defineStore(
                   let headerColumn = <DynamicTableColumn>{
                     field: metric.metric_name,
                     header: metric_header_label,
+                    tooltip: metric.metric_display_name,
                   };
+                  let cell_value = '';
+                  if (metric.metric_value !== null) {
+                    const n = Number(metric.metric_value);
+                    cell_value = Number.isFinite(n) ? n.toFixed(5) : '';
+                  }
+                  let headerCell = {
+                    header: cell_value,
+                    colspan: 1,
+                    metric_name: metric.metric_name,
+                    metric_display_name: metric.metric_display_name,
+                    styles: [],
+                  }
                   if (
                     metric.metric_name ===
                     runListDataResult._data.objective_function_metric
                   ) {
                     headerColumn["styles"] = ["bg-objective-function-col"];
+                    headerColumn["header"] += '*';
+                    headerCell["styles"] = ["bg-objective-function-col"];
+                    // hack - make sure the Objective Function cell in the first and second header row are styled consistently
+                    calibrationRunDetailDataListHeaders.value[0][headerRow.length-2]["styles"] = ["bg-objective-function-col"];
                   }
                   calibrationRunDetailTableColumn.value.push(headerColumn);
 
-                  headerRow.push({
-                    header: `${Number(metric.metric_value).toFixed(4)}`,
-                    colspan: 1,
-                  });
+                  headerRow.push(headerCell);
                 }
               );
 
@@ -200,9 +214,13 @@ export const useEvaluationAltIterationStore = defineStore(
                     field: parameter.parameter_name,
                     header: parameter.parameter_name,
                   });
-
+                  let cell_value = '';
+                  if (parameter.parameter_value !== null) {
+                    const n = Number(parameter.parameter_value);
+                    cell_value = Number.isFinite(n) ? n.toFixed(5) : '';
+                  }
                   headerRow.push({
-                    header: `${Number(parameter.parameter_value).toFixed(4)}`,
+                    header: cell_value,
                     colspan: 1,
                   });
                 }
@@ -223,9 +241,12 @@ export const useEvaluationAltIterationStore = defineStore(
 
               iteration_data.metrics.forEach(
                 (metric: CalibrationRunIterationMetricData) => {
-                  rowData[metric.metric_name] = Number(
-                    metric.metric_value
-                  ).toFixed(4);
+                  let cell_value = '';
+                  if (metric.metric_value !== null) {
+                    const n = Number(metric.metric_value);
+                    cell_value = Number.isFinite(n) ? n.toFixed(5) : '';
+                  }
+                  rowData[metric.metric_name] = cell_value;
                 }
               );
               computedCalibrationRunDetailDataList.value.push(rowData);
@@ -243,9 +264,12 @@ export const useEvaluationAltIterationStore = defineStore(
 
               iteration_data.parameters.forEach(
                 (parameters: CalibrationRunIterationParameterData) => {
-                  rowData[parameters.parameter_name] = Number(
-                    parameters.parameter_value
-                  ).toFixed(4);
+                  let cell_value = '';
+                  if (parameters.parameter_value !== null) {
+                    const n = Number(parameters.parameter_value);
+                    cell_value = Number.isFinite(n) ? n.toFixed(5) : '';
+                  }
+                  rowData[parameters.parameter_name] = cell_value;
                 }
               );
               computedtuningParametersDataList.value.push(rowData);

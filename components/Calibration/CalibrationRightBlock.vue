@@ -4,15 +4,15 @@
     <div class="grid-rows-12">
 
       <div id="TopRightBlock" class="row-span-5">        
-        <div class="grid grid-cols-5">
-          <div class="col-span-5 mb-3">
+        <div class="grid grid-cols-6">
+          <div class="col-span-6 mb-3">
 
             <h2>Progress</h2>
           </div>
           <div id="ProgressGroup" class="col-span-3">
             <CalibrationProgressGroup />
           </div>
-          <div id="GageCutout" class="col-span-2">
+          <div id="GageCutout" class="col-span-3">
             <GageCutout />
           </div>
         </div>
@@ -34,6 +34,6 @@ import GageCutout from "../Common/GageCutout.vue";
 
 <style lang="scss" scoped>
 #CalibrationRightBlock {
-  min-width: 500px;
+  min-width: 498px;
 }
 </style>
