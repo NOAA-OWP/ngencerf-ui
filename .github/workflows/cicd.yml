@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   pull_request:
-    branches: [ngwpc-candidate, ngwpc-release, main, nwm-release, development, release-candidate]
+    branches: [main, nwm-release, development, release-candidate]
   push:
-    branches: [ngwpc-candidate, ngwpc-release, main, nwm-release, development, release-candidate]
+    branches: [main, nwm-release, development, release-candidate]
 
 permissions:
   contents: read
@@ -118,7 +118,7 @@ jobs:
           retention-days: 7
 
   sonarqube-internal:
-    if: (github.event_name == 'pull_request' || github.event_name == 'push') && github.repository_owner == 'NGWPC'
+    if: (github.event_name == 'pull_request' || github.event_name == 'push') && github.repository_owner == 'NOAA-OWP'
     runs-on: self-hosted
     needs: [setup, build]
     continue-on-error: true

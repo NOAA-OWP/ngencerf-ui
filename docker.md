@@ -6,9 +6,12 @@ To build and run the ngenCERF-UI application, you will need the following softwa
 - Docker Enginer
 - Docker Compose 
 
-You will need a file containing your NGWPC gitlab Personal Access Token (PAT) written at ~/.gitlab_token.
+> [!CAUTION]
+> GitLab is unavailable for this usage
 
-This Docker container pulls images from the NGWPC official Docker registry, so you will need to be logged into that registry. Using your gitlab credentials, login to the registry using the following command:
+You will need a file containing your NOAA-OWP gitlab Personal Access Token (PAT) written at ~/.gitlab_token.
+
+This Docker container pulls images from the NOAA-OWP official Docker registry, so you will need to be logged into that registry. Using your gitlab credentials, login to the registry using the following command:
 ```
 $ docker login registry.sh.nextgenwaterprediction.com
 ```
@@ -16,6 +19,9 @@ $ docker login registry.sh.nextgenwaterprediction.com
 This will only start the ngenCERF UI application. If you need to connect to a backend server you will need to have that running at the address http://localhost:8000/.
 
 ## Running ngenCERF-UI Container
+
+> [!CAUTION]
+> GitLab is unavailable for this usage
 
 It is recommended to use the [ngencerf-docker](https://gitlab.sh.nextgenwaterprediction.com/NGWPC/nwm-ngen/ngencerf-docker/) project to run the full ngenCERF application stack at once. However if you would like to just run the frontend application in isolation, execute the following command:
 ```
