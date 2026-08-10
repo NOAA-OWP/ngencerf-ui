@@ -1,6 +1,6 @@
 <template>
   <client-only>
-    <div class="h-screen-inner pr-2">
+    <div v-if="!userCalibrationRunData?.modules?.some(item => item.toLowerCase() === 'lstm')" class="h-screen-inner pr-2">
       <div id="RunDetailsTbl" class="text-left mt-3 pr-3 pl-3 pt-1">
         <div class="tableTitle">Run Details - Calibration Job ID {{ calibrationJobId }}</div>
         <DataTable id="cr-detail-list" :value="computedCalibrationRunDetailDataList" scrollable scroll-height="250px"
@@ -11,15 +11,22 @@
           <ColumnGroup type="header">
             <Row>
               <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :header="col.header"
-                :field="col.field" :hidden="col.hidden ?? false" :class="col.styles ?? []" sortable></Column>
+                :field="col.field" :hidden="col.hidden ?? false" :class="col.styles ?? []" sortable>
+                <!-- should be able to have col.tooltip show up as a tooltip here -->
+                <!-- <template #header="slotProps">
+                  <div class="column-header">
+                    {{ slotProps.column.props.header }}
+                  </div>
+                </template> -->
+              </Column>
             </Row>
             <Row v-for="(row, index) in calibrationRunDetailDataListHeaders" :key="index" :pt="{ id: index }">
-              <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :colspan="col.colspan">
+              <Column v-for="( col, colIndex ) in row" :key="colIndex" :header="col.header" :class="col.styles ?? []" :colspan="col.colspan">
               </Column>
             </Row>
           </ColumnGroup>
           <Column v-for="( col, colIndex ) in calibrationRunDetailTableColumn" :key="colIndex" :field="col.field"
-            :hidden="col.hidden ?? false"></Column>
+            :hidden="col.hidden ?? false" :class="col.styles ?? []"></Column>
         </DataTable>
         <div class="text-sm">* Metric used as Objective Function</div>
       </div>
@@ -58,6 +65,9 @@
         </div>
       </div>
     </div>
+    <div v-else>
+      This tab has been disabled for formulations using LSTM.
+    </div>
 
   </client-only>
 </template>
@@ -68,8 +78,9 @@ import { useToast } from "primevue/usetoast";
 
 import type { DataTableRowClickEvent } from 'primevue/datatable';
 import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NextgenEnums";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { useEvaluationAltIterationStore } from '@/stores/evaluation/EvaluationAltIterationStore';
 import { generalStore } from '@/stores/common/GeneralStore';
 import { useEvaluationRunStatusStore } from '@/stores/evaluation/EvaluationRunStatusStore';
@@ -84,6 +95,10 @@ const {
   resetEvaluationAltIterationStore,
 } = useEvaluationAltIterationStore();
 
+const { fetchUserCalibrationRunData } = useUserDataStore();
+const userDataStore = useUserDataStore();
+const { userCalibrationRunData } = storeToRefs(userDataStore);
+
 const {
   calibrationRunDetailDataListHeaders,
   tuningParametersDataListHeaders,
@@ -93,7 +108,8 @@ const {
   computedtuningParametersDataList,
 } = storeToRefs(useEvaluationAltIterationStore());
 
-const { clearRunningStatusInfo } = useEvaluationRunStatusStore();
+const { validationStatusCheckingIntervalId, validationRunningTimeIntervalId } = storeToRefs(useEvaluationRunStatusStore());
+const { hardResetEvaluationRunStatusStore } = useEvaluationRunStatusStore();
 const { iterationValidationRunId } = storeToRefs(useEvaluationRunStatusStore());
 const { calibrationJobId, evaluateIterationRunId, evaluateValidationRunId, evaluateDisplayIterationNumber } = storeToRefs(generalStore());
 
@@ -103,13 +119,12 @@ const selectedCalibrationByIterationParameterRow = ref<any>();
 const calibrationRunDetailTable = ref<HTMLTableElement>();
 const tuningParametersTable = ref<HTMLTableElement>();
 
-const ptColumn = ref({
-  columnHeaderContent: { style: { "justify-content": "center" } },
-  bodyCell: { style: { "text-align": "right" } }
-});
-
 onMounted(() => {
   hilightTab(EvaluationTabs.tab_selectAltIteration);
+
+  fetchUserCalibrationRunData();
+  
+  hardResetEvaluationRunStatusStore();
 
   nextTick(() => {
     resetEvaluationAltIterationStore();
@@ -159,12 +174,12 @@ const onTableRowUnselect = (event: DataTableRowClickEvent) => {
 const navigateToEvaluateStatus = (event: any) => {
   if (evaluateIterationRunId.value && evaluateIterationRunId.value > 0) {
     iterationValidationRunId.value = evaluateValidationRunId.value = 0;
-    clearRunningStatusInfo();
+    hardResetEvaluationRunStatusStore();
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[EvaluationTabs.tab_runStatus];
     e.click();
   } else {
-    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Iteration ID', detail: 'Pleasea select a iteration job first.', life: ToastTimeout.timeout6000 };
+    const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Iteration ID', detail: 'Please select a iteration job first.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
 }
@@ -231,6 +246,30 @@ table#cr-detail-list2 th {
 
 th.p-datatable-header-cell.bg-objective-function-col,
 th.p-datatable-header-cell.bg-objective-function-col:hover {
-  background-color: rgb(204, 85, 0);
+  background-color: rgb(204, 85, 0) !important;
+}
+
+#RunDetailsTbl .p-datatable-thead>tr:nth-child(2) th.bg-objective-function-col,
+#RunDetailsTbl .p-datatable-thead>tr:nth-child(2):hover th.bg-objective-function-col {
+  background-color: rgb(246, 189, 148) !important;
+  border: rgb(246, 189, 148);
+}
+
+#RunDetailsTbl .p-datatable-thead>tr:nth-child(3) th.bg-objective-function-col,
+#RunDetailsTbl .p-datatable-thead>tr:nth-child(3):hover th.bg-objective-function-col {
+  background-color: rgb(255, 241, 230) !important;
+  border: rgb(255, 241, 230);
+}
+
+tr.p-datatable-selectable-row td.bg-objective-function-col {
+  background-color: rgb(252, 248, 242) !important;
+}
+
+tr.p-datatable-selectable-row:hover td.bg-objective-function-col {
+  background-color: rgb(245, 238, 233)  !important;
+}
+
+tr.p-datatable-selectable-row.p-datatable-row-selected:hover td.bg-objective-function-col {
+  background-color: rgb(255, 236, 221) !important;
 }
 </style>

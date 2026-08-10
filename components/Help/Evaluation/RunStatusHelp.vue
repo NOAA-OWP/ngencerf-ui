@@ -5,7 +5,7 @@
     <p class="text-center" style="color:#cc5500;font-size:0.8em;">
       WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
-
+    <hr />
     <table class="_help-table" aria-label="Evaluation Run/Status Help Table">
       <thead>
         <tr>
@@ -21,7 +21,9 @@
         </tr>
         <tr>
           <td class="td1">Elapsed Time</td>
-          <td class="td2">Time elapsed since the job was submitted. Time is in days, HH:MM:SS</td>
+          <td class="td2">
+            Time elapsed since the job was submitted.<br />
+            Time is in days, HH:MM:SS</td>
         </tr>
         <tr>
           <td class="td1">Iteration</td>
@@ -30,6 +32,10 @@
         <tr>
           <td class="td1">Status</td>
           <td class="td2">Job status.</td>
+        </tr>
+        <tr>
+          <td class="td1">Validation Job ID</td>
+          <td class="td2">ID assigned to the validation job once run is started.</td>
         </tr>
         <tr>
           <td class="td1">&nbsp;</td>
@@ -45,11 +51,10 @@
           <td class="td2">Stop/cancel the validation before it has completed. Appears only when a job is running.</td>
         </tr>
         <tr>
-          <td class="td1">Go To Evaluation Button</td>
+          <td class="td1">Evaluate</td>
           <td class="td2">View details about the validation run, including plots, plot data, performance metrics and
             logs. Appears once the job is done.</td>
         </tr>
-
       </tbody>
     </table>
   </div>

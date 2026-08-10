@@ -1,4 +1,4 @@
-import type { ToastMessageOptions } from "primevue/toast"
+import type { ToastMessageOptions } from "primevue/toast";
 
 export interface User {
   uid: number;
@@ -45,6 +45,7 @@ export interface NonFieldError {
 export interface GageBasinApiSavedResponse extends GeneralApiSaveResponse {
   geopackage_image_url?: string | null;
   eds_errors: edsError[];
+  warnings: string[];
 }
 
 export interface CreateRunValidationApiResponse extends GeneralApiSaveResponse {
@@ -80,6 +81,7 @@ export interface FormulationTabSaveWarningGroupRequirement {
  */
 export interface CalibrationJobsList {
   jobs: CalibrationJobListItem[];
+  total_count?: number;
 }
 
 export interface CalibrationJobListItem {
@@ -87,6 +89,7 @@ export interface CalibrationJobListItem {
   gage_id: string;
   job_genesis: string;
   created_at: Date;
+  last_updated_on: string;
   status: string;
   calibration_start_period: Date;
   calibration_end_period: Date;
@@ -94,7 +97,12 @@ export interface CalibrationJobListItem {
   submit_date: Date;
   objective_function: string;
   optimization_algorithm: string;
+  is_archived: boolean;
+  is_locked: boolean;
+  is_downloadable: boolean;
   validations: CalibrationJobValidationItem[];
+  stop_criteria: number;
+  modules: string[];
 }
 
 /**
@@ -133,9 +141,12 @@ export interface ValidationJobParameter {
  */
 export interface UserCalibrationRunData {
   calibration_run_id: number;
+  job_data_dir: string;
   submit_date: string; // e.g. "2024-09-13T05:50:22.334Z"
+  last_updated_on: string;
   gage: GageData;
-  forcing_source: string;
+  forcing_source_requested: string;
+  forcing_source_actual: string;
   forcing_user_dir: string;
   forcing_dir_path: string;
   observational_source: string;
@@ -145,8 +156,15 @@ export interface UserCalibrationRunData {
   external_data_status: ExternalDataStatus;
   geopackage_hydrofabric_file_path: string;
   geopackage_image_url: string;
+  logging_config: {
+    logging_enabled: boolean;
+    modules: {
+      [key: string]: string;
+    }
+  }
   modules: string[];
   formulation_name: string;
+  is_aet_rootzone: boolean;
   formulation_warning?: FormulationWarning;
   use_sloth: boolean;
   sloth_parameters: SlothParameterData[];
@@ -154,6 +172,7 @@ export interface UserCalibrationRunData {
   time_range: UserCalibrationRunTimeRangeData;
   calibration_times: UserCalibrationRunCalibrationTimesData;
   validation_times: UserCalibrationRunValidationTimesData;
+  output_variable_to_calibrate: string;
   num_catchments: number | null;
   parameters_selected: boolean;
   parameters: UserCalibrationRunParametersData[];
@@ -166,6 +185,7 @@ export interface UserCalibrationRunData {
   save_output_iteration: boolean;
   stop_criteria: number;
   status: string;
+  failure_messages: any;
 }
 
 export interface FormulationWarning {
@@ -253,7 +273,7 @@ export interface GageOptionData {
 export interface SaveGageTabPayload {
   calibration_run_id?: number;
   gage_id?: string;
-  forcing_source?: string;
+  forcing_source_requested?: string;
   observational_source?: string;
   geopackage_source?: string;
 }
@@ -308,6 +328,7 @@ export interface FormulationTabData {
 
 export interface FormulationModuleData {
   name: string;
+  display_name: string;
   groups: string[];
   used_by_calibration_run: boolean;
 }
@@ -315,6 +336,7 @@ export interface FormulationModuleData {
 export interface SaveFormulationTabPayload {
   calibration_run_id?: number;
   formulation_name?: string;
+  is_aet_rootzone?: boolean;
   modules?: string[];
   use_sloth?: boolean;
   sloth_parameters?: SlothParameterData[];
@@ -361,6 +383,7 @@ export interface tuning_save {
  */
 export interface SelectOption {
   name: string;
+  display_name: string;
   description: string;
   selected?: boolean;
   groups?: string[];
@@ -419,6 +442,7 @@ export interface OptimizationTabData {
 
 export interface OptimizationMetricData {
   name: string;
+  display_name: string;
   description: string;
   is_active: boolean;
   categorical: boolean;
@@ -508,6 +532,7 @@ export interface ValidatedCalibrationRunListItem
 
 export interface ValidatedCalibrationRunList {
   jobs: ValidatedCalibrationRunListItem[];
+  total_count?: number;
 }
 
 export interface CalibrationValidationRunData {
@@ -544,6 +569,7 @@ export interface DynamicTableColumn {
   header?: string;
   hidden?: boolean;
   styles?: string[];
+  tooltip?: string;
 }
 
 export interface CalibrationRunByIteration {
@@ -581,6 +607,7 @@ export interface CalibrationRunByIterationRetrospectiveData {
 
 export interface CalibrationRunIterationMetricData {
   metric_name: string;
+  metric_display_name: string;
   metric_value: number;
 }
 
@@ -619,6 +646,7 @@ export interface CalibrationGetStatusResponse {
   submit_date: Date;
   elapsed_time: string | null;
   performance_metrics: CalibrationGetStatusPerformanceMetricItem[] | null;
+  failure_messages: any;
 }
 
 export interface CalibrationGetStatusValidationItem {
@@ -631,6 +659,7 @@ export interface CalibrationGetStatusValidationItem {
   run_start: Date;
   elapsed_time?: string | null;
   performance_metrics?: CalibrationGetStatusPerformanceMetricItem[] | null;
+  failure_messages: any;
 }
 
 export interface CalibrationGetStatusPerformanceMetricItem {
@@ -665,20 +694,28 @@ export type AccountEvent = {
   errorLogEvent: string;
 };
 
-export type CombinedVerstionInfo = {
+export type CombinedVersionInfo = {
   version: string;
   date: string;
   contact_email: string;
   commit_hash: string;
   ngenCerf_version: string;
   ngenCerf_date: string;
+  ngenCerf_copyright: string;
 };
 
-export type ForecastCycle = {
+export type ForecastConfiguration = {
   name: string;
   data_sources: string;
   time_range: string;
   is_active: boolean;
+  availability_lag: number;
+  domain: string;
+  cycle_start: number;
+  cycle_end: number;
+  cycle_freq: number;
+  fcst_win: number;
+  fcst_timestep: number;
 };
 
 export type CalibrationRunsForForecast = CalibrationRunForForecast[];
@@ -686,6 +723,7 @@ export type CalibrationRunsForForecast = CalibrationRunForForecast[];
 export type CalibrationRunForForecast = {
   calibration_run_id: number;
   gage_id: string;
+  domain_name: string;
   job_genesis: string;
   created_at: string;
   status: string;
@@ -696,37 +734,64 @@ export type CalibrationRunForForecast = {
   objective_function: string;
   optimization_algorithm: string;
   validations: CalibrationJobValidationItem[];
+  is_archived: boolean;
+  is_locked: boolean;
+  is_downloadable: boolean;
+  forecast_run_id: number;
+  forecast_status: string;
+  configuration: string;
+  cycle_date: string;
+  cold_start_date: string;
+  logging_config: {
+    logging_enabled: boolean;
+    modules: {
+      [key: string]: string;
+    }
+  }
 };
 
 export interface ForecastJob {
   calibration_run_id: number;
   forecast_run_id: number;
-  cycle: string;
+  configuration: string;
+  cycle_date: string;
   gage_id: string;
   forecast_status: string;
-  forcing_download_status: string;
+  cold_start?: {
+    cold_start_status: string;
+    cold_start_date: string;
+    cold_start_submit_date: string;
+  }
   submit_date: string;
+  failure_messages: any;
 }
 
 export type ForecastJobs = {
   forecast_jobs: ForecastJob[];
+  total_count?: number;
 }
 
-export const ValidationFormFields = {
-  formulation_name: "Formulation Name",
-  modules: "Formulation Modules",
-  sloth_parameters: "Sloth Parameters",
-  maps_to_module: "Sloth Parameter For Module",
-  maps_to_variable_name: "Sloth Parameter Module Param",
-  param_type: "Sloth Parameter Type",
-  param_units: "Sloth Parameter Units",
-  stop_criteria: "Stop Criteria",
-  save_plot_iteration_frequency: "Plot Generation Frequency",
-  streamflow_threshold: "Flow Threshold",
-  peak_flow_threshold: "Peak Flow Threshold",
-  objective_function: "Objective Function",
-  optimization: "Optimization Algorithm",
-};
+export interface VerificationJob {
+  verification_run_id: number;
+  forecast_run: ForecastJob;
+  yaml_config_data: DynamicObject;
+  submit_date: string;
+  run_start: string;
+  run_end: string;
+  performance_metrics: CalibrationGetStatusPerformanceMetricItem[] | null;
+  status: string;
+  failure_messages: any;
+}
+
+export type VerificationJobs = {
+  verification_jobs: VerificationJob[];
+  total_count?: number;
+}
+
+export interface CreatedVerificationJob {
+  message: string;
+  verification_run_id: number;
+}
 
 export type PlotNames = {
   calibration_run_id: number;
@@ -742,7 +807,7 @@ export type GageResetData = {
   };
   geopackage_source: string;
   observational_source: string;
-  forcing_source: string;
+  forcing_source_requested: string;
   geopackage_image_url: string;
 }
 
@@ -755,6 +820,20 @@ export interface ToastRecord extends ToastMessageOptions {
   datetime: string;
 }
 
+export type StatusRecord = {
+  status: string;
+  filterValue: string;
+}
+
+export type FilterTimeRange = {
+  earliest: Date;
+  latest: Date;
+}
+
+export type ServerStatus = {
+  status: number;
+  ok: boolean;
+}
 
 export interface GitData {
   release: string;
@@ -765,3 +844,4 @@ export interface GitData {
   message: string;
 }
 
+export type LogLevel = "debug" | "info" | "warning" | "severe" | "fatal";

@@ -8,9 +8,9 @@
           @click="tabClicked">Calibration Run</td>
       </tr>
       <tr>
-        <td><i :class="(forecastCycle?.is_active) ? 'checkMark': ''"
+        <td><i :class="(forecastConfiguration?.is_active) ? 'checkMark': ''"
             class="pi pi-check font-bold"></i></td>
-        <td data-tab="2" title="Cycle" aria-label="Cycle" @click="tabClicked">Cycle</td>
+        <td data-tab="2" title="Configuration" aria-label="Configuration" @click="tabClicked">Configuration</td>
       </tr>
     </tbody>
   </table>
@@ -20,7 +20,7 @@
 import { generalStore } from "@/stores/common/GeneralStore";
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 
-const { forecastCycle, calibrationRunForForecast } = useForecastStore();
+const { forecastConfiguration, calibrationRunForForecast } = useForecastStore();
 const { getForecastTabIndex, getMenuIndex } = generalStore();
 const currentForecastTab = ref(getForecastTabIndex());
 const emit = defineEmits(["tabNumber"]);

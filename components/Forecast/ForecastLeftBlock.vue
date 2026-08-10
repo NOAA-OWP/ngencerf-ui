@@ -13,7 +13,7 @@
        <SetupForecastTab />
       </span>
       <span v-else-if="activeTab === 4">
-        <StatusRunTab />
+        <RunStatusTab />
       </span>
       <span v-else-if="activeTab === 5">
         <ResultsTab />
@@ -29,7 +29,7 @@ import Tabs from '@/components/Common/Tabs.vue'
 import PreviousCalibrationRuns from '@/components/Forecast/PreviousCalibrationRuns.vue';
 import ForecastRunsTab from './ForecastRunsTab.vue';
 import SetupForecastTab from './SetupForecastTab.vue';
-import StatusRunTab from './StatusRunTab.vue';
+import RunStatusTab from './RunStatusTab.vue';
 import ResultsTab from './ResultsTab.vue';
 
 const { getForecastTabIndex, setForecastTabIndex } = generalStore();

@@ -1,19 +1,22 @@
 <template> 
-  <!-- ForecastLeftBlock.vue -->
+  <!-- VerificationLeftBlock.vue -->
   <div>
     <Tabs @tabNumber="tabChanged" />
     <div class="shrink-0">
       <span v-if="activeTab === 1">
-        <PreviousRunsTab />
+        <VerificationPreviousForecastRuns />
       </span>
-      <span v-else-if="activeTab === 2">
-        <ResultsTab />
+      <span v-if="activeTab === 2">
+        <VerificationRunsTab />
       </span>
       <span v-else-if="activeTab === 3">
-        <ResultsTab />
+        <SetupVerificationTab />
       </span>
       <span v-else-if="activeTab === 4">
-        <ResultsTab />
+        <VerificationRunStatusTab />
+      </span>
+      <span v-else-if="activeTab === 5">
+        <VerificationResultsTab />
       </span>
     </div>
   </div>
@@ -22,11 +25,14 @@
 <script setup lang="ts">
 import Tabs from '@/components/Common/Tabs.vue'
 
-// Default to Tab 1, HeadwaterBasinGage
-import { generalStore } from "@/stores/common/GeneralStore";
-import ResultsTab from './ResultsTab.vue'
-import PreviousRunsTab from "./PreviousRunsTab.vue"
+// Default to Tab 1, Previous Forecast Runs
+import VerificationPreviousForecastRuns from "./PreviousForecastRuns.vue"
+import VerificationRunsTab from "./VerificationRunsTab.vue"
+import SetupVerificationTab from "./SetupVerificationTab.vue"
+import VerificationRunStatusTab from "./VerificationRunStatusTab.vue"
+import VerificationResultsTab from "./VerificationResultsTab.vue"
 
+import { generalStore } from "@/stores/common/GeneralStore";
 const { getVerificationTabIndex, setVerificationTabIndex } = generalStore();
 
 // Default to Tab 1, HeadwaterBasinGage
