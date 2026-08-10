@@ -2,7 +2,7 @@
   <Transition name="slide-fade">
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
-        <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
           class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
@@ -22,7 +22,9 @@
           </div>
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
             :show-status="false" :show-gage="false" :show-modules="false" :show-archived="false"
-            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+            :totalSize="forecastRunsForVerificationListTotalSize" :totalPages="forecastRunsForVerificationListTotalPages"
+            v-model:currentPage="forecastRunsForVerificationListCurrentPage"
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'fr-context-menu' } }" class="bg-white" ref="frContextMenu"
@@ -84,20 +86,6 @@
                 </span>
               </template>
             </Column>
-            <Column field="created_at" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Creation Date</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <div v-if="slotProps.data.created_at" class="text-center"
-                  :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
-                  :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)">
-                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
-                </div>
-              </template>
-            </Column>
             <Column :pt="ptColumn" field="configuration" header="Configuration" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.configuration" :aria-label="'Configuration ' + slotProps.data.configuration"
@@ -153,7 +141,7 @@
       </div>
 
     </div>
-    <div class="waitgif" v-if="isVerificationLoading">
+    <div class="waitgif" v-if="isLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </client-only>
@@ -178,6 +166,8 @@ import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
+const { isLoading } = storeToRefs(generalStore());
+
 const forecastStore = useForecastStore();
 const verificationStore = useVerificationStore();
 const { selectedForecastJob } = storeToRefs(forecastStore);
@@ -192,9 +182,7 @@ const {
   forecastRunsForVerificationListEndRow,
   forecastRunsForVerificationListSort,
   verificationJobId,
-  selectedVerificationJob,
-  userVerificationJobData,
-  isVerificationLoading
+  selectedVerificationJob
 } = storeToRefs(verificationStore);
 
 const {
@@ -204,7 +192,8 @@ const {
   resetSelectedVerificationJobData,
   fetchNewVerificationJobId,
   loadSelectedVerificationJob,
-  setSelectedVerificationJobId
+  setSelectedVerificationJobId,
+  resetFilters
 } = useVerificationStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
@@ -245,23 +234,21 @@ const onRowContextMenu = (event: any) => {
 };
 
 onMounted(async () => {
-  isVerificationLoading.value = true;
+  isLoading.value = true;
 
   hilightTab(VerificationTabs.tab_forecastRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
   nextTick(async () => {
-    // clear previously selected forecast job
-    selectedForecastJob.value = undefined;
-    forecastJobId.value = undefined;
+    resetSelectedVerificationJobData();
     forecastRunsForVerificationListCurrentPage.value = 1;
 
     // load forecast runs
     await getForecastRunsForVerification();
   });
 
-  isVerificationLoading.value = false;
+  isLoading.value = false;
 });
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
@@ -273,8 +260,8 @@ const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
   forecastJobId.value = undefined;
 }
 
-const navigateToSetupVerification = () => {
-  isVerificationLoading.value = true;
+const navigateToVerificationJobStatus = () => {
+  isLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
 
@@ -286,32 +273,13 @@ const navigateToSetupVerification = () => {
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
-    isVerificationLoading.value = false;
+    isLoading.value = false;
   });
 }
 
 const createNewVerification = async () => {
-  // Clear out old data
-  resetSelectedVerificationJobData();
-  fetchNewVerificationJobId().then(response => {
-    if (response.status === 201) {
-      if (response?._data && response?._data?.verification_run_id && response?._data?.verification_run_id > 0) {
-        verificationJobId.value = response?._data?.verification_run_id as number;
-        loadSelectedVerificationJob(verificationJobId.value).then(queryResponse => {
-          userVerificationJobData.value = queryResponse?._data;
-          navigateToSetupVerification();
-        });
-      } else {
-        const tMsg: ToastMessageOptions = { severity: "error", summary: 'Create Verification Job Failed.', detail: "Unable to Retrieve Valid Verification Job Id", life: ToastTimeout.timeoutError };
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
-    } else {
-      useApiErrorResponsePreprocess(response).forEach(message => {
-        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Create Verification Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
-        toast.add(tMsg); addToastRecord(tMsg);
-      });
-    }
-  });
+  // Just go to Run/Status with the selected forecast - no need to create anything new yet
+  navigateToVerificationJobStatus();
 }
 
 const rowStyle = (data: any) => {
@@ -332,9 +300,9 @@ const toggleMessagesGroup = () => {
  * Refresh Forecast Jobs Table
  */
 const refreshJobList = async () => {
-  isVerificationLoading.value = true;
+  isLoading.value = true;
   await getForecastRunsForVerification();
-  isVerificationLoading.value = false;
+  isLoading.value = false;
 }
 
 </script>

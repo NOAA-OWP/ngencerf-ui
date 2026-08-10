@@ -29,7 +29,6 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
 
   const filterGroup = ref<string>("");
   const selectedModuleValues = ref<string[]>([]);
-  const formulationNameInput = ref<string>("");
   const isAETRootzone = ref<boolean>(false);
   const slothParameterInputs = ref<SlothParameterData[]>([]);
   const useSlothParameters = ref<boolean>(false);
@@ -67,8 +66,6 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   };
 
   const setUserSelection = (): void => {
-    formulationNameInput.value =
-      userCalibrationRunData?.value?.formulation_name ?? "";
     if (userCalibrationRunData.value?.modules != null) {
         try {
             selectedModuleValues.value = JSON.parse(
@@ -326,10 +323,6 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
   async function saveFormulationTabData() {
     isLoading.value = true;
     saveFormulationPayload.value = <SaveFormulationTabPayload>{};
-
-    saveFormulationPayload.value.formulation_name = formulationNameInput.value
-      ? formulationNameInput.value
-      : "";
     saveFormulationPayload.value.modules =
       selectedModuleValues.value.length > 0 ? selectedModuleValues.value : [];
     saveFormulationPayload.value.is_aet_rootzone = isAETRootzone.value;
@@ -399,7 +392,6 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
    * @return {void}
    */
   const resetFormulationStore = (): void => {
-    formulationNameInput.value = "";
     selectedModuleValues.value = ['T-Route'];
     isAETRootzone.value = false;
     useSlothParameters.value = false;
@@ -415,7 +407,6 @@ export const useFormulationStore = defineStore("FormulationStore", () => {
     filterGroup,
     useSlothParameters,
     selectedModuleValues,
-    formulationNameInput,
     isAETRootzone,
     slothParameterInputs,
     fetchFormulationModuleOptions,

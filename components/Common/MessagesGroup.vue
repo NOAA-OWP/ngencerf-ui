@@ -6,6 +6,13 @@
           userCalibrationRunData?.calibration_run_id ? userCalibrationRunData.calibration_run_id : '' }}</h2>
 
       <div class=" grid grid-cols-2 gap=1 text-sm mt-4">
+        <div class="col-span-2">
+          <div v-if="calData?.job_name" :aria-label="'Job Name ' + calData?.job_name"
+            :title="'Job Name ' + calData?.job_name"><span class="font-medium">Job Name:</span>
+            {{
+              calData?.job_name }}
+          </div>
+        </div>
         <div class="col-span-1">
           <div v-if="calData?.gage?.gage_id" :aria-label="'Gage ' + calData?.gage?.gage_id"
             :title="'Gage ' + calData?.gage?.gage_id"><span class="font-medium">Gage:</span>
@@ -43,11 +50,6 @@
       <div class="line-spacer">&nbsp;</div>
       <div class="grid grid-cols=1 gap=1 text-sm">
         <div class="col-span-1">
-          <div v-if="calData?.formulation_name" :aria-label="'Formulation Name ' + calData?.formulation_name"
-            :title="'Formulation Name ' + calData?.formulation_name"><span class="font-medium">Formulation Name:</span>
-            {{
-              calData?.formulation_name }}
-          </div>
           <div v-if="calData?.modules?.length" :aria-label="'Modules ' + getModuleList()"
             :title="'Modules ' + getModuleList()"><span class="font-medium">Modules:
             </span>{{ getModuleList() }}</div>
@@ -202,6 +204,7 @@ const {
   userSelectedCalibrationTuningParameters,
   selectedOutputVariableToCalibrate,
 } = storeToRefs(useTuningStore());
+const { loadTuningTabStaticData } = useTuningStore();
 const { resultsPathname } = storeToRefs(useRunStatusStore());
 
 const componentProps = withDefaults(defineProps<{
@@ -232,6 +235,13 @@ const formatDate = (d: any) => {
     return formatISOStringOrDateToYYYYMMDDHHMM(d);
   }
 };
+
+onMounted(async() => {
+  // make sure tuning parameters are loaded
+  if (!userSelectedCalibrationTuningParameters.value || userSelectedCalibrationTuningParameters.value.length === 0) {
+    await loadTuningTabStaticData();
+  }
+})
 
 </script>
 

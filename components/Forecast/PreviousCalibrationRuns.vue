@@ -2,7 +2,7 @@
   <Transition name="slide-fade">
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
-        <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
           class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
@@ -25,7 +25,9 @@
         <div id="CalTable" class="w-max mx-auto">
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
             :show-status="false" :show-modules="false" :show-archived="false"
-            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+            :totalSize="calibrationRunsForForecastListTotalSize" :totalPages="calibrationRunsForForecastListTotalPages"
+            v-model:currentPage="calibrationRunsForForecastListCurrentPage"
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -83,17 +85,17 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="formulation_name" sortable>
+            <Column :pt="ptColumn" field="job_name" sortable>
               <template #header>
                 <div class="column-header">
-                  <span>Formulation Name</span>
+                  <span>Job Name</span>
                 </div>
               </template>
               <template #body="slotProps">
-                <span v-if="slotProps.data.formulation_name"
-                  :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
-                  :title="'Formulation Name ' + slotProps.data.formulation_name">
-                  {{ slotProps.data.formulation_name }}
+                <span v-if="slotProps.data.job_name"
+                  :aria-label="'Job Name ' + slotProps.data.job_name"
+                  :title="'Job Name ' + slotProps.data.job_name">
+                  {{ slotProps.data.job_name }}
                 </span>
               </template>
             </Column>
@@ -237,7 +239,12 @@ const {
   calibrationRunsForForecastListEndRow,
   calibrationRunsForForecastListSort 
 } = storeToRefs(forecastStore);
-const { getCalibrationJobsForForecast, resetUserSelectedForecastCalibrationRun, hardResetForecastRunStatusStore } = forecastStore;
+const { 
+  getCalibrationJobsForForecast, 
+  resetUserSelectedForecastCalibrationRun, 
+  hardResetForecastRunStatusStore,
+  resetFilters
+} = forecastStore;
 
 
 const toast = useToast();
@@ -247,7 +254,7 @@ const crContextMenu = ref(); //calibration run context menu
 const selectedCalibrationRun = ref<CalibrationRunForForecast>();
 
 const { isLoading } = storeToRefs(generalStore());
-const { calibrationDownloadJobID, calibrationDownloadFileName } = storeToRefs(useCalibrationJobStore());
+const { calibrationDownloadJobID } = storeToRefs(useCalibrationJobStore());
 
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const onRowContextMenu = (event: any) => {
@@ -367,20 +374,11 @@ watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
   }
 });
 
-const openSelectedCalibrationRun = async () => {
-  isLoading.value = true;
-  resetUserSelectedEvalValidationRun();
-  await loadSelectedCalibrationRun(calibrationRunForForecast.value?.calibration_run_id as number);
-  await fetchUserSelectedCalibrationValidationRunList();
-  navigateToSetupForecast();
-  isLoading.value = false;
-};
-
 const navigateToSetupForecast = async () => {
   if (calibrationRunForForecast?.value?.calibration_run_id && calibrationRunForForecast.value.calibration_run_id > 0) {
+    forecastJobId.value = undefined;
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast Tab"]');
     if (e) {
-      await loadSelectedCalibrationRun(calibrationRunForForecast.value?.calibration_run_id as number);
       e.click();
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Setup Forecast Tab not found', life: ToastTimeout.timeoutError};
@@ -546,7 +544,7 @@ const exportSelectedCalibrationData = async () => {
     toast.add(tMsg); addToastRecord(tMsg);
     nextTick(async () => {
       try {
-        // If successful, this job will update calibrationDownloadFileName, and watch function will trigger a Toast message
+        // If successful, this job will update calibrationDownloadJobID, and watch function will trigger a Toast message
         await getCalibrationJobZip(selectedRunId);
       } catch (error) {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Results Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeoutError };
@@ -565,13 +563,9 @@ watch(calibrationDownloadJobID, () => {
     // Display Toast message saying download was successful and then clear the Job ID/filename refs
     // to avoid interfering with next download
     let tDetail = 'Results zip file successfully created.'
-    if (calibrationDownloadFileName.value) {
-      tDetail = 'Results zip file "' + calibrationDownloadFileName.value + '" successfully created.'
-    }
     const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Results Successful for Calibration Job ID ' + calibrationDownloadJobID.value, detail: tDetail, life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
     calibrationDownloadJobID.value = null;
-    calibrationDownloadFileName.value = null;
   }
 });
 

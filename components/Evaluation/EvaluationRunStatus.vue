@@ -102,8 +102,8 @@
           </label>
         </div>
         <div class="pl-5" style="width: 100%;">
-          <span v-for="message in failureMessages">
-            {{ message }}<br/>
+          <span v-for="failure_message in failureMessages">
+            {{ failure_message.message }}<br/>
           </span>
         </div>
       </div>
@@ -205,10 +205,10 @@ onMounted(async () => {
 
   // assume having evaluateValidationRunId but not evaluateIterationRunId means user is intend to view the status of a done/stopped job
   if (evaluateValidationRunId.value > 0 && evaluateIterationRunId.value === 0) {
+    iterationValidationRunId.value = evaluateValidationRunId.value;
     await loadValidationStatusInformation(evaluateValidationRunId.value);
     if (iterationValidationRunId.value > 0 && validationStatus.value !== '') {
       updateLogDisplay();
-    } else {
     }
   } else {
     // this condition assume we have evaluateIterationRunId value which also assume user want to run a new validation
@@ -295,6 +295,7 @@ const updateLogDisplay = () => {
           });
         }
       } else {
+        selectedLogFilePath.value = '';
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Log file unavailable', life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
       }
@@ -309,30 +310,14 @@ watch(validationStatus, async (newStatus, initialStatus) => {
     }
     validationStatusCheckingIntervalId.value = setInterval(async () => {
       queryIterationValidationRunStatus().then(response => {
-        let find_validation_run = undefined;
-        if (response._data.validations) {
-          find_validation_run = response._data.validations.filter((validation: CalibrationGetStatusValidationItem) => {
-            return validation.validation_run_id === iterationValidationRunId.value
-          });
-        }
-        if (!find_validation_run) {
+        if (response?._data?.status) {
+          validationStatus.value = response._data.status;
+        } else {
           validationStatus.value = 'Failed';
           clearInterval(validationStatusCheckingIntervalId.value);
           clearInterval(validationRunningTimeIntervalId.value);
           validationStatusCheckingIntervalId.value = undefined;
           validationRunningTimeIntervalId.value = undefined;
-        } else {
-          // make sure we actually have validation run
-          const validation_run = find_validation_run.shift();
-          if (!validation_run) {
-            validationStatus.value = 'Failed';
-            clearInterval(validationStatusCheckingIntervalId.value);
-            clearInterval(validationRunningTimeIntervalId.value);
-            validationStatusCheckingIntervalId.value = undefined;
-            validationRunningTimeIntervalId.value = undefined;
-          } else {
-            validationStatus.value = validation_run.status;
-          }
         }
       })
       updateLogDisplay();
@@ -430,6 +415,10 @@ onUnmounted(() => {
   width: 135px;
   text-align: right;
   padding-right: 20px;
+}
+
+.gray-border {
+  border: 2px solid #d9d9d9;
 }
 </style>
 

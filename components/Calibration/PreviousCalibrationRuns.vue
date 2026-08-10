@@ -14,17 +14,20 @@
         </div>
 
         <!-- Table -->
-        <div class="">
-
+        <div>
           <div id="CalTable" class="w-max mx-auto">
             <JobFilterDialog id="JobFilterDialog" :disable-all="disableFilters" 
               :totalSize="calibrationRunListTotalSize" :totalPages="calibrationRunListTotalPages"
-              @RefreshJobList="refreshJobList()" @BulkJobAction="bulkJobAction()" ref="jobFilterRef" />
+              v-model:currentPage="calibrationRunListCurrentPage" @RefreshJobList="refreshJobList()" 
+              @ResetFilters="resetFilters()" @BulkJobAction="bulkJobAction()" :showBulkActions="showBulkActions" 
+              :selected-jobs="selectedMultipleCalibrationRuns" :all-jobs="allCalibrationRuns" :visible-jobs="visibleCalibrationRuns"
+              @SelectAllJobs="selectAllJobs()" @SelectVisibleJobs="selectVisibleJobs()" @DeselectAllJobs="deselectAllJobs()"
+              ref="jobFilterRef" />
             
             <ConfirmDialog></ConfirmDialog>
 
             <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white w-[250px]" ref="crContextMenu"
-              :model="buildContextMenu" @hide="selectedCalibrationRun = undefined"></ContextMenu>
+              :model="buildContextMenu" @hide="onRowContextMenuHide"></ContextMenu>
 
             <div v-if="userCalibrationJobsListData.length > 0 && calibrationRunListTotalSize > 0" class="pagination-box">
               <div class="pagination-rows">
@@ -39,8 +42,8 @@
             <DataTable id="Datatable" :value="userCalibrationJobsListData" 
               scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
               v-model:sortField="calibrationRunListSort.field" v-model:sortOrder="calibrationRunListSort.direction"
-              v-model:selection="selectedCalibrationRun" selectionMode="multiple" contextMenu
-              v-model:contextMenuSelection="selectedCalibrationRun" @rowContextmenu="onRowContextMenu"
+              v-model:selection="selectedCalibrationRun" selectionMode="multiple" :metaKeySelection="true" dataKey="calibration_run_id" 
+              v-model:contextMenuSelection="selectedCalibrationRun" contextMenu @rowContextmenu="onRowContextMenu"
               :rowStyle="rowStyle" @row-dblclick="onRowDblClick($event)" @row-select="dtRowSelected($event)"
               @row-unselect="dtRowUnselect($event)">
 
@@ -102,17 +105,17 @@
                   </span>
                 </template>
               </Column>
-              <Column :pt="ptColumn" field="formulation_name" sortable>
+              <Column :pt="ptColumn" field="job_name" sortable>
                 <template #header>
                   <div class="column-header">
-                    <span>Formulation Name</span>
+                    <span>Job Name</span>
                   </div>
                 </template>
                 <template #body="slotProps">
-                  <span v-if="slotProps.data.formulation_name"
-                    :aria-label="'Formulation Name ' + slotProps.data.formulation_name"
-                    :title="'Formulation Name ' + slotProps.data.formulation_name">
-                    {{ slotProps.data.formulation_name }}
+                  <span v-if="slotProps.data.job_name"
+                    :aria-label="'Job Name ' + slotProps.data.job_name"
+                    :title="'Job Name ' + slotProps.data.job_name">
+                    {{ slotProps.data.job_name }}
                   </span>
                 </template>
               </Column>
@@ -268,7 +271,7 @@ const { hardResetRunStatusStore } = useRunStatusStore();
 const { elapsedTimeIntervalId, calibrationStatusIntervalId, validationsStatusIntervalId } = storeToRefs(useRunStatusStore());
 
 const { calibrationJobId } = storeToRefs(generalStore());
-const { calibrationDownloadJobID, calibrationDownloadFileName } = storeToRefs(useCalibrationJobStore());
+const { calibrationDownloadJobID } = storeToRefs(useCalibrationJobStore());
 const { getMenuIndex, addToastRecord } = generalStore();
 
 const { 
@@ -276,7 +279,6 @@ const {
   userCalibrationRunData, 
   includeArchivedJobs,
   selectedBulkJobAction,
-  selectedBulkJobActionScope,
   calibrationRunListPageSize,
   calibrationRunListCurrentPage,
   calibrationRunListTotalPages,
@@ -289,7 +291,8 @@ const {
   queryUserCalibrationRunData, 
   fetchUserCalibrationJobsListData, 
   fetchUserCalibrationJobsListIDsOnly,
-  clearUserCalibrationRunData 
+  clearUserCalibrationRunData,
+  resetFilters
 } = useUserDataStore();
 const { 
   fetchNewCalibrationRunId, 
@@ -313,6 +316,8 @@ const selectedCalibrationRun = ref<CalibrationJobListItem>();
 const selectedMultipleCalibrationRuns = ref<number[]>([]);
 const selectedMultipleCalibrationRunData = ref<CalibrationJobListItem[]>([]);
 const selectedMultipleCalibrationRunsText = ref<string>('');
+const allCalibrationRuns = ref<number[]>([]);
+const visibleCalibrationRuns = ref<number[]>([]);
 
 let interval: number | undefined;
 const runningColor = ref<string>('white');
@@ -401,6 +406,10 @@ onMounted(async () => {
   if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu
     hilightTab(CalibrationTabs.tab_calibrationRuns);
 
+    resetFilters();
+
+    selectedBulkJobAction.value = 0;
+
     isLoading.value = false;
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); } 
@@ -410,6 +419,12 @@ onMounted(async () => {
     hardResetRunStatusStore();
     clearUserCalibrationRunData();
     await fetchUserCalibrationJobsListData();
+    visibleCalibrationRuns.value = userCalibrationJobsListData.value.map(job => job.calibration_run_id);
+    if (calibrationRunListTotalPages.value > 1) {
+      allCalibrationRuns.value = await fetchUserCalibrationJobsListIDsOnly();
+    } else {
+      allCalibrationRuns.value = visibleCalibrationRuns.value;
+    }
     interval = window.setInterval(toggleColor, 500); // Toggle every 500ms (0.5s)
   }
 })
@@ -422,7 +437,9 @@ onBeforeUnmount(() => {
 });
 
 const onRowContextMenu = (event: any) => {
-  if (selectedMultipleCalibrationRuns.value.length <= 1) {
+  if (selectedMultipleCalibrationRuns.value.length <= 1 || !selectedMultipleCalibrationRuns.value.includes(selectedCalibrationRun.value.calibration_run_id)) {
+    selectedMultipleCalibrationRuns.value = [selectedCalibrationRun.value.calibration_run_id];
+    selectedMultipleCalibrationRunData.value = [selectedCalibrationRun.value];
     crContextMenu.value.show(event.originalEvent);
   }
   else {
@@ -434,12 +451,26 @@ const onRowContextMenu = (event: any) => {
   })
 };
 
+const onRowContextMenuHide = (event: any) => {
+  selectedCalibrationRun.value = undefined;
+  selectedMultipleCalibrationRuns.value = [];
+  selectedMultipleCalibrationRunData.value = [];
+  nextTick(async () => {
+    highlightSelectedRows();
+  })
+};
+
 const dtRowSelected = (e: any) => {
+  if (!e.originalEvent.ctrlKey && !e.originalEvent.shiftKey) {
+    // single-click - clear any previous multiple selections
+    selectedMultipleCalibrationRuns.value = [];
+    selectedMultipleCalibrationRunData.value = [];
+  }
   addCalibrationRun(e.data);
 }
 
 const dtRowUnselect = (e: any) => {
-  deleteCalibrationRunById(e.data);
+  removeCalibrationRun(e.data);
 }
 
 const highlightSelectedRows = () => {
@@ -478,7 +509,7 @@ function addCalibrationRun(calRun: CalibrationJobListItem): void {
  * In this example, it will remove any calibration run with id equal to 1.
  * @param id - The calibration run id to delete (default is 1).
  */
-function deleteCalibrationRunById(calRun: CalibrationJobListItem): void {
+function removeCalibrationRun(calRun: CalibrationJobListItem): void {
   selectedMultipleCalibrationRuns.value = selectedMultipleCalibrationRuns.value.filter(
     run => run !== calRun.calibration_run_id
   );
@@ -500,9 +531,32 @@ watch(selectedCalibrationRun, () => {
 });
 
 const disableFilters = computed(() => {
-  return (selectedMultipleCalibrationRuns.value.length > 1);
+  return showHideMultOps.value;
 });
 
+const showBulkActions = computed(() => {
+  // let JobFilterDialogue know based on our job list what bulk actions to allow
+  // always include the placeholder option
+  let actionValues = [0];
+  if (userCalibrationJobsListData.value.some(run => run.is_archived === false)) {
+    // only allow delete and archive if there are unarchived jobs
+    actionValues.push(1);
+    actionValues.push(2);
+  }
+  if (userCalibrationJobsListData.value.some(run => run.is_archived === true)) {
+    // only allow unarchive if there are archived jobs
+    actionValues.push(3);
+  }
+  if (userCalibrationJobsListData.value.some(run => run.is_locked === false && run.is_archived === false)) {
+    // only allow lock if there are unlocked jobs that are not archived
+    actionValues.push(4);
+  }
+  if (userCalibrationJobsListData.value.some(run => run.is_locked === true)) {
+    // only allow unlock if there are locked jobs
+    actionValues.push(5);
+  }
+  return actionValues;
+});
 
 const handleContextMenu = (event: MouseEvent) => {
   event.preventDefault(); // Prevent the default context menu
@@ -532,7 +586,7 @@ const ptColumn = ref({
 
 // watch for sort order change - reset current page to 1
 watch(calibrationRunListSort, () => {
-  calibrationRunListCurrentPage.value = 1
+  calibrationRunListCurrentPage.value = 1;
   refreshJobList();
 },{ deep: true });
 
@@ -547,28 +601,53 @@ watch(calibrationRunListCurrentPage, async () => {
 
 const refreshJobList = async () => {
   isLoading.value = true;
+  // changing filters clears previous selections
+  selectedCalibrationRun.value = undefined;
+  selectedMultipleCalibrationRuns.value = [];
   await fetchUserCalibrationJobsListData();
+  visibleCalibrationRuns.value = userCalibrationJobsListData.value.map(job => job.calibration_run_id);
+  if (calibrationRunListTotalPages.value > 1) {
+    allCalibrationRuns.value = await fetchUserCalibrationJobsListIDsOnly();
+  } else {
+    allCalibrationRuns.value = visibleCalibrationRuns.value;
+  }
   isLoading.value = false;
 }
 
+const selectAllJobs = () => {
+  // select all jobs on ALL pages
+  selectedCalibrationRun.value = userCalibrationJobsListData.value;
+  selectedMultipleCalibrationRuns.value = allCalibrationRuns.value;
+  selectedMultipleCalibrationRunData.value = userCalibrationJobsListData.value;
+}
+
+const selectVisibleJobs = () => {
+  // select all jobs on current page only
+  selectedCalibrationRun.value = userCalibrationJobsListData.value;
+  selectedMultipleCalibrationRuns.value = visibleCalibrationRuns.value;
+  selectedMultipleCalibrationRunData.value = userCalibrationJobsListData.value;
+}
+
+const deselectAllJobs = () => {
+  selectedCalibrationRun.value = undefined;
+  selectedMultipleCalibrationRuns.value = [];
+  selectedMultipleCalibrationRunData.value = [];
+}
+
 const bulkJobAction = async () => {
-  // If scope is all pages (true) and there are multiple pages, retrieve list of job IDs. 
-  // Otherwise just use the list from the currently displayed page.
-  if (selectedBulkJobActionScope.value && calibrationRunListTotalPages.value > 1) {
-    isLoading.value = true;
-    selectedMultipleCalibrationRuns.value = await fetchUserCalibrationJobsListIDsOnly();
-    isLoading.value = false;
+  if (selectedMultipleCalibrationRuns.value.length > 0) {
+    showHideMultOps.value = true;
+    // wait a tick for the multi-job menu to display so that it only shows the confirm button
+    nextTick(async () => {
+      if (multiJobRef.value) {
+        // ask the user to confirm the action - MultipleJobOperations will take care of the rest
+        multiJobRef.value.confirmAction(selectedBulkJobAction.value);
+      }
+    });
   } else {
-    selectedMultipleCalibrationRuns.value = userCalibrationJobsListData.value.map(job => job.calibration_run_id);
+    const tMsg: ToastMessageOptions = { severity: "error", summary: 'No Jobs Selected.', detail: 'A bulk action cannot be applied when no jobs are selected.', life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
   }
-  showHideMultOps.value = true;
-  // wait a tick for the multi-job menu to display so that it only shows the confirm button
-  nextTick(async () => {
-    if (multiJobRef.value) {
-      // ask the user to confirm the action - MultipleJobOperations will take care of the rest
-      multiJobRef.value.confirmAction(selectedBulkJobAction.value);
-    }
-  });
 }
 
 // Function to toggle the color between 'red' and 'blue'
@@ -611,9 +690,12 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
   queryUserCalibrationRunData().then(queryResponse => {
     if (queryResponse?.status === 200) {
       userCalibrationRunData.value = queryResponse?._data;
-      loadEntireRun();
+      if (userCalibrationRunData.value.status === 'Saved') {
+        gotoHeadwaterBasinGage();
+      } else {
+        gotoRunStatusTab();
+      }
     } else {
-      isLoading.value = false;
       let tDetail = "Unable to Retrieve Calibration Job Data";
       if (queryResponse?._data?.message) {
         tDetail = queryResponse._data.message;
@@ -622,20 +704,9 @@ const openSelectedCalibrationRun = async (selectedCalibrationRun: any) => {
       toast.add(tMsg); addToastRecord(tMsg);
     }
   });
+  isLoading.value = false;
 }
 
-const loadEntireRun = () => {
-  isLoading.value = true;
-  nextTick(async () => {
-    await loadGageTabStaticData();
-    isLoading.value = true;
-    await loadTuningTabStaticData();
-    await loadOptimizationTabStaticData();
-    isLoading.value = false;
-    gotoRunStatusTab();
-  })
-
-}
 const gotoRunStatusTab = () => {
   const allTabs = document.getElementsByClassName("tabs");
   const e = allTabs[CalibrationTabs.tab_runStatus] as HTMLElement;
@@ -701,9 +772,6 @@ const createNewCalibration = async () => {
 
 const gotoHeadwaterBasinGage = () => {
   nextTick(async () => {
-    await loadGageTabStaticData();
-    await loadTuningTabStaticData();
-    await loadOptimizationTabStaticData();
     const tabs = document.getElementsByClassName("tabs");
     const e = <HTMLElement>tabs[CalibrationTabs.tab_headwaterBasinGage];
     e.click();
@@ -764,7 +832,7 @@ const changeSelectedCalibrationRunStatus = (selectedCalibrationRun: any, jobStat
     acceptLock(selectedRunId, false)
   }
   else {
-    const selectedRunName = (selectedCalibrationRun.value.formulation_name) ? " titled '" + selectedCalibrationRun.value.formulation_name + "'" : " (untitled)";
+    const selectedRunName = (selectedCalibrationRun.value.job_name) ? " titled '" + selectedCalibrationRun.value.job_name + "'" : " (untitled)";
     let confirmMessage = "Are you sure you want to " + ty.toLowerCase() + " calibration run " + selectedRunId + selectedRunName;
     if (selectedCalibrationRun.value.status === "Running") confirmMessage += " The running calibration will be aborted."
 
@@ -837,6 +905,7 @@ const acceptDelete = (selectedRunId: number) => {
   });
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
+  selectedBulkJobAction.value = 0;
 }
 
 /**
@@ -893,6 +962,7 @@ const acceptMultipleDelete = () => {
 
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
+  selectedBulkJobAction.value = 0;
 }
 
 /**
@@ -935,6 +1005,7 @@ const acceptArchive = (selectedRunId: number, archiveJob: boolean) => {
 
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
+  selectedBulkJobAction.value = 0;
 }
 
 /**
@@ -989,6 +1060,7 @@ const acceptMultipleArchive = (archiveJob: boolean) => {
   });
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
+  selectedBulkJobAction.value = 0;
 }
 
 
@@ -1002,7 +1074,7 @@ const acceptLock = (selectedRunId: number, lock: boolean) => {
       /* const tMsg: ToastMessageOptions = { severity: 'success', 
         summary: 'Calibration Job ' + (lock ? 'Locked' : 'Unlocked'), detail: 'Job ' + selectedRunId + ' ' + (lock ? 'Locked' : 'Unlocked'), life: ToastTimeout.timeoutSuccess };
       toast.add(tMsg); addToastRecord(tMsg); */
-      await fetchUserCalibrationJobsListData();
+      refreshJobList();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Lock Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -1012,6 +1084,7 @@ const acceptLock = (selectedRunId: number, lock: boolean) => {
   });
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
+  selectedBulkJobAction.value = 0;
 }
 
 /**
@@ -1043,7 +1116,7 @@ const acceptMultipleLock = (lock: boolean) => {
           life: ToastTimeout.timeoutError};
         toast.add(tMsg); addToastRecord(tMsg);
       }
-      await fetchUserCalibrationJobsListData();
+      refreshJobList();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: (lock ? 'Lock' : 'Unlock') + ' Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
@@ -1053,6 +1126,7 @@ const acceptMultipleLock = (lock: boolean) => {
   });
   selectedCalibrationRun.value = undefined;
   selectedMultipleCalibrationRuns.value = [];
+  selectedBulkJobAction.value = 0;
 }
 
 /**
@@ -1085,7 +1159,7 @@ const downloadSelectedCalibrationData = async (selectedCalibrationRun: any) => {
     toast.add(tMsg); addToastRecord(tMsg);
     nextTick(async () => {
       try {
-        // If successful, this job will update calibrationDownloadFileName, and watch function will trigger a Toast message
+        // If successful, this job will update calibrationDownloadJobID, and watch function will trigger a Toast message
         await getCalibrationJobZip(selectedRunId);
       } catch (error) {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Download Error for Calibration Job ID ' + selectedRunId, detail: error, life: ToastTimeout.timeoutError };
@@ -1104,13 +1178,9 @@ watch(calibrationDownloadJobID, () => {
     // Display Toast message saying download was successful and then clear the Job ID/filename refs
     // to avoid interfering with next download
     let tDetail = 'Download zip file successfully created.'
-    if (calibrationDownloadFileName.value) {
-      tDetail = 'Download zip file "' + calibrationDownloadFileName.value + '" successfully created.'
-    }
     const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Download Successful for Calibration Job ID ' + calibrationDownloadJobID.value, detail: tDetail, life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
     calibrationDownloadJobID.value = null;
-    calibrationDownloadFileName.value = null;
   }
 });
 

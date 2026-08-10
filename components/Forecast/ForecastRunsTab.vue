@@ -2,7 +2,7 @@
   <Transition name="slide-fade">
     <div id="MessagesGroupWindow" v-if="showMessagesGroup">
       <div class="text-right sticky top-0">
-        <img title="Close" aria-label="Close" src="~/assets/styles/img/xclose.png" width="40"
+        <img title="Close" aria-label="Close" src="@/assets/styles/img/xclose.png" width="40"
           class="absolute cursor-pointer right-0 mt-1 mr-1" @click="toggleMessagesGroup" alt="Close" />
       </div>
       <MessagesGroup />
@@ -23,7 +23,9 @@
 
           <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
             :show-gage="false" :show-modules="false" :show-archived="false"
-            @RefreshJobList="refreshJobList()" ref="jobFilterDialog" />
+            :totalSize="forecastRunListTotalSize" :totalPages="forecastRunListTotalPages"
+            v-model:currentPage="forecastRunListCurrentPage"
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -99,20 +101,6 @@
                 </span>
               </template>
             </Column>
-            <Column field="created_at" sortable>
-              <template #header>
-                <div class="column-header">
-                  <span>Creation Date</span>
-                </div>
-              </template>
-              <template #body="slotProps">
-                <div v-if="slotProps.data.created_at" class="text-center"
-                  :aria-label="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)"
-                  :title="'Creation Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at)">
-                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.created_at) }}
-                </div>
-              </template>
-            </Column>
             <Column :pt="ptColumn" field="configuration" header="Configuration" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.configuration" :aria-label="'Configuration ' + slotProps.data.configuration"
@@ -129,9 +117,9 @@
               </template>
               <template #body="slotProps">
                 <div v-if="slotProps.data.cycle_date" class="text-center"
-                  :aria-label="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) + 'Z'"
-                  :title="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) + 'Z'">
-                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) }}Z
+                  :aria-label="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date)"
+                  :title="'Cycle Date ' + formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date)">
+                  {{ formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cycle_date) }}
                 </div>
               </template>
             </Column>
@@ -143,9 +131,9 @@
               </template>
               <template #body="slotProps">
                 <div v-if="slotProps.data.cold_start?.cold_start_date" class="text-center"
-                  :aria-label="'Cold Start Date ' + (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) + 'Z' : '')"
-                  :title="'Cold Start Date ' + (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) + 'Z' : '')">
-                  {{ (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) + 'Z' : '') }}
+                  :aria-label="'Cold Start Date ' + (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) : '')"
+                  :title="'Cold Start Date ' + (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) : '')">
+                  {{ (slotProps.data.cold_start.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(slotProps.data.cold_start.cold_start_date) : '') }}
                 </div>
               </template>
             </Column>
@@ -181,7 +169,7 @@
       </div>
 
     </div>
-    <div class="waitgif" v-if="isForecastLoading">
+    <div class="waitgif" v-if="isLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </client-only>
@@ -205,6 +193,8 @@ import MessagesGroup from "@/components/Common/MessagesGroup.vue";
 import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
+const { isLoading } = storeToRefs(generalStore());
+
 const forecastStore = useForecastStore();
 const {
   forecastJobId,
@@ -218,22 +208,20 @@ const {
   forecastRunListStartRow,
   forecastRunListEndRow,
   forecastRunListSort,
-  selectedForecastJob,
-  isForecastLoading
+  selectedForecastJob
 } = storeToRefs(forecastStore);
 
 const {
   setSelectedForecastRunId,
   resetSelectedForecastRunData,
-  loadForecastRunStatusTabData,
-  loadForecastResultsTabData,
   loadSelectedCalibrationRun,
   setSelectedForecastRowData,
   getForecastJobs,
   getCalibrationJobsForForecast,
   deleteForecastJob,
   resetUserSelectedForecastCalibrationRun,
-  hardResetForecastRunStatusStore
+  hardResetForecastRunStatusStore,
+  resetFilters
 } = useForecastStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
@@ -278,8 +266,10 @@ const onRowContextMenu = (event: any) => {
     if (crRowData.forecast_status === 'Done') {
       cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-chart-line', command: () => navigateToForecastResults() });
     }
-    cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => clearDataAndNavigateToSetupForecast() });
-    cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+    if (crRowData.calibration_run_id) {
+      cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => clearDataAndNavigateToSetupForecast() });
+      cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
+    }
     if (crRowData.forecast_status !== 'Running') {
       cmForecastRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedForecastJob() });
     }
@@ -287,7 +277,7 @@ const onRowContextMenu = (event: any) => {
 };
 
 onMounted(async () => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
   forecastJobId.value = undefined;
   forecastRunListCurrentPage.value = 1;
 
@@ -314,7 +304,7 @@ onMounted(async () => {
     await getCalibrationJobsForForecast();
   });
 
-  isForecastLoading.value = false;
+  isLoading.value = false;
 });
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
@@ -327,16 +317,16 @@ const onForecastRowUnSelect = async (event: DataTableRowClickEvent) => {
 }
 
 const viewCalibrationDetails = async (calibration_run_id: number) => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
   nextTick(async () => {
     await loadSelectedCalibrationRun(calibration_run_id);
-    isForecastLoading.value = false;
+    isLoading.value = false;
     showMessagesGroup.value = true;
   })
 }
 
 const clearDataAndNavigateToSetupForecast = () => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
 
   nextTick(async () => {
     navigateToSetupForecast();
@@ -344,7 +334,7 @@ const clearDataAndNavigateToSetupForecast = () => {
 };
 
 const navigateToSetupForecast = () => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast Tab"]');
 
@@ -356,17 +346,18 @@ const navigateToSetupForecast = () => {
 
       // set userCalibrationRunData
       await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
-      isForecastLoading.value = false;
+      forecastJobId.value = undefined;
+      isLoading.value = false;
       e.click();
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Forecast Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
-    isForecastLoading.value = false;
+    isLoading.value = false;
   });
 }
 
 const navigateToForecastRunStatus = () => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
 
@@ -376,12 +367,12 @@ const navigateToForecastRunStatus = () => {
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
-    isForecastLoading.value = false;
+    isLoading.value = false;
   });
 }
 
 const navigateToForecastResults = () => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
   nextTick(async () => {
     const e: HTMLElement | null = document.querySelector('.tabs[title="Results tab"]');
 
@@ -391,7 +382,7 @@ const navigateToForecastResults = () => {
     } else {
       toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
     }
-    isForecastLoading.value = false;
+    isLoading.value = false;
   });
 }
 
@@ -452,9 +443,9 @@ const toggleMessagesGroup = () => {
  * Refresh Forecast Jobs Table
  */
 const refreshJobList = async () => {
-  isForecastLoading.value = true;
+  isLoading.value = true;
   await getForecastJobs();
-  isForecastLoading.value = false;
+  isLoading.value = false;
 }
 
 watch(selectedForecastJob, () => {

@@ -58,7 +58,7 @@ export const fixFloatToFivePlaces = (f: number) => {
   let p = s.indexOf(".");
   if (p !== -1) {
     if (s.substring(p + 1).length > 5) {
-      return f.toFixed(5);
+      return Number(f.toFixed(5));
     } else {
       return f;
     }

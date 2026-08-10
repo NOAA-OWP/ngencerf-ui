@@ -49,7 +49,7 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ calibration_run_id: calibrationJobId.value })
+      body: JSON.stringify({ validation_run_id: iterationValidationRunId.value })
     });
   }
 
@@ -68,29 +68,18 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
 
   const loadValidationStatusInformation = async ( validation_run_id: number ) => {
     queryIterationValidationRunStatus().then( response => {
-      const find_validation_run = response._data.validations.filter( ( validation: CalibrationGetStatusValidationItem ) => {
-        return validation.validation_run_id === validation_run_id
-      });
-      if ( find_validation_run ) {
-        displayValidationId.value = validation_run_id;
-        const validation_run = find_validation_run.shift() as CalibrationGetStatusValidationItem;
-        validationStatus.value = validation_run.status;
-        failureMessages.value = response?._data?.failure_messages;
-        evaluateDisplayIterationNumber.value = validation_run.iteration_num;
-        startTime.value = validation_run.submit_date.toString();
-        if ( validationStatus.value.toLocaleUpperCase() !== "RUNNING" ) {
-          runningTime.value = validation_run.elapsed_time ? formatElapsedTime(validation_run.elapsed_time) : '';
-        } else {
-          if (validationRunningTimeIntervalId.value) {
-            clearInterval(validationRunningTimeIntervalId.value);
-          }
-          validationRunningTimeIntervalId.value = setInterval( updateRunningTime, 1000 ) as unknown as number;
-        }
+      displayValidationId.value = validation_run_id;
+      validationStatus.value = response?._data.status;
+      failureMessages.value = response?._data?.failure_messages;
+      evaluateDisplayIterationNumber.value = response?._data?.iteration_num;
+      startTime.value = response?._data?.submit_date.toString();
+      if ( validationStatus.value.toLocaleUpperCase() !== "RUNNING" ) {
+        runningTime.value = response?._data?.elapsed_time ? formatElapsedTime(response?._data?.elapsed_time) : '';
       } else {
-        clearInterval(validationStatusCheckingIntervalId.value);
-        clearInterval(validationRunningTimeIntervalId.value);
-        validationStatusCheckingIntervalId.value = undefined;
-        validationRunningTimeIntervalId.value = undefined;
+        if (validationRunningTimeIntervalId.value) {
+          clearInterval(validationRunningTimeIntervalId.value);
+        }
+        validationRunningTimeIntervalId.value = setInterval( updateRunningTime, 1000 ) as unknown as number;
       }
     })
   }

@@ -60,22 +60,21 @@ export const makeProtectedApiCall = async <T>(
   const { lastServerError } = storeToRefs(useUserDataStore());
 
   let responseData: any;
+  // Create a mutable copy of the user options
+  const requestOptions = { ...userOptions };
+
+  // Manually stringify body if it is an object.
+  if (
+    requestOptions.body &&
+    typeof requestOptions.body === "object" &&
+    !Array.isArray(requestOptions.body) &&
+    !(requestOptions.body instanceof FormData)
+  ) {
+    requestOptions.body = JSON.stringify(requestOptions.body);
+  }
 
   try {
-    const response = await fetch(url, {
-      ...userOptions,
-      async onRequest({ request, options }: { request: any; options: any }) {
-        // stringify body if it is an objectuseUserDataStore()
-        if (
-          options.body &&
-          typeof options.body === "object" &&
-          !Array.isArray(options.body) &&
-          !(options.body instanceof FormData)
-        ) {
-          options.body = JSON.stringify(options.body);
-        }
-      },
-    });
+    const response = await fetch(url, requestOptions);
 
     let myResponse = (lastServerError.value = {
       ok: response.ok,
@@ -105,8 +104,10 @@ export const makeProtectedApiCall = async <T>(
         sendUserToLogin();
         return;
       }
-      userOptions.headers.Authorization = `Bearer ${userDataStore.getAccessToken()}`;
-      return makeProtectedApiCall(url, userOptions);
+      // Update authorization header on the mutable options object
+      requestOptions.headers.Authorization = `Bearer ${userDataStore.getAccessToken()}`;
+      // Recursively call with the fixed options
+      return makeProtectedApiCall(url, requestOptions);
     }
 
     // Client bad requests, except for Unauthorized, which is handled above
@@ -151,7 +152,6 @@ export const makeProtectedApiCall = async <T>(
       ok: false,
     };
     return responseData;
-    //sendUserToLogin();
   }
 };
 

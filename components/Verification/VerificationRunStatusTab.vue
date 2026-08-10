@@ -1,117 +1,102 @@
 <template>
-  <div class="w-full">
-    <h1 class="pt-3 mb-8 text-3xl font-bold text-center" aria-label="Verification Run/Status Tab" title="Verification Run/Status Tab">
-      Verification Run/Status
-    </h1>
-    <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
-      If status is Ready click Run to submit and run the verification.
-    </p>
-    <br />
-  </div>
-  <div>
-
-    <div class="grid place-items-center">
-      <div class="grid grid-cols-5">
-        <div class="col-span-2">
-          <table>
-            <caption style="text-align: center;font-size:1.1em;font-weight:bold;margin-bottom:3px;"
-              aria-label="Verification Job Run Time Area" title="Verification Job Run Time Area">Verification Job Run Time
-            </caption>
-            <thead>
-              <tr height="25px">
-                <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr height="40px" :aria-label="'Verification Job ID ' + verificationJobId"
-                :title="'Verification Job ID ' + verificationJobId">
-                <th scope="row" class="text-right font-bold">
-                  <div style="width: 140px;">Verification Job ID</div>
-                </th>
-                <td class="pl-5">{{ verificationJobId ?? '-'.repeat(15) }}</td>
-              </tr>
-              <tr height="32px" :aria-label="'Submit Time ' + submitTime" :title="'Submit Time ' + submitTime">
-                <th scope="row" class="text-right font-bold">
-                  <div style="width: 140px;">Submit Time</div>
-                </th>
-                <td class="pl-5">{{ submitTime ?? '-'.repeat(15) }}</td>
-              </tr>
-              <tr height="32px" :aria-label="'Elapsed Time ' + elapsedTime" :title="'Elapsed Time ' + elapsedTime">
-                <th scope="row" class="text-right font-bold">
-                  <div style="width: 140px;">Elapsed Time</div>
-                </th>
-                <td class="pl-5">{{ elapsedTime ?? '-'.repeat(15) }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div data-v-a7d04dc9="" class="col-span-1"><div data-v-a7d04dc9="" class="vertical-separator"></div></div>
-
-        <div class="col-span-2 pl-5">
-          <table>
-            <caption style="font-size:1.1em;font-weight:bold;margin-bottom:3px;" aria-label="Verification Job Status area"
-              title="Verification Job Status area">Verification Job Status</caption>
-            <thead>
-              <tr height="25px">
-                <th scope="row" class="text-right" colspan="2" style="border-top: 3px solid #d9d9d9;"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr height="40px" :aria-label="'Status is ' + verificationJobStatus"
-                :title="'Status is ' + verificationJobStatus">
-                <th scope="row" class="text-right font-bold">
-                  <div style="width: 140px;">Status</div>
-                </th>
-                <td v-if="verificationJobStatus" class="pl-5">{{ verificationJobStatus }}</td>
-                <td v-else class="pl-5">Ready</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="col-span-5" v-if="failureMessages">
-          <div style="display:flex; margin-top: 1em;"  aria-label="Failure Message" title="Failure Message">
-            <div class="text-right font-bold" style="width: 155px;">
-              <label class="text-right whitespace-nowrap" for="failureMessage" style="width: 155px;padding-top:1px;">
-                Failure Message
-              </label>
-            </div>
-            <div class="pl-5" style="width: 100%;">
-              <span v-for="message in failureMessages">
-                {{ message }}<br/>
-              </span>
+  <div id="ForecastRunStatusPage">
+    <div class="pl-6 pr-2 pt-2">
+      <div class="flex mt-3">
+        <div class="w-5/6 relative">
+          <div v-if="logList.length > 0" class="inline-block">
+            <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
+            <div class="inline-block w-2/3">
+              <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;"
+                v-model="selectedLogCategory" :options="logList" option-label="display_name" optionValue="name">
+              </Select>
             </div>
           </div>
-        </div>
-
-        <div class="col-span-3"></div>
-
-        <div class="col-span-2 pl-5">
-          <span v-if="verificationJobStatus === 'Ready'">
-            <Button class=" ngenButtonDiv-green font-normal" title="Run Button" aria-label="Run Button"
-              @click="startVerificationJob()">
-              Run
-            </Button>
-          </span>
-          <span v-if="verificationJobStatus === 'Running'">
-            <Button class="col-span-1 ngenButtonDiv-red" title="Cancel Button" @click="stopVerificationJob()"
-              aria-label="Cancel Button">
-              Cancel
-            </Button>
-          </span>
-          <span v-if="verificationJobStatus === 'Done'">
-            <Button class="ngenButtonDiv ml-6 font-normal px-4 whitespace-nowrap" title="View Results Button"
-              @click="goNextTab()" aria-label="View Results Button">
-              View Results
-            </Button>
-          </span>
+          <div v-else-if="!verificationJobId" class="w-full">
+            <p class="text-center mt-1" style="font-size: 12px;font-weight: normal;">
+              Click Run to submit and run the verification.
+            </p>
+          </div>
+          
+          <div class="grid auto-cols-max grid-cols-3 gap=1 text-sm text-left mt-2">
+            <div class="col-span-1">
+              <div>
+                <span class="font-medium">Forecast Job ID: </span>
+                {{ forecastJobId ?? '-'.repeat(15) }}
+              </div>
+              <div>
+                <span class="font-medium">Verification Job ID: </span>
+                {{ verificationJobId ?? '-'.repeat(15) }}
+              </div>
+            </div>
+            <div class="col-span-1">
+              <div>
+                <span class="font-medium">Configuration: </span>
+                {{ selectedVerificationJob?.forecast_run?.configuration ?? (selectedForecastJob?.configuration ?? 'Unknown') }}
+              </div>
+              <div>
+                <span class="font-medium">Cycle Date: </span>
+                {{ (selectedVerificationJob?.forecast_run?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedVerificationJob.forecast_run.cycle_date) + ' UTC' : (selectedForecastJob?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(selectedForecastJob.cycle_date) + ' UTC' : 'None')) }}
+              </div>
+            </div>
+            <div class="col-span-1">
+              <div>
+                <span class="font-medium">Status: </span>
+                {{ verificationJobStatus ?? 'Ready' }}
+              </div>
+              <div>
+                <span class="font-medium">Submit Time: </span>
+                {{ submitTime ?? '-'.repeat(15) }}
+              </div>
+              <div>
+                <span class="font-medium">Elapsed Time: </span>
+                {{ elapsedTime ?? '-'.repeat(15) }}
+              </div>
+              <div class="mt-2 mb-2">
+                <!--BUTTONS - START-->
+                <span v-if="forecastJobId && !verificationJobId">
+                  <Button class=" ngenButtonDiv-green font-normal" title="Run Button" aria-label="Run Button"
+                    @click="startVerificationJob()">
+                    Run
+                  </Button>
+                </span>
+                <span v-if="['Submitted','Running'].includes(verificationJobStatus)">
+                  <Button class="col-span-1 ngenButtonDiv-red" title="Cancel Button" @click="stopVerificationJob()"
+                    aria-label="Cancel Button">
+                    Cancel
+                  </Button>
+                </span>
+                <span v-if="verificationJobStatus === 'Done'">
+                  <Button class="ngenButtonDiv ml-6 font-normal px-4 whitespace-nowrap" title="View Results Button"
+                    @click="goNextTab()" aria-label="View Results Button">
+                    View Results
+                  </Button>
+                </span>
+                <!--BUTTONS - END-->
+              </div>
+            </div>
+          </div>
+            
+          <div>
+            <div v-if="failureMessages" class="text-left pl-3 text-nowrap" style="font-size:0.9em;">
+              <label for="status">Failure Message </label>
+              <div class="pl-5" style="width: 100%;">
+                <span v-for="message in failureMessages">
+                  {{ message }}<br/>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
     </div>
 
-    <div class="waitgif" v-if="isVerificationLoading">
+    <!-- DISPLAY LOGS -->
+    <div v-show="logList.length > 0">
+      <LogDisplay/>
+    </div>
+
+    <div class="waitgif" v-if="isLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
@@ -120,42 +105,56 @@
 <script setup lang="ts">
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
+import LogDisplay from "../Common/LogDisplay.vue";
 
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
-
+import { hilightTab } from '@/composables/TabHilight';
 import { storeToRefs } from "pinia";
 
+import { useVerificationStore } from "@/stores/verification/VerificationStore";
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useLogStore } from '@/stores/common/LogStore';
+
+const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
-import { useVerificationStore } from "@/stores/verification/VerificationStore";
 const verificationStore = useVerificationStore();
 
 const { 
+  selectedForecastJob,
+  selectedVerificationJob,
+  forecastJobId,
   verificationJobId, 
-  userVerificationJobData, 
   submitTimeDate,
   submitTime,
   elapsedTime,
   verificationStatusCheckingInterval,
   verificationRunningTimeInterval,
   verificationJobStatus,
-  failureMessages,
-  isVerificationLoading 
+  failureMessages
 } = storeToRefs(verificationStore);
 const { 
   loadVerificationRunStatusTabData,
   loadVerificationStatusInformation,
   updateRunningTime,
-  runVerificationJob,
+  createAndRunVerificationJob,
   cancelVerificationJob
 } = useVerificationStore();
 
-import { hilightTab } from '@/composables/TabHilight';
-onMounted(() => {
+const {
+  selectedLogCategory,
+  logList,
+  logListOptions
+} = storeToRefs(useLogStore());
+const {
+  populateLogListOptions,
+  resetUserLogRefs
+} = useLogStore();
+
+onMounted(async() => {
   hilightTab(VerificationTabs.tab_runStatus);
 
   clearInterval(verificationStatusCheckingInterval.value);
@@ -167,17 +166,34 @@ onMounted(() => {
   submitTime.value = undefined;
   elapsedTime.value = undefined;
 
-  loadVerificationStatusInformation();
+  if (verificationJobId.value) {
+    await loadVerificationStatusInformation();
+    await loadVerificationRunStatusTabData();
+    if (verificationJobStatus.value && !['Ready','Submitted'].includes(verificationJobStatus.value)) {
+      await populateLogListOptions();
+    }
+  }
 
-  loadVerificationRunStatusTabData();
+  watch(verificationJobStatus, async (newVerificationJobStatus, oldVerificationJobStatus) => {
+    if (verificationJobId.value && 
+      ( 
+        newVerificationJobStatus === 'Running' || 
+        (oldVerificationJobStatus && oldVerificationJobStatus !== "Unknown" && 
+        newVerificationJobStatus && newVerificationJobStatus !== "Unknown")
+      )
+    ) {
+      populateLogListOptions();
+    }
+  });
 })
 
 /**
  * Start the verification job
  */
 const startVerificationJob = async () => {
-  runVerificationJob(verificationJobId.value as number).then((response) => {
+  createAndRunVerificationJob().then((response) => {
     if (response.status >= 200 && response.status < 300) {
+      verificationJobId.value = response._data.verification_run_id;
       verificationJobStatus.value = response._data.status;
       failureMessages.value = response._data.failure_messages;
 
@@ -248,6 +264,9 @@ onUnmounted(() => {
   failureMessages.value = undefined;
   submitTime.value = undefined;
   elapsedTime.value = undefined;
+  logList.value = [];
+  logListOptions.value = [];
+  resetUserLogRefs();
 })
 
 </script>
@@ -261,5 +280,9 @@ onUnmounted(() => {
   font-size: 30px;
   margin-top: 40px;
   margin-bottom: 40px;
+}
+
+.gray-border {
+  border: 2px solid #d9d9d9;
 }
 </style>

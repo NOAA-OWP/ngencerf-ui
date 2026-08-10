@@ -6,17 +6,15 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   css: ["/assets/styles/styles.scss", "@vuepic/vue-datepicker/dist/main.css"],
   modules: [
-    [
-      "@pinia/nuxt",
-      {
-        // automatically imports `defineStore` and imports `defineStore` as `definePiniaStore`
-        autoImports: ["defineStore", ["defineStore", "definePiniaStore"], "acceptHMRUpdate"],
-      },
-    ],
+    '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
-    "@nuxtjs/google-fonts",
+    '@nuxtjs/google-fonts',
     '@primevue/nuxt-module'
   ],
+
+  piniaPluginPersistedstate: {
+    storage: 'localStorage',
+  },
 
   postcss: {
     plugins: {

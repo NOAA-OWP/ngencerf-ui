@@ -5,7 +5,7 @@
     <p class="text-center" style="color:#cc5500;font-size:0.8em;">
       WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
     </p>
-    <hr />
+        <hr class="my-6 border-black" />
     <div>
       <table class="_help-table" aria-label="Evaluation Run/Status Help Table">
         <thead>
@@ -16,7 +16,7 @@
         </thead>
         <tbody>
             <tr>
-              <td class="td1">Display</td>
+              <td class="td1">Display<span class="required-asterisk" aria-hidden="true">*</span></td>
               <td class="td2">Select comparison to view.</td>
             </tr>
             <tr>
@@ -79,6 +79,10 @@
             </tr>              
         </tbody>
       </table>
+        <div class="required-hint mt-0 mb-4">
+            <span class="required-asterisk">*</span> An asterisk next to a label indicates a required field
+        </div>
+        <hr class="my-6 border-black" />
     </div>
     <p style="margin-top:12px;font-size: 0.9em;">
       <strong>Note:</strong><br />

@@ -222,6 +222,10 @@
                 </tr>
             </tbody>
         </table>
+        <div class="required-hint mt-0 mb-4">
+            <span class="required-asterisk">*</span> An asterisk next to a label indicates a required field
+        </div>
+        <hr class="my-6 border-black" />
     </div>
 </template>
 

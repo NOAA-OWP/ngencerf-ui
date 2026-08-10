@@ -64,15 +64,12 @@ export const useOptimizationStore = defineStore(
           headers: {
             Authorization: `Bearer ${getAccessToken()}`,
             "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ calibration_run_id: calibrationJobId.value }),
+          }
         }
       ).then((optimizationTabDataResult) => {
         optimizationTabData.value =
           optimizationTabDataResult?._data ?? undefined;
         optimizationStore_data_loading.value = false;
-
-        setUserSelection();
       });
     };
 
@@ -279,6 +276,7 @@ export const useOptimizationStore = defineStore(
       getOptimizationInputUserData,
       saveOptimizationTabData,
       resetOptimizationInputs,
+      setUserSelection,
       resetUserSelectionOptimization,
       resetOptimizationStore,
       loadOptimizationTabStaticData,

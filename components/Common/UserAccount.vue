@@ -25,19 +25,19 @@
       <div class="col-span-1">
         <form @submit.prevent="changePassword" @cancel="closeAccountBox" v-if="showForm === 'changePassword'">
           <div class="passwordBox grid row-auto">
-            <label for="OldPass">Old password</label>
+            <label for="OldPass" class="required-label">Old password</label>
             <div class="mb-2">
               <Password id="OldPass" type="password" name="password" autocomplete="current-password" v-model="oldpass"
                 aria-label="Enter old password here" title="Enter old password here" toggleMask :feedback="false" />
             </div>
 
-            <label for="NewPass">New password</label>
+            <label for="NewPass" class="required-label">New password</label>
             <div class="mb-2">
               <Password id="NewPass" type="password" name="password" autocomplete="new-password" v-model="newpass"
                 aria-label="Enter new password here" title="Enter new password here" toggleMask :feedback="true" />
             </div>
 
-            <label for="ReNewPass">Confirm New password</label>
+            <label for="ReNewPass" class="required-label">Confirm New password</label>
             <div class="mb-2">
               <Password id="ReNewPass" type="password" name="password" autocomplete="new-password"
                 v-model="confirmNewpass" aria-label="Confirm New Password" title="Confirm New Password" toggleMask
@@ -56,6 +56,9 @@
               Close
             </Button>
           </div>
+          <div class="required-hint mt-4">
+            <span class="required-asterisk">*</span> Required field
+          </div>
 
         </form>
       </div>
@@ -71,13 +74,13 @@
 
         <form @submit.prevent="updateName" @cancel="closeAccountBox" v-if="showForm === 'updateName'">
           <div class="passwordBox grid row-auto">
-            <label for="FirstName">First Name</label>
+            <label for="FirstName" class="required-label">First Name</label>
             <div class="mb-3">
               <InputText id="FirstName" type="text" name="first_name" v-model="newFirstName"
                 aria-label="Enter first name here" title="Enter first name here" />
             </div>
 
-            <label for="LastName">Last Name</label>
+            <label for="LastName" class="required-label">Last Name</label>
             <div class="mb-3">
               <InputText id="LastName" type="text" name="last_name" v-model="newLastName"
                 aria-label="Enter last name here" title="Enter last name here" />
@@ -94,8 +97,12 @@
               Close
             </Button>
           </div>
+          <div class="required-hint mt-4">
+            <span class="required-asterisk">*</span> Required field
+          </div>
 
         </form>
+        
       </div>
 
     </div>

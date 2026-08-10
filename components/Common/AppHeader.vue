@@ -40,7 +40,7 @@
             <div id="Circles" class="col-span-2">
                 <div id="UserGroup" class="grid grid-cols-2">
                     <div class="col-span-1">
-                        <Button v-if="userLoggedIn && location.name !== 'Login' && location.name !== 'Verification'"
+                        <Button v-if="userLoggedIn && location.name !== 'Login'"
                             class="pt-0" id="HelpCircle" title="Help" aria-label="Help"
                             @click="displayHelp">?</Button>
                     </div>
@@ -128,7 +128,24 @@
                                     <LazyForecastRunStatusHelp />
                                 </span>
                                 <span v-if="getForecastTabIndex() === 5">
-                                    <LazyForecastResultesHelp />
+                                    <LazyForecastResultsHelp />
+                                </span>
+                            </div>
+                        </div>
+
+                        <div v-else-if="location.name === 'Verification'" class="py-10 px-1">
+                            <div v-if="getMenuIndex() === 4">
+                                <span v-if="getVerificationTabIndex() === 1">
+                                    <LazyVerificationForecastRunsHelp />
+                                </span>
+                                <span v-if="getVerificationTabIndex() === 2">
+                                    <LazyVerificationVerificationRunsHelp />
+                                </span>
+                                <span v-if="getVerificationTabIndex() === 3">
+                                    <LazyVerificationtRunStatusHelp />
+                                </span>
+                                <span v-if="getVerificationTabIndex() === 4">
+                                    <LazyVerificationResultsHelp />
                                 </span>
                             </div>
                         </div>
@@ -188,9 +205,16 @@ const LazyEvaluationRunStatusHelp = defineAsyncComponent(() => import("@/compone
 // Forecast Workflow Help Files
 const LazyForecastCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/CalibrationRunsHelp.vue"));
 const LazyForecastForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ForecastRunsHelp.vue"));
-const LazyForecastResultesHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
+const LazyForecastResultsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
 const LazyForecastSetupForecastHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/SetupForecastHelp.vue"));
 const LazyForecastRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/RunStatusHelp.vue"));
+
+// Forecast Workflow Help Files
+const LazyVerificationForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/ForecastRunsHelp.vue"));
+const LazyVerificationVerificationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/VerificationRunsHelp.vue"));
+const LazyVerificationtRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Verification/RunStatusHelp.vue"));
+const LazyVerificationResultsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/ResultsHelp.vue"));
+
 
 const { popupActive } = storeToRefs(generalStore());
 
@@ -200,7 +224,7 @@ const accountOverlay = ref();
 const aboutOverlay = ref();
 const errorOverlay = ref();
 
-const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex } = generalStore();
+const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex } = generalStore();
 
 const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } = useUserDataStore();
 

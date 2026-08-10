@@ -1,73 +1,97 @@
 <template>
     <div class="_help-page">
         <div class="_help-title">Calibration - Formulation Tab</div>
-        <div class="_help-subtitle">Provide a user defined formulation name for this calibration job and
+        <div class="_help-subtitle">Provide a user defined job name for this calibration job and
             select the forumlation modules.</div>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-        <hr />
+        <hr class="my-6 border-black" />
         <p style="margin-left: 10px; font-size:0.9em; line-height: 20px;">
             <em>The Previous and Next buttons on each of the tabs are meant to guide the user through a calibration setup, 
                 starting here at the Headwater Basin Gage tab. The user can also simply click a tab or a link in the Progress
                 area to go to that specific setup tab.</em>
         </p>
-        <table class="_help-table"  aria-describedby="Formulation Tab Help Table">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="td1">Formulation Name</td>
-                    <td class="td2">Enter name for the formulation. Alphanumeric characters, underscore and dashes are
-                        allowed. No spaces.</td>
-                </tr>
-                <tr>
-                    <td class="td1">Select Modules</td>
-                    <td class="td2">Select the modules to use in the formulation. When a module is selected,
-                        the associated group(s) will be checked in the Groups Covered by Selections area.</td>
-                </tr>
-                <tr>
-                    <td class="td1">Groups Filter</td>
-                    <td class="td2">Pulldown filter to show only modules for the selected group type.
-                    </td>
-                </tr>
-                <tr>
-                    <td class="td1">Groups Covered by Selections</td>
-                    <td class="td2">Group list of the types of modelling available from the Formulation modules.
-                        Checkmarks show
-                        the groups covered by the users module selections.
-                    </td>
-                </tr>
-                <tr>
-                    <td class="td1">&nbsp;</td>
-                    <td class="td2">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="td1">Save Button</td>
-                    <td class="td2">Save data from the tab. Partial saves are allowed.</td>
-                </tr>
-                <tr>
-                    <td class="td1">Revert Button</td>
-                    <td class="td2">If changes are made to the selected modules, the Revert button will appear. When
-                        clicked it undo all the changes made to the list.</td>
-                </tr>
-                <tr>
-                    <td class="td1">Prev Button</td>
-                    <td class="td2">Move to the Headwater Basin Gage tab.</td>
-                </tr>
-                <tr>
-                    <td class="td1">Next Button</td>
-                    <td class="td2">Move to the Tuning Controls Tab. If there is any unsaved data, the user will first
-                        be prompted
-                        to save.</td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="_help-title" style="padding-top: 20px;padding-bottom: 0px;">Formulation Rules</div>
+        <hr class="my-6 border-black" />
+        <div style="margin-left: 25px; margin-top:20px;">
+            <div class="text-center font-bold text-xl mb-3">General Rules</div>
+            <div style="margin-left: 10px;">
+                <ul style="list-style-type: disc;margin-left: 20px;">
+                    <li>When entering data manually, press <strong>Enter</strong> to confirm each field;
+                        otherwise, the value will be discarded.</li>
+                    <li>A <strong>gage</strong> is required before anything on this tab can be selected.</li>
+                    <li>Selecting modules automatically:
+                        <ul class="list-disc list-outside ml-6 space-y-0">
+                            <li>Checks the corresponding hydrologic group.</li>
+                            <li>Displays which NWM v3 output variables will and will not be generated.</li>
+                            <li>Shows the CFE Rootzone checkbox when a CFE module is selected.</li>
+                        </ul>
+                    </li>
+                    <li>A formulation is <strong>Calibratable</strong> if it meets the formulation rules defined below.</li>
+                    <li>A formulation is  <strong>Complete</strong> if it is calibratable and produces all required 
+                        NWM v3 Output Variables.</li>
+                    <li>Partial saves are allowed.</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="my-6 border-black mt-6" />
+        <div style="margin-left: 25px; margin-top:20px;">
+            <div class="text-center font-bold text-xl mb-3">General Rules</div>
+            <table class="_help-table"  aria-describedby="Formulation Tab Help Table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="td1">Select Modules<span class="required-asterisk" aria-hidden="true">*</span></td>
+                        <td class="td2">Select the modules to use in the formulation. When a module is selected,
+                            the associated group(s) will be checked in the <strong>Groups Covered by Selections</strong> area.</td>
+                    </tr>
+                    <tr>
+                        <td class="td1">Groups Filter</td>
+                        <td class="td2">Pulldown filter to show only modules for the selected group type.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td1">Groups Covered by Selections</td>
+                        <td class="td2">Groups list the types of modeling available.<br >
+                            Checkmarks indicate which groups are covered by your current module selections.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td1">&nbsp;</td>
+                        <td class="td2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="td1">Save Button</td>
+                        <td class="td2">Save data from the tab. Partial saves are allowed.</td>
+                    </tr>
+                    <tr>
+                        <td class="td1">Revert Button</td>
+                        <td class="td2">The Revert button appears when anything on the tab changes. Clicking it 
+                            restores the previous saved state.</td>
+                    </tr>
+                    <tr>
+                        <td class="td1">Prev Button</td>
+                        <td class="td2">Move to the Headwater Basin Gage tab. If there are unsaved changes, you will 
+                            be prompted to either remain on the current tab or discard the changes before continuing.</td>
+                    </tr>
+                    <tr>
+                        <td class="td1">Next Button</td>
+                        <td class="td2">Moves to the Tuning Controls tab. If there are unsaved changes, you will 
+                            be prompted to either remain on the current tab or discard the changes before continuing.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="required-hint mt-0 mb-4">
+            <span class="required-asterisk">*</span> An asterisk next to a label indicates a required field
+        </div>
+        <hr class="my-6 border-black" />
+        <div class="_help-title mt-2" style="padding-top: 20px;padding-bottom: 0px;">Formulation Rules</div>
         <div style="margin-left: 30px; margin-top:20px;">
             <ul style="list-style-type: disc;">
                 <li>Only one module per process (except for SFT and SMP, which are always run together currently)</li>
@@ -133,12 +157,16 @@
                 <li><strong>Auxiliary Soil Process</strong> (Optional)
                     <ul style="margin-left: 20px;">
                         <li style="font-style:italic">aka <strong>Soil Moisture Group</strong></li>
-                        <li style="font-size:0.95em;"><strong>sft/smp:</strong></li>
+                        <li>Generally required to produce all NWM output variables.</li>
+                        <li style="font-size:0.95em;"><strong>SFT/SMP:</strong></li>
                         <li style="margin-left: 15px;">
-                            SFT and SMP currently run together in ngen-cal.<br />
-                            They require either CFE-(X, S) or LASAM.<br />
-                            They share parameters with CFE and LASAM, so calibration of those parameters is done
-                            jointly.
+                            <ul class="list-disc list-outside ml-6 space-y-0">
+                                <li>SFT is paired with SMP (required).</li>
+                                <li>They require a rainfall-runoff model for input (CFE-X/S, LASAM, and TopModel 
+                                    currently have integrations).</li>
+                                <li>They share parameters with CFE and LASAM, so when paired with either of those 
+                                    modules the calibration of parameters is done jointly.</li>
+                            </ul>
                         </li>
                     </ul>
                 </li>
@@ -150,8 +178,7 @@
                 </li>
             </ul>
         </div>
-        <br />
-        <hr />
+        <hr class="my-6 border-black mt-6" />
         <div class="_help-title" style="padding-top: 20px;padding-bottom: 0px;">NWM v3 Output Variable Map</div>
         <div style="margin-left: 30px; margin-top:20px;">
             <div class="overflow-x-auto overflow-y-auto max-h-[80vh]">

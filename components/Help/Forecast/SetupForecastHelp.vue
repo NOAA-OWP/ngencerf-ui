@@ -2,26 +2,45 @@
     <div class="_help-page">
         <div class="_help-title">Forecast - Setup Forecast Tab</div>
         <p id="help-subtitle" class="_help-subtitle">
-            Select the type of forecast to run.<br />
-            <br />
-            Greyed out rows in the table are not yet available from the GUI. Use the ngenCERF CLI to run those
-            configuration.
         </p>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
             WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
-        <hr />
-        <p class="text-center">
-            <strong>IMPORTANT</strong><br />
-            <strong>Short Range Forecast</strong> is for <strong>CONUS</strong> gages only.<br />
-            Use the ngenCERF CLI for oCONUS Forecasts.<br />
-            <br />
-            <span style="color:red">Selecting an oCONUS gage will result in a Failed Forecast.</span>
+        <hr class="my-6 border-black" />
+        <p class="text-center font-medium">
+            All times referenced are in Coordinated Universal Time (UTC), also known as Zulu (Z)
         </p>
-        <br />
-        <p class="text-center">
-            Once the forecast configuration is selected, click on the Next button to review and run the forecast.
-        </p>
+        <hr class="my-6 border-black" />
+
+        <div class="ml-2">
+            <!-- Forecast configuration details -->
+            <div class="space-y-4">
+                <p>
+                    To set up a forecast, <strong>select one of the available forecast configurations</strong> 
+                    from the table. Once selected, you will be prompted to provide the following input 
+                    fields for the forecast:
+                </p>
+
+                <ul class="list-disc list-outside space-y-0 ml-6">
+                    <li><strong>Cold Start Date</strong></li>
+                    <li><strong>Cold Start Hour</strong></li>
+                    <li><strong>Cycle Date<span class="required-asterisk" aria-hidden="true">*</span></strong></li>
+                    <li><strong>Cycle Hour<span class="required-asterisk" aria-hidden="true">*</span></strong></li>
+                </ul>
+
+                <p>
+                    To configure your forecast, enter all required fields. At a minimum, you must provide the 
+                    <strong>Cycle Date</strong> and <strong>Cycle Hour</strong>. The <strong>Next</strong> button
+                    will appear only after all required information has been entered.
+                </p>
+                <p class="text-center mt-2">
+                    Click <strong>Next</strong> to review your settings and run the forecast.
+                </p>
+                <div class="required-hint mt-2 mb-4">
+                    <span class="required-asterisk">*</span> An asterisk next to a label indicates a required field
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 

@@ -6,7 +6,7 @@
           <div class="col-span-1">
 
             <div id="OptAlg" class="mt-2">
-              <label for="OptimizationAlgorithm">Optimization Algorithm</label>
+              <label for="OptimizationAlgorithm" class="required-label">Optimization Algorithm</label>
               <Select id="OptimizationAlgorithm" class="mt-1" v-model="uiOptimization"
                 :options="getOptimizationAlgorithmOptionsList" filter optionLabel="name" optionValue="name"
                 placeholder="" @change="optimizationSelectChange" aria-label="Optimization Algorithm"
@@ -19,7 +19,7 @@
             <div class="mt-2">
               <div class="">
                 <div class="flex mt-2">
-                  <div class="text-left font-bold">Algorithm Parameter(s)</div>
+                  <div class="text-left font-bold required-label">Algorithm Parameter(s)</div>
                   <div id="ClearTableBtn" class="ml-auto">
                     <Button id="ClrBtn" @click="resetOptimizationInputs" class="c-blue font-normal underline mr-2"
                       :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
@@ -54,20 +54,31 @@
         <div class="grid grid-cols-2 gap-10">
           <div class="col-span-1">
             <div id="ObjFunct">
-              <label for="ObjectiveFunction<">Objective Function</label>
+              <label for="ObjectiveFunction" class="required-label">Objective Function</label>
               <Select id="ObjectiveFunction" class="rounded-md" filter v-model="uiObjectiveFunction"
                 :options="getObjectiveFunctionOptionsList" optionLabel="display_name" optionValue="name" placeholder=""
                 @change="updateMetricFlowFieldVisibility" aria-label="Objective Function" title="Objective Function"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
+              <div v-if="uiObjectiveFunction" class="ml-3 mt-2">
+                For {{ uiObjectiveFunction }} the Objective Function = 
+                {{
+                  ['KGE','NSE','NNSE','NSELOG','CORR','CSI','POD'].includes(uiObjectiveFunction.toUpperCase()) ? '1 - metric' :
+                    (['RMSE','MAE','RSR','FAR','PKBIAS','PKTE','EVBIAS'].includes(uiObjectiveFunction.toUpperCase()) ? 'metric' :
+                      ['PBIAS','LSEG_FDC','HSEG_FDC'].includes(uiObjectiveFunction.toUpperCase()) ? 'abs(metric)' : ''
+                    )
+                }}
+              </div>
               <div v-if="showObjectiveFunctionStreamFlow" class="ml-3 mt-2">
-                Flow Threshold <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
+                Flow Threshold<span class="required-asterisk" aria-hidden="true">* </span>
+                <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
                   :minFractionDigits="2" class="w-24" aria-label="Flow Threshold" title="Flow Threshold"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                   @input="handleOptimizationDataChange">
                 </InputNumber> m3/s
               </div>
               <div v-if="showObjectiveFunctionPeakFlow" class="ml-3 mt-2">
-                Peak Flow Threshold <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
+                Peak Flow Threshold<span class="required-asterisk" aria-hidden="true">* </span>
+                <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
                   :minFractionDigits="2" class="w-24" aria-label="Peak Flow Threshold" title="Peak Flow Threshold"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                   @input="handleOptimizationDataChange">
@@ -89,8 +100,8 @@
                 <span class="text-sm ml-2">(POD, CSI, FAR)</span>
               </div>
               <div v-if="showMetricStreamFlow && !cbCategoricalDisabled" id="FlowThreshold" class="mt-2 pl-8">
-
-                Flow Threshold <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
+                Flow Threshold<span class="required-asterisk" aria-hidden="true">* </span>
+                <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
                   :minFractionDigits="2" class="w-24" aria-label="Flow Threshold" title="Flow Threshold"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                   @input="handleOptimizationDataChange"></InputNumber> m3/s
@@ -106,7 +117,8 @@
                 <span class="text-sm ml-2">(PKBIAS, PKTE, EVBIAS)</span>
               </div>
               <div v-if="showMetricPeakFlow && !cbEventBasedDisabled" id="FlowThreshold" class="mt-2 pl-8">
-                Peak Flow Threshold <InputNumber inputId="metricEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
+                Peak Flow Threshold<span class="required-asterisk" aria-hidden="true">* </span>
+                <InputNumber inputId="metricEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
                   :minFractionDigits="2" class="w-24" aria-label=" Peak Flow Threshold" title=" Peak Flow Threshold"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                   @input="handleOptimizationDataChange"></InputNumber>
@@ -124,7 +136,7 @@
           <div class="col-span-1">
             <!--REVIVING LOST CONTENT HERE-->
             <div id="CalibrationStopCriteria" class="bordered">
-              <label for="StopCriteria">Calibration Stop Criteria</label><br>
+              <label for="StopCriteria" class="required-label">Calibration Stop Criteria</label><br>
               <InputNumber id="StopCriteria" inputId="stopCriteria" v-model="uiStopCriteria" showButtons :min="2"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 aria-label="Calibration Stop Criteria" title="Calibration Stop Criteria"
@@ -135,7 +147,7 @@
           </div>
           <div class="col-span-1">
             <div id="PlotGenFreq" class="bordered">
-              <label for="PlotFrequency">Plot Generation Frequency</label><br>
+              <label for="PlotFrequency" class="required-label">Plot Generation Frequency</label><br>
               Once Every:&nbsp;&nbsp;<InputNumber id="PlotFrequency" class="w-[100px]" inputId="plotFrequency"
                 v-model="uiPlotFrequency" showButtons :min="1" aria-label="Plot Generation Frequency"
                 title="Plot Generation Frequency"
@@ -166,7 +178,7 @@
       </span>
       <span v-else>
         <div class="col-span-1 mr-6 h-8 whitespace-nowrap">
-          Run on {{ formatDateForRunOnString(submitTimeDate as Date) }}
+          {{ submitTimeDate ? 'Run on ' + formatDateForRunOnString(submitTimeDate) : 'Run on Unknown Date' }}
         </div>
       </span>
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
@@ -236,7 +248,7 @@ const {
   saveOptMetPayload
 } = storeToRefs(optimizationStore);
 
-const { saveOptimizationTabData, resetOptimizationInputs } = optimizationStore;
+const { loadOptimizationTabStaticData, setUserSelection, saveOptimizationTabData, resetOptimizationInputs } = optimizationStore;
 const { fetchUserCalibrationRunData } = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
@@ -254,10 +266,19 @@ const showMetricPeakFlow = ref<boolean>(false);
 const showMetricStreamFlow = ref<boolean>(false);
 const ele = document.getElementById("MainLeftDataArea") as HTMLElement;
 
-onMounted(() => {
+onMounted(async() => {
+  if (!optimizationTabData.value) {
+    await loadOptimizationTabStaticData();
+  }
+  setUserSelection();
+  
   hilightTab(CalibrationTabs.tab_optimizationMetrics);
   toast.removeAllGroups();
   if (ele) { ele.scrollTo(0, 0); }
+  
+  if (userCalibrationRunData?.value?.submit_date) {
+    submitTimeDate.value = new Date(userCalibrationRunData.value.submit_date);
+  }
 
   updateMetricFlowFieldVisibility();
 

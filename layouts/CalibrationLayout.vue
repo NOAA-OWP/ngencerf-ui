@@ -22,7 +22,7 @@
 
       <div v-else class="grid row-span-10 gap-2 mx-2">
         <div class="grid grid-cols-12">
-          <div class="col-span-8">
+          <div :class="'col-span-' + (userCalibrationRunData ? 8 : 12)">
             <div class="grid grid-rows-12 mx-auto px-2 py-2">
               <div class="grid row-span-12 white-tall-content-box">
                 <div id="MainLeftDataParent" class="overflow-auto">
@@ -33,7 +33,7 @@
               </div>
             </div>
           </div>
-          <div class="col-span-4">
+          <div v-if="userCalibrationRunData" class="col-span-4">
             <div class="grid grid-rows-12 mx-auto px-2 py-2">
               <div class="grid row-span-12 white-tall-content-box">
                 <div id="MainRightDataArea" class="overflow-auto"> 
@@ -52,14 +52,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from "vue";
+import { onUnmounted } from "vue";
 import AppFooter from "@/components/Common/AppFooter.vue";
 import AppHeader from "@/components/Common/AppHeader.vue";
 import CalibrationRightBlock from "@/components/Calibration/CalibrationRightBlock.vue";
 import CalibrationLeftBlock from "@/components/Calibration/CalibrationLeftBlock.vue";
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 const { getMenuIndex, getCalibrationTabIndex, setCalibrationTabIndex } = generalStore();
+const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
 onUnmounted(() => {
   // Reset tab index to 1 when we leave this layout, 
