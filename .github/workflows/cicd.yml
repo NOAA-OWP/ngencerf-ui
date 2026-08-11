@@ -117,24 +117,6 @@ jobs:
           path: coverage/cobertura-coverage.xml
           retention-days: 7
 
-  sonarqube-internal:
-    if: (github.event_name == 'pull_request' || github.event_name == 'push') && github.repository_owner == 'NOAA-OWP'
-    runs-on: self-hosted
-    needs: [setup, build]
-    continue-on-error: true
-    container:
-      image: sonarsource/sonar-scanner-cli
-      options: --entrypoint="" --user 0
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: SonarQube Scan
-        env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: sonar-scanner -X -Dsonar.verbose=true
-
   codeql-scan:
     if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
