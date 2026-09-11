@@ -29,17 +29,16 @@
             :aria-label="'Calibration Job ID is ' + calibrationRunForForecast?.calibration_run_id"
             :title="'Calibration Job ID is  ' + calibrationRunForForecast?.calibration_run_id">
             <h2 style="font-size:1.5em; padding-top:5px;">
-                <a v-if="userCalibrationRunData" href="#" class="c-blue underline"
-                  @click="toggleMessagesGroup">
+                <a href="#" class="c-blue underline" @click="toggleMessagesGroup">
                   Calibration Job ID: 
                   {{ calibrationRunForForecast?.calibration_run_id }}
                 </a>
             </h2>
         </div>
         <h1 class="mb-6 text-3xl font-bold text-center relative">
-            Forecast Configuration Selection
+            Forecast Configuration Selection {{ forecastJobStatus }}
         </h1>
-        <p  v-if="!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)"
+        <p v-if="!calibrationRunForForecast?.forecast_status || ['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)"
             class="prompt-txt mt-2 text-center">
             Select a configuration, choose Cycle Date/Hour and optional Cold Start Date, then click Next.
         </p>
@@ -83,6 +82,7 @@
             </Column>
         </DataTable>
     </div>
+    <DynamicDialog />
     <div v-if="calibrationRunForForecast?.forecast_status && !['Saved','Ready'].includes(calibrationRunForForecast?.forecast_status)" class="text-normal mt-2 mx-auto text-center">
       This forecast has already been run. Click Next to see status.
       <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Button" aria-label="Next Button"
@@ -116,14 +116,14 @@
             :teleport="true" utc='preserve' 
             :disabled="!forecastConfiguration"/>
         </div>
-        <div class="text-nowrap text-right font-bold p-1 required-label">Cycle Date</div>
+        <div class="text-nowrap text-right font-bold p-1">
+          Cold Start Hour
+        </div>
         <div class="text-nowrap p-1">
-          <VueDatePicker v-model="cycleDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
-            @update:model-value="convertCycleDateStringToDateTimeObject" :enable-time-picker="false"
-            :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
-            :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
-            :teleport="true" utc='preserve' 
-            :disabled="!forecastConfiguration"/>
+          <Select id="coldStartHour" v-model="coldStartHour" :options="coldStartHourList" default="12" 
+            aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
+            class="!w-24" :disabled="!forecastConfiguration">
+          </Select>
         </div>
         <div>
           <span v-if="cycleDate && (cycleHour || cycleHour === 0) && forecastConfiguration">
@@ -135,20 +135,22 @@
             </div>
           </span>
         </div>
-        <div class="text-nowrap text-right font-bold p-1">
-          Cold Start Hour
-        </div>
+        <div class="text-nowrap text-right font-bold p-1 required-label">Cycle Date</div>
         <div class="text-nowrap p-1">
-          <Select id="coldStartHour" v-model="coldStartHour" :options="coldStartHourList" default="12" 
-            aria-label="Cold Start Hour Select" title="Cold Start Hour Select"
-            :disabled="!forecastConfiguration">
-          </Select>
+          <VueDatePicker v-model="cycleDate" class="dp__theme_dark" text-input format="yyyy-MM-dd"
+            @update:model-value="convertCycleDateStringToDateTimeObject" :enable-time-picker="false"
+            :min-date="minCycleDate ? minCycleDate.toISO() : ''" 
+            :max-date="maxCycleDate ? maxCycleDate.toISO() : ''" 
+            :teleport="true" utc='preserve' 
+            :disabled="!forecastConfiguration"/>
         </div>
-        <div class="text-nowrap text-right font-bold p-1 required-label">Cycle Hour</div>
+        <div class="text-nowrap text-right font-bold p-1 required-label">
+          Cycle Hour
+        </div>
         <div class="text-nowrap p-1">
           <Select id="cycleHour" v-model="cycleHour" :options="cycleHourList" default="12" 
             aria-label="Cycle Hour Select" title="Cycle Hour Select"
-            :disabled="!forecastConfiguration">
+            class="!w-24" :disabled="!forecastConfiguration">
           </Select>
         </div>
       </div>
@@ -169,6 +171,7 @@ import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { generalStore } from '~/stores/common/GeneralStore';
 
 import { hilightTab } from '@/composables/TabHilight';
+import { useDialog } from 'primevue/usedialog';
 
 import MessagesGroup from "../Common/MessagesGroup.vue";
 
@@ -177,7 +180,7 @@ const { addToastRecord } = generalStore();
 
 const toast = useToast();
 
-const showMessagesGroup = ref<Boolean>(false);
+const showMessagesGroup = ref<boolean>(false);
 
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { fetchUserCalibrationRunData } = useUserDataStore();
@@ -195,6 +198,13 @@ const {
 
 const { loadForecastTab } = useForecastStore();
 
+const props = defineProps({
+  callGoToTab: {
+    type: Function,
+    required: false,
+  }
+});
+
 const minCycleDate = ref<any>();
 const maxCycleDate = ref<any>();
 const cycleHour = ref<number>();
@@ -202,11 +212,14 @@ const cycleHourList = ref<number[]>([]);
 const coldStartHour = ref<number>();
 const coldStartHourList = ref<number[]>(Array.from({ length: 24 }, (_, index) => index));
 
+const dialog = useDialog();
+const nextPrevDialogOpened = ref<boolean>(false);
+
 /**
  * Disable row if forecast configuration is not active
  */
 const rowClass = (data: any) => {
-    return [{ 'pointer-events-none': (forecastJobStatus.value && forecastJobStatus.value !== 'Ready')}];
+    return [{ 'pointer-events-none': (calibrationRunForForecast?.value?.forecast_status && calibrationRunForForecast?.value?.forecast_status !== 'Ready')}];
 };
 
 /**
@@ -214,10 +227,9 @@ const rowClass = (data: any) => {
  */
 const rowStyle = (data: any) => {
     return {
-        color: (forecastJobStatus.value && forecastJobStatus.value !== 'Ready') ? 'grey' : 'black'
+        color: calibrationRunForForecast?.value?.forecast_status && calibrationRunForForecast?.value?.forecast_status !== 'Ready' ? 'grey' : 'black'
     };
 };
-
 
 onMounted(async () => {
     toast.removeAllGroups(); // clear all toast messages
@@ -254,9 +266,8 @@ onMounted(async () => {
     hilightTab(ForecastTabs.tab_setupForecast);
 
     nextTick(async () => {
-        // load userCalibrationRunData so we can show details on user request
         calibrationJobId.value = calibrationRunForForecast.value?.calibration_run_id;
-        await fetchUserCalibrationRunData();
+
         // load tab data to populate forecastConfigurations
         const loadForecastTabResponse: any = await loadForecastTab();
         if (loadForecastTabResponse?._data?.forecast_configuration_values) {
@@ -275,6 +286,11 @@ const toggleMessagesGroup = async () => {
   if (showMessagesGroup.value) {
     showMessagesGroup.value = false;
   } else {
+    if (!userCalibrationRunData?.value) {
+      isLoading.value = true;
+      await fetchUserCalibrationRunData();
+      isLoading.value = false;
+    }
     showMessagesGroup.value = true;
   }
 }
@@ -341,10 +357,26 @@ const goToRunStatusTab = () => {
           }
         }
     }
-    const allTabs = document.getElementsByClassName("tabs");
-    const e = allTabs[ForecastTabs.tab_runStatus] as HTMLElement;
-    e.click();
+    if (props.callGoToTab) {
+      props.callGoToTab(4);
+    }
 };
+
+const validateTab = (tabNumber?: number) => {
+  let error = false;
+  let text = [];
+  // configuration has to be picked first, so just check for that.
+  // ignore if they're actually clicking through to Run/Status
+  if (forecastConfiguration.value && tabNumber !== 4) {
+    error = true;
+    text.push("Are you sure you want to abandon this Forecast? It will not be saved.");
+  }
+  return { error: error, text: text }
+}
+
+defineExpose({
+  validateTab
+});
 </script>
 
 <style lang="scss" scoped>

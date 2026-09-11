@@ -16,11 +16,6 @@ const { popupActive } = storeToRefs(generalStore());
 
 onMounted(() => {
   popupActive.value = false;
-  nextTick(() => {
-    const allTabs = document.getElementsByClassName("tabs");
-    const e = allTabs[CalibrationTabs.tab_calibrationRuns] as HTMLElement;
-    if (e) { e.click(); }
-  });
 });
 
 </script>

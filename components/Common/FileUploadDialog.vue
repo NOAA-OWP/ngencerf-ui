@@ -1,7 +1,7 @@
 <template>
   <div class="file-upload">
     <FileUpload :name="inputName" :customUpload="true" @uploader="onUpload($event)" :multiple="selectMultiple"
-      :accept="fileExtension" />
+      :accept="fileExtension" :previewWidth="0" />
   </div>
 </template>
 

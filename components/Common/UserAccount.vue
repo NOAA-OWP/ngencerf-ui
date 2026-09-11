@@ -2,15 +2,14 @@
   <!-- User Page -->
 
   <div id="UserBox" class="bg-white mx-auto p-5 rounded-lg max-w-screen-md">
-
-    <div class="grid grid-cols-2 gap-2">
-      <div class="col-span-2">
-        <div class="ttl">Your Account</div>
-        <div class="name">
-          {{ firstName }} {{ lastName }}
-          <span class="pt-1 inline-block ml-3" style="font-size:0.7em;">( {{ userName }} )</span>
-        </div>
+    <div>
+      <div class="ttl">Your Account</div>
+      <div class="name">
+        {{ firstName }} {{ lastName }}
+        <span class="pt-1 inline-block ml-3" style="font-size:0.7em;">( {{ userName }} )</span>
       </div>
+    </div>
+    <div v-if="allowPasswordChange" class="grid grid-cols-2 gap-2">
       <div class="col-span-1">
         <a href="#" @click="showForm = 'changePassword'" class="mt-6 mb-6" :class="changePasswordClasses"
           aria-label="Change Password" title="Change Password">Change Password</a>
@@ -106,7 +105,16 @@
       </div>
 
     </div>
-
+    <div v-else class="mt-2">
+      Passwords and account access are managed by your organization.
+      Contact your system administrator if you need assistance.
+      <div class="buttonArea mt-4">
+        <Button class="c-blue font-normal underline" id="closeAccountBtn" name="cancel" value="Cancel"
+          v-on:click="closeAccountBox" aria-label="Close Account Box" title="Close Account Box">
+          Close
+        </Button>
+      </div>
+    </div>
   </div>
 
 </template>
@@ -128,6 +136,7 @@ import { useBackendConfig } from "@/composables/UseBackendConfig";
 
 const { addToastRecord } = generalStore();
 
+const { allowPasswordChange } = storeToRefs(generalStore());
 const { firstName, lastName, userInitials } = storeToRefs(useUserDataStore());
 
 const {
@@ -153,6 +162,10 @@ const userName = ref<string>("")
 onMounted(() => {
   fullName.value = getUserFullName();
   userName.value = getUserName();
+
+  if (!allowPasswordChange.value) {
+    closeAccountBox();
+  }
 });
 
 watch(showForm, async () => {
@@ -203,18 +216,22 @@ const changePassword = async () => {
   } else if (passwordChangeData.new_password !== passwordChangeData.re_new_password) {
     failureMessages.push("New password fields do not match.");
   } else {
-    const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/set_password/`, {
+    await $fetch<any>(`${ngencerfBaseUrl}/auth/users/set_password/`, {
       method: 'POST',
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
       body: passwordChangeData
-    });
-    if (error?.value) {
-      let e = error.value?.data;
+    }).then(response => {
+      // Clear out the inputs and report success
+      oldpass.value = "";
+      newpass.value = "";
+      confirmNewpass.value = "";
+    }).catch(error => {
+      let e = error?.data;
       if (!e) {
-        failureMessages.push("Cannot reach server. Error code: " + error.value.statusCode);
+        failureMessages.push("Cannot reach server. Error code: " + error?.statusCode);
       } else {
         for (const key of Object.keys(e)) {
           for (const message of e[key]) {
@@ -222,13 +239,9 @@ const changePassword = async () => {
           }
         }
       }
-    } else {
-      // Clear out the inputs and report success
-      oldpass.value = "";
-      newpass.value = "";
-      confirmNewpass.value = "";
-    }
+    });
   }
+
   if (failureMessages.length > 0) {
     failureMessages.push("Password not updated.");
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Password Change Error', detail: failureMessages.join('\n'), life: ToastTimeout.timeoutSuccess };
@@ -252,18 +265,22 @@ const updateName = async () => {
   if (updateNameData.first_name === "" || updateNameData.last_name=== "") {
     failureMessages.push("First and last names must be filled out.")
   } else {
-    const { data, error } = await useFetch<any>(`${ngencerfBaseUrl}/auth/users/me/`, {
+    await $fetch<any>(`${ngencerfBaseUrl}/auth/users/me/`, {
       method: 'PATCH',
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
       body: updateNameData
-    });
-    if (error?.value) {
-      let e = error.value?.data;
+    }).then(response => {
+      // Clear out the inputs and report success
+      setFirstName(updateNameData.first_name);
+      setLastName(updateNameData.last_name);
+      userInitials.value = getUserInitials();
+    }).catch(error => {
+      let e = error?.data;
       if (!e) {
-        failureMessages.push("Cannot reach server. Error code: " + error.value.statusCode);
+        failureMessages.push("Cannot reach server. Error code: " + error.statusCode);
       } else {
         for (const key of Object.keys(e)) {
           for (const message of e[key]) {
@@ -271,12 +288,7 @@ const updateName = async () => {
           }
         }
       }
-    } else {
-      // Clear out the inputs and report success
-      setFirstName(updateNameData.first_name);
-      setLastName(updateNameData.last_name);
-      userInitials.value = getUserInitials();
-    }
+    });
   }
   if (failureMessages.length > 0) {
     failureMessages.push("Name not updated.");

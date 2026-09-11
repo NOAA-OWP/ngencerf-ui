@@ -23,6 +23,9 @@
             The table updates automatically as you select filters.
             </p>
 
+            <p><strong>Domain</strong></p>
+            <p class="mb-2">Select a single domains to show jobs with gages in that domain.</p>
+
             <p><strong>Headwater Basin Gage</strong></p>
             <p class="mb-2">Select a single gage to show jobs for that basin.</p>
 
@@ -158,7 +161,7 @@
                 <tr>
                     <td class="td1 align-top" style="font-weight:normal;">Delete</td>
                     <td class="td2 align-top">Selecting this action will <strong>permanently delete the chosen calibration job</strong> along 
-                        with all associated validation, forecast, and verification jobs. All references to this 
+                        with all associated validation, forecast, hindcast, and verification jobs. All references to this 
                         job will also be removed from the database. <strong>This action cannot be undone.</strong> 
                         After deletion, you will remain on the current page.
                     </td>

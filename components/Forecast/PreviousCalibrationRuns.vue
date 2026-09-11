@@ -9,7 +9,7 @@
     </div>
   </Transition>
   <client-only>
-    <div class="pr-2">
+    <div class="pr-2 text-center">
       <div class="flex mt-2">
         <div class="w-full">
           <h1 class="pt-3 mb-8 text-3xl font-bold text-center">
@@ -23,11 +23,15 @@
 
       <div id="calibrationRunsForForecastList">
         <div id="CalTable" class="w-max mx-auto">
-          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
+          <JobFilterDialog id="JobFilterDialog" job-type="Calibration"
             :show-status="false" :show-modules="false" :show-archived="false"
             :totalSize="calibrationRunsForForecastListTotalSize" :totalPages="calibrationRunsForForecastListTotalPages"
             v-model:currentPage="calibrationRunsForForecastListCurrentPage"
-            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
+            :showBulkActions="showBulkActions" v-model:selected-jobs="selectedCalibrationRuns" 
+            :all-job-ids="allCalibrationRunIds" :visible-job-ids="visibleCalibrationRunIds"
+            :delete-jobs="deleteCalibrationRun" :archive-jobs="archiveCalibrationRun" :lock-jobs="lockCalibrationRun"
+            @UpdateGageList="updateGageList()" ref="jobFilterRef" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -44,16 +48,22 @@
           </div>
 
           <DataTable id="CalibrationRunForForecastTable" :value="calibrationRunsForForecast" 
-            scrollable scroll-height="400px" table-style="min-width: 50rem"
+            scrollable scroll-height="400px" :rowStyle="rowStyle" table-style="min-width: 50rem"
             v-model:sortField="calibrationRunsForForecastListSort.field" v-model:sortOrder="calibrationRunsForForecastListSort.direction"
-            v-model:selection="calibrationRunForForecast" selectionMode="single" :rowStyle="rowStyle"
+            v-model:selection="selectedCalibrationRuns" selectionMode="multiple" :metaKeySelection="true" 
+            v-model:contextMenuSelection="contextMenuSelection" contextMenu @rowContextmenu="onRowContextMenu"
             @rowSelect="onCalibrationRunForForecastRowSelect" @rowUnselect="onCalibrationRunForForecastRowUnSelect"
-            @rowContextmenu="onRowContextMenu" class="boxed">
-            <Column :pt="ptColumn" field="calibration_run_id" header="Job ID" sortable>
+            @row-dblclick="onRowDblClick($event)" dataKey="calibration_run_id" class="boxed">
+            <Column :pt="ptColumn" field="calibration_run_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Calibration</span><br /><span>Job ID</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.calibration_run_id"
-                  :aria-label="'Job ID ' + slotProps.data.calibration_run_id"
-                  :title="'Job ID ' + slotProps.data.calibration_run_id">
+                  :aria-label="'Calibration Job ID ' + slotProps.data.calibration_run_id"
+                  :title="'Calibration Job ID ' + slotProps.data.calibration_run_id">
                   {{ slotProps.data.calibration_run_id }}
                   <span v-if="slotProps.data.is_locked" class="pi pi-lock"></span>
                 </span>
@@ -216,12 +226,27 @@ import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
 import { ForecastTabs } from "@/composables/NgencerfEnums";
 
-const { deleteCalibrationRun, archiveCalibrationRun, exportJob, getCalibrationJobZip } = useCalibrationJobStore();
+const { 
+  deleteCalibrationRun, 
+  archiveCalibrationRun, 
+  lockCalibrationRun,
+  exportJob, 
+  getCalibrationJobZip 
+} = useCalibrationJobStore();
 
 const { addToastRecord } = generalStore();
 
+const props = defineProps({
+  callGoToTab: {
+    type: Function,
+    required: false,
+  }
+});
+
 const evaluationCalibrationRunStore = useEvaluationCalibrationRunStore();
 const showMessagesGroup = ref<boolean>(false);
+
+const jobFilterRef = ref(null);
 
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
@@ -237,13 +262,17 @@ const {
   calibrationRunsForForecastListTotalSize,
   calibrationRunsForForecastListStartRow,
   calibrationRunsForForecastListEndRow,
-  calibrationRunsForForecastListSort 
+  calibrationRunsForForecastListSort,
+  selectedForecastJob,
+  forecastJobStatus
 } = storeToRefs(forecastStore);
 const { 
   getCalibrationJobsForForecast, 
+  fetchCalibrationJobsForForecastIdsOnly,
   resetUserSelectedForecastCalibrationRun, 
-  hardResetForecastRunStatusStore,
-  resetFilters
+  hardResetForecastStore,
+  resetFilters,
+  fetchGageList
 } = forecastStore;
 
 
@@ -253,31 +282,64 @@ const crContextMenu = ref(); //calibration run context menu
 //this model is for highlighting purpose
 const selectedCalibrationRun = ref<CalibrationRunForForecast>();
 
-const { isLoading } = storeToRefs(generalStore());
+const { isLoading, calibrationJobId } = storeToRefs(generalStore());
 const { calibrationDownloadJobID } = storeToRefs(useCalibrationJobStore());
 
 const cmCalibrationRun = ref<DataTableContextMenuOption[]>([]);
 const onRowContextMenu = (event: any) => {
+  const clickedRow = event.data;
+
+  // Only select the clicked row for context menu purposes
+  contextMenuSelection.value = clickedRow;
+
+  // Preserve previous selection; don't overwrite selectedCalibrationRuns
+  // Optionally, if you want to auto-select the row if it wasn't already selected:
+  if (Array.isArray(selectedCalibrationRuns.value)) {
+    const alreadySelected = selectedCalibrationRuns.value.some(
+      row => row.calibration_run_id === clickedRow.calibration_run_id
+    );
+    if (!alreadySelected) {
+      selectedCalibrationRuns.value.push(clickedRow);
+    }
+  } else if (selectedCalibrationRuns.value && selectedCalibrationRuns.value !== clickedRow) {
+    selectedCalibrationRuns.value = [selectedCalibrationRuns.value,clickedRow];
+  } else {
+    selectedCalibrationRuns.value = [clickedRow];
+  }
+  
+  // Show context menu
+  crContextMenu.value.show(event.originalEvent);
+
   cmCalibrationRun.value = [];
   const crRowData = event.data as CalibrationRunForForecast;
+
+  // only set calibrationRunForForecast if we have a single row selected
+  calibrationRunForForecast.value = selectedCalibrationRuns.value.length === 1 ? selectedCalibrationRuns.value[0] : undefined; 
   if (calibrationRunForForecast && calibrationRunForForecast.value?.calibration_run_id === crRowData.calibration_run_id) {
-    crContextMenu.value.show(event.originalEvent);
-    //forecastJobId.value = parseInt(event.originalEvent.currentTarget.children[0].textContent);
-    setSelectedCalibrationRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
-    cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => navigateToSetupForecast() });
+    setSelectedCalibrationRunId(crRowData.calibration_run_id);
+    cmCalibrationRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => goToSetupForecast() });
     cmCalibrationRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
     if (calibrationRunForForecast.value?.is_downloadable) {
       cmCalibrationRun.value.push({ label: 'Download Results', icon: 'pi pi-download', command: () => downloadSelectedCalibrationData() });
     }
     cmCalibrationRun.value.push({ label: 'Export Calibration Config', icon: 'pi pi-file-export', command: () => exportSelectedCalibrationData() });
-    if (!calibrationRunForForecast?.value?.status.includes('Submitted') && !calibrationRunForForecast?.value?.status.includes('Running') && !calibrationRunForForecast?.value?.is_locked) {
-      cmCalibrationRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedCalibrationRun() });
-    }
-    if (!calibrationRunForForecast?.value?.status.includes('Submitted') && !calibrationRunForForecast?.value?.status.includes('Running') && !calibrationRunForForecast.value?.is_archived) {
-      cmCalibrationRun.value.push({ label: 'Archive', icon: 'pi pi-folder', command: () => archiveSelectedCalibrationRun(true) });
-    }
+  }
+  // multi-job actions
+  if (selectedCalibrationRuns.value.some(run =>
+    !['Submitted','Running'].includes(run.status) && !run.is_archived && !run.is_locked
+  )) {
+    cmCalibrationRun.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => jobFilterRef.value.changeSelectedJobStatus(JobStatusAction.delete) });
+    cmCalibrationRun.value.push({ label: 'Archive', icon: 'pi pi-folder', command: () => jobFilterRef.value.changeSelectedJobStatus(JobStatusAction.archive) });
+    cmCalibrationRun.value.push({ label: 'Lock', icon: 'pi pi-lock', command: () => jobFilterRef.value.changeSelectedJobStatus(JobStatusAction.lock) });
+  }
+  if (selectedCalibrationRuns.value.some(run => run.is_locked )) {
+    cmCalibrationRun.value.push({ label: 'Unlock', icon: 'pi pi-lock-open', command: () => jobFilterRef.value.changeSelectedJobStatus(JobStatusAction.unlock) });
   }
 };
+
+const onRowDblClick = (event: any) => {
+  goToSetupForecast(event);
+}
 
 const {
   loadCalibrationDataComplete,
@@ -292,19 +354,50 @@ const {
   fetchUserValidatedCalibrationJobsListData,
 } = evaluationCalibrationRunStore;
 
-const { userCalibrationRunData } = storeToRefs(useUserDataStore());
+const { userCalibrationRunData, uiGageList } = storeToRefs(useUserDataStore());
 
 const { calibrationRunsForForecast, calibrationRunForForecast, forecastRunGageList } = storeToRefs(useForecastStore());
 
-const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId } = useForecastStore();
+const { setSelectedCalibrationRunId, resetSelectedCalibrationRunId, fetchForecastGageList } = useForecastStore();
+
+const selectedCalibrationRuns = ref<CalibrationRunForForecast[]>();
+const contextMenuSelection = ref(null);
+
+const allCalibrationRunIds = ref<number[]>([]);
+const visibleCalibrationRunIds = ref<number[]>([]);
+
+const showBulkActions = computed(() => {
+  // let JobFilterDialogue know based on our job list what bulk actions to allow
+  // always include the placeholder option
+  let actionValues = [0];
+  if (calibrationRunsForForecast.value.some(run => run.is_archived === false && run.is_locked === false)) {
+    // only allow delete and archive if there are unarchived, unlocked jobs
+    actionValues.push(1);
+    actionValues.push(2);
+  }
+  // un-archive is not allowed here since we do not show archived jobs
+  if (calibrationRunsForForecast.value.some(run => run.is_locked === false && run.is_archived === false)) {
+    // only allow lock if there are unlocked jobs that are not archived
+    actionValues.push(4);
+  }
+  if (calibrationRunsForForecast.value.some(run => run.is_locked === true)) {
+    // only allow unlock if there are locked jobs
+    actionValues.push(5);
+  }
+  return actionValues;
+});
 
 onMounted(async () => {
   isLoading.value = true;
   forecastJobId.value = undefined;
+  calibrationRunForForecast.value = undefined;
+  userCalibrationRunData.value = undefined;
+  selectedForecastJob.value = undefined;
+  forecastJobStatus.value = undefined; 
   calibrationRunsForForecastListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals
-  hardResetForecastRunStatusStore();
+  hardResetForecastStore();
 
   hilightTab(ForecastTabs.tab_calibrationRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
@@ -316,9 +409,20 @@ onMounted(async () => {
     resetUserSelectedEvalCalibrationRun();
     resetUserSelectedForecastCalibrationRun();
     await getCalibrationJobsForForecast();
+    updateGageList();
+    visibleCalibrationRunIds.value = calibrationRunsForForecast.value.map(job => job.calibration_run_id);
+    if (calibrationRunsForForecastListTotalPages.value > 1) {
+      allCalibrationRunIds.value = await fetchCalibrationJobsForForecastIdsOnly();
+    } else {
+      allCalibrationRunIds.value = visibleCalibrationRunIds.value;
+    }
     isLoading.value = false;
   });
 });
+
+const updateGageList = async() => {
+  uiGageList.value = await fetchGageList();
+}
 
 // watch for sort order change - reset current page to 1
 watch(calibrationRunsForForecastListSort, () => {
@@ -338,6 +442,12 @@ watch(calibrationRunsForForecastListCurrentPage, () => {
 const refreshJobList = async () => {
   isLoading.value = true;
   await getCalibrationJobsForForecast();
+  visibleCalibrationRunIds.value = calibrationRunsForForecast.value.map(job => job.calibration_run_id);
+  if (calibrationRunsForForecastListTotalPages.value > 1) {
+    allCalibrationRunIds.value = await fetchCalibrationJobsForForecastIdsOnly();
+  } else {
+    allCalibrationRunIds.value = visibleCalibrationRunIds.value;
+  }
   isLoading.value = false;
 }
 
@@ -374,15 +484,15 @@ watch(() => userCalibrationRunData.value, (updatedRunData, initialRunData) => {
   }
 });
 
-const navigateToSetupForecast = async () => {
+const goToSetupForecast = async (event: any=null) => {
+  if (event) {
+    calibrationRunForForecast.value = event.data;
+    setSelectedCalibrationRunId(event.data.calibration_run_id);
+  }
   if (calibrationRunForForecast?.value?.calibration_run_id && calibrationRunForForecast.value.calibration_run_id > 0) {
     forecastJobId.value = undefined;
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast Tab"]');
-    if (e) {
-      e.click();
-    } else {
-      const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Setup Forecast Tab not found', life: ToastTimeout.timeoutError};
-      toast.add(tMsg); addToastRecord(tMsg);
+    if (props.callGoToTab) {
+      props.callGoToTab(3);
     }
   } else {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Missing Calibration Job', detail: 'Please select a calibration job first.', life: ToastTimeout.timeoutWarn };
@@ -394,124 +504,6 @@ const rowStyle = (data: any) => {
   if (!['Saved', 'Ready'].includes(data.status)) {
     return { backgroundColor: 'white' }
   }
-}
-
-const confirmDelete = useConfirm();
-
-const deleteSelectedCalibrationRun = () => {
-  const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
-  let confirmMessage = "Are you sure you want to delete this run?"
-  confirmDelete.require({
-    message: confirmMessage,
-    header: 'Confirm Delete',
-    icon: 'pi pi-exclamation-triangle',
-    rejectProps: {
-      label: 'Cancel',
-      severity: 'secondary',
-      outlined: true
-    },
-    acceptProps: {
-      label: 'DELETE RUN',
-    },
-    accept: () => acceptDelete(selectedRunId),
-    reject: () => {
-      //do nothing
-    }
-  })
-};
-
-const acceptDelete = (selectedRunId: number) => {
-  deleteCalibrationRun(selectedRunId).then(response => {
-    if (response.status === 200) {
-      let successMessages: string[] = [];
-      let failureMessages: string[] = [];
-      response._data?.jobs.forEach(job => {
-        if (job.success) {
-          successMessages.push(job.message);
-        } else {
-          failureMessages.push(job.message);
-        }
-      });
-      toast.removeAllGroups();
-      if (successMessages.length > 0) {
-        const tMsg: ToastMessageOptions = { severity: 'success', 
-          summary: 'Delete Job', detail: successMessages.join('\n'), 
-          life: ToastTimeout.timeoutSuccess};
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
-      if (failureMessages.length > 0) {
-        const tMsg: ToastMessageOptions = { severity: 'error', 
-          summary: 'Delete Job', detail: failureMessages.join('\n'), 
-          life: ToastTimeout.timeoutError};
-        toast.add(tMsg); addToastRecord(tMsg);
-      } 
-      getCalibrationJobsForForecast();
-    } else {
-      useApiErrorResponsePreprocess(response).forEach(message => {
-        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
-        toast.add(tMsg); addToastRecord(tMsg);
-      });
-    }
-  });
-  calibrationRunForForecast.value = undefined;
-};
-
-const confirmArchive = useConfirm();
-const archiveSelectedCalibrationRun = () => {
-  const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
-  let confirmMessage = "Are you sure you want to Archive this calibration run? Unarchiving must be done from the Calibration workflow."
-  confirmArchive.require({
-    message: confirmMessage,
-    header: 'Confirm Archive',
-    icon: 'pi pi-exclamation-triangle',
-    rejectProps: {
-      label: 'Cancel',
-      severity: 'secondary',
-      outlined: true
-    },
-    acceptProps: {
-      label: "ARCHIVE RUN",
-    },
-    accept: () => acceptArchive(selectedRunId),
-    reject: () => {
-      //do nothing
-    }
-  })
-}
-const acceptArchive = (selectedRunId: number) => {
-  archiveCalibrationRun(selectedRunId, true).then(async (response) => {
-    if (response.status === 200) {
-      let successMessages: string[] = [];
-      let failureMessages: string[] = [];
-      response._data?.jobs.forEach(job => {
-        if (job.success) {
-          successMessages.push(job.message);
-        } else {
-          failureMessages.push(job.message);
-        }
-      });
-      toast.removeAllGroups();
-      if (successMessages.length > 0) {
-        const tMsg: ToastMessageOptions = { severity: 'success', 
-          summary: 'Archive Job', detail: successMessages.join('\n'), 
-          life: ToastTimeout.timeoutSuccess};
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
-      if (failureMessages.length > 0) {
-        const tMsg: ToastMessageOptions = { severity: 'error', 
-          summary: 'Archive Job', detail: failureMessages.join('\n'), 
-          life: ToastTimeout.timeoutError};
-        toast.add(tMsg); addToastRecord(tMsg);
-      }
-      getCalibrationJobsForForecast();
-    } else {
-      useApiErrorResponsePreprocess(response).forEach(message => {
-        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Archive Calibration Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
-        toast.add(tMsg); addToastRecord(tMsg);
-      });
-    }
-  });
-  selectedCalibrationRun.value = undefined;
 }
 
 /**
@@ -540,7 +532,7 @@ const exportSelectedCalibrationData = async () => {
   const selectedRunId = calibrationRunForForecast.value?.calibration_run_id as number;
   if (calibrationRunForForecast.value?.is_downloadable) {
     //isLoading.value = true;
-    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Results Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and will be prompted to save when the file is ready.', life: ToastTimeout.timeoutInfo };
+    const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Downloading Results Zip File for Calibration Job ID ' + selectedRunId, detail: 'Generating zip file. You may continue other ngenCERF activities and the file will be saved when ready.', life: ToastTimeout.timeoutInfo };
     toast.add(tMsg); addToastRecord(tMsg);
     nextTick(async () => {
       try {

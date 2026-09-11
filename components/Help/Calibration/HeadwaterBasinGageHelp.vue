@@ -41,8 +41,9 @@
                 </tr>
                 <tr>
                     <th scope="row" class="td1">Forcing<span class="required-asterisk" aria-hidden="true">*</span></th>
-                    <td class="td2">Pull down to select Forcing data source for the selected gage.
-                        Either AORC or NWM Retrospective.
+                    <td class="td2">Pull down to select Forcing data source for the selected gage.<br />
+                        CONUS gages: AORC or NWM Retrospective.<br />
+                        oCONUS gages: NWM Retrospective only.
                     </td>
                 </tr>
                 <tr>

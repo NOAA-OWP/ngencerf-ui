@@ -1,7 +1,7 @@
 // @ts-check
 import { defineStore, storeToRefs } from "pinia";
 
-import type { SelectOption, CalibrationValidationRunData, ValidatedevaluationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "@/composables/NgencerfModels";
+import type { SelectOption, CalibrationValidationRunData, ValidatedEvaluationRunList, CalibrationValidationJobList, CalibrationRunValidationParameterData } from "@/composables/NgencerfModels";
 
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
@@ -27,6 +27,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     moduleOperator, 
     uiGageId, 
     uiGageList, 
+    uiDomainName,
     createdAtStart,
     createdAtEnd,
     minCreatedAt,
@@ -66,41 +67,21 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   const selectedCalibrationModules = ref<string[] | undefined>([]);
 
   /**
-  * @returns {SelectOption[]}
-  */
-  const evaluationCalibrationRunGageList = computed(() => {
-    let gageOptionList = <SelectOption[]>[];
-    gageOptionList.push({
-      'name': "All",
-      'description': "All"
-    });
-    userEvaluationRunListData.value.forEach(runItem => {
-      const checkGageIndex = gageOptionList.findIndex(
-        (gageOption) =>
-          gageOption.name === runItem.gage_id
-      ) !== -1;
-      if (!checkGageIndex) {
-        gageOptionList.push({
-          'name': runItem.gage_id,
-          'description': runItem.gage_id
-        });
-      }
-    });
-    return gageOptionList;
-  });
+   * list of gages eligible for Compare Permutations (backend guarantees >= 2 calibration jobs per gage)
+   */
+  const compareCalibrationRunGageList = ref<SelectOption[]>([]);
 
   /**
-  * @returns {SelectOption[]}
-  */
-  const compareCalibrationRunGageList = computed(() => {
-    let gageOptionList = <SelectOption[]>[];
-    evaluationCalibrationRunGageList.value.forEach(gage => {
-      if (userEvaluationRunListData.value.filter((row) => (row as CalibrationJobListItem).gage_id === gage.name).length >= 2) {
-        gageOptionList.push(gage);
-      }
-    });
-    return gageOptionList;
-  });
+   * fetch the list of gages eligible for comparison and populate compareCalibrationRunGageList
+   * @return {void}
+   */
+  async function fetchCompareGageList() {
+    const gages: string[] = await fetchGageList(true);
+    compareCalibrationRunGageList.value = gages.map((gageId: string) => ({
+      name: gageId,
+      description: gageId
+    }));
+  }
 
   /**
    * fetch user created calibration job list data
@@ -115,6 +96,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         direction: evaluationRunListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
         gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
         module_filter: {
           modules: modulesFilterList.value,
@@ -148,10 +130,9 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
         ,
         status: statusTypeFilterList.value,
         include_archived: includeArchivedJobs.value
-      },
-      get_gages: uiGageList.value.length === 0
+      }
     }
-    const runListDataResult = await makeProtectedApiCall<ValidatedevaluationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
+    const runListDataResult = await makeProtectedApiCall<ValidatedEvaluationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -201,10 +182,6 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     evaluationRunListStartRow.value = (evaluationRunListPageSize.value * (evaluationRunListCurrentPage.value - 1)) + 1;
     evaluationRunListEndRow.value = Math.min(evaluationRunListStartRow.value + (evaluationRunListPageSize.value - 1), evaluationRunListTotalSize.value);
     
-    if (runListDataResult?._data?.gages) {
-      uiGageList.value = runListDataResult?._data?.gages;
-      uiGageList.value.sort();
-    }
     if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
       minCreatedAt.value = runListDataResult?._data?.date_range[0];
       maxCreatedAt.value = runListDataResult?._data?.date_range[1];
@@ -213,6 +190,63 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       minJobId.value = runListDataResult?._data?.id_range[0];
       maxJobId.value = runListDataResult?._data?.id_range[1];
     }
+  }
+
+  /**
+   * fetch list of calibration job IDs only (for bulk actions)
+   * @return {void}
+   */
+  async function fetchUserValidatedCalibrationJobsListDataIdsOnly() {
+    // apply user's filters without paging, since we want the entire list
+    let requestBody = {
+      filters: {
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+        gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
+        module_filter: {
+          modules: modulesFilterList.value,
+          operator: moduleOperator.value === 'All' ? 'and' : 'or'
+        },
+        date_filter:
+            (createdAtStart.value && createdAtEnd.value) ? {
+              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "between"
+            } : createdAtStart.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
+              operator: "after"
+            } : createdAtEnd.value ? {
+              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
+              operator: "before"
+            } : {}
+          ,
+        id_filter:
+          (jobIdStart.value && jobIdEnd.value) ? {
+            start_id: jobIdStart.value,
+            end_id: jobIdEnd.value,
+            operator: "between"
+          } : jobIdStart.value ? {
+            id: jobIdStart.value,
+            operator: "after"
+          } : jobIdEnd.value ? {
+            id: jobIdEnd.value,
+            operator: "before"
+          } : {}
+        ,
+        status: statusTypeFilterList.value,
+        include_archived: includeArchivedJobs.value
+      },
+      ids_only: true
+    }
+    const runListDataResult = await makeProtectedApiCall<ValidatedEvaluationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    return runListDataResult?._data?.jobs ?? [];
   }
 
   /**
@@ -227,10 +261,9 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       },
       filters: {
         gage_id: uiCompareGageId.value && uiCompareGageId.value !== "All" ? uiCompareGageId.value: "",
-      },
-      get_gages: uiGageList.value.length === 0
+      }
     }
-    const runListDataResult = await makeProtectedApiCall<ValidatedevaluationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
+    const runListDataResult = await makeProtectedApiCall<ValidatedEvaluationRunList>(`${ngencerfBaseUrl}/calibration/get_calibration_jobs_for_evaluation/`, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`,
@@ -301,20 +334,51 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
       displayCalibrationValidationRunList.value.push(validation);
     }) 
   }
-  
-    /**
-     * Get Calibration Plot Names for Comparison
-     * @return {any}
-     */
-    const queryGetPlotNamesForComparison = async (): Promise<any> => {
-      return makeProtectedApiCall<CalibrationPlotListNamesData>(`${ngencerfBaseUrl}/calibration/get_plot_names_for_comparison/`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${getAccessToken()}`,
-          "Content-Type": 'application/json'
-        },
-      });
-    };
+
+  /**
+   * fetch list of gage IDs
+   * @param {boolean} forComparison - when true, backend only returns gages with >= 2 calibration jobs
+   * @return {void}
+   */
+  async function fetchGageList(forComparison: boolean = false) {
+    // only apply domain and archived filters
+    let requestBody = {
+      domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+      include_archived: false,
+      for_comparison: forComparison
+    }
+    const gageListResult =
+      await makeProtectedApiCall<any>(
+        `${ngencerfBaseUrl}/calibration/get_calibration_gages_for_evaluation/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+    
+    if (gageListResult?._data?.gages) {
+      return gageListResult._data.gages.sort();
+    }
+    return [];
+  }
+
+  /**
+   * Get Calibration Plot Names for Comparison
+   * @return {any}
+   */
+  const queryGetPlotNamesForComparison = async (): Promise<any> => {
+    return makeProtectedApiCall<CalibrationPlotListNamesData>(`${ngencerfBaseUrl}/calibration/get_plot_names_for_comparison/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${getAccessToken()}`,
+        "Content-Type": 'application/json'
+      },
+    });
+  };
 
   /**
    * Get Calibration Plots for Comparison
@@ -426,6 +490,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
    * reset job filters
    */
   const resetFilters = () => {
+    uiDomainName.value = 'All';
     uiGageId.value = 'All';
     modulesFilterList.value = []; 
     moduleOperator.value = 'All';
@@ -450,7 +515,6 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
   return {
     uiCompareGageId,
     evaluationRunList,
-    evaluationCalibrationRunGageList,
     compareCalibrationRunGageList,
     userSelectedEvalCalibrationRunId,
     loadCalibrationDataComplete,
@@ -458,6 +522,7 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     setSelectedCalibrationRunId,
     loadSelectedCalibrationRun,
     fetchUserValidatedCalibrationJobsListData,
+    fetchUserValidatedCalibrationJobsListDataIdsOnly,
     fetchUserValidatedCalibrationJobsListDataForComparison,
     queryGetPlotNamesForComparison,
     queryGetPlotsForComparison,
@@ -465,6 +530,8 @@ export const useEvaluationCalibrationRunStore = defineStore('EvaluationCalibrati
     getReferenceDataSetOptions,
     resetUserSelectedCalibrationValidationRunList,
     fetchUserSelectedCalibrationValidationRunList,
+    fetchGageList,
+    fetchCompareGageList,
     displayUserSelectedCalibrationValidationRunList,
     resetUserSelectedCalibrationCompareRunList,
     resetUserSelectedEvalValidationRun,

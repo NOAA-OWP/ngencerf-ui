@@ -28,6 +28,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const {
     userCalibrationRunData,
     calibrationJobNgenGlobalLogging,
+    calibrationJobLogFileMode,
     ngenLogLevel,
     forcingLogLevel,
     logLevels,
@@ -54,6 +55,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
   const validationBestStatus = ref<string>();
   const validControlAndValidBestStatus = ref<string>();
   const validationBestAchieved = ref<BestIterationData>({ iteration: 0, isBest: false });
+  const failureMessages = ref<any>();
 
   /**
    * Compute resultsPathname based on userCalibrationRunData.value.job_data_dir
@@ -74,18 +76,14 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       return userCalibrationRunData.value.status;
     } else if (userCalibrationRunData?.value?.status !== 'Done') {
       return `Calibration ${userCalibrationRunData?.value?.status}`;
-    } else if (userCalibrationRunData?.value?.status === 'Done' && validationControlStatus?.value === 'Running') {
-      return `Calibration Done, Validation Control Running`;
-    } else if (userCalibrationRunData?.value?.status === 'Done' && validationBestStatus?.value === 'Running') {
-      return `Calibration Done, Validation Best Running`;
     } else if (
       userCalibrationRunData?.value.status === 'Done' &&
       validationControlStatus?.value === 'Done' &&
       validationBestStatus?.value === 'Done'
     ) {
       return 'Done';
-    } else if (userCalibrationRunData.value.status === 'Done' && validControlAndValidBestStatus?.value) {
-      return `Calibration Done, Validation ${validControlAndValidBestStatus.value}`;
+    } else if (userCalibrationRunData.value.status === 'Done' && validationControlStatus?.value && validationControlStatus?.value) {
+      return `Calibration Done, Valid ${getValidControlAndValidBestStatusForDisplay(validationControlStatus.value, validationBestStatus.value)}`;
     }
     return '';
   });
@@ -227,12 +225,14 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       logging_config?: {
         logging_enabled?: boolean;
         modules?: Record<string, LogLevel>;
+        split_logs_by_module?: boolean;
       }
     } = {
       calibration_run_id: calibrationJobId.value,
       ...(calibrationJobNgenGlobalLogging.value !== undefined && {
         logging_config: {
           logging_enabled: calibrationJobNgenGlobalLogging.value,
+          split_logs_by_module: calibrationJobLogFileMode.value,
           ...(serializedModules && {
             // add ngenLogLevel and forcingLogLevel to beginning of the object
             modules: {
@@ -325,7 +325,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     * @return {any}
     */
   const queryGetLogData = async (
-    log_category: string,
     log_name: string,
     calibration_run_id: number,
     start?: number,
@@ -338,7 +337,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
         "Content-Type": 'application/json'
       },
       body: JSON.stringify({
-        log_category: log_category,
         log_name: log_name,
         calibration_run_id: calibration_run_id,
         start: start !== undefined ? start : 0,
@@ -353,7 +351,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
    */
   const queryGetLogStatus = async (
     calibration_run_id: number,
-    log_category: string,
     log_name: string,
     byte_offset: number
   ): Promise<any> => {
@@ -365,7 +362,6 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
       },
       body: JSON.stringify({
         calibration_run_id: calibration_run_id,
-        log_category: log_category,
         log_name: log_name,
         byte_offset: byte_offset,
       })
@@ -426,6 +422,8 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     validControlAndValidBestStatus,
     resultsPathname,
     overallCalibrationValidationStatus,
+    validationBestAchieved,
+    failureMessages,
     loadRunStatusStore,
     getValidControlAndValidBestStatus,
     queryGetCalibrationStatus,
@@ -438,8 +436,7 @@ export const useRunStatusStore = defineStore('RunStatusStore', () => {
     queryGetLogNames,
     queryGetLogData,
     queryGetLogStatus,
-    hardResetRunStatusStore,
-    validationBestAchieved
+    hardResetRunStatusStore
   };
 });
 

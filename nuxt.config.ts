@@ -55,7 +55,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      ngencerfBaseUrl: process.env.NGENCERF_BASE_URL || 'http://localhost:8000'
+      ngencerfBaseUrl: process.env.NGENCERF_BASE_URL || 'http://localhost:8000/api'
     }
   }
 });

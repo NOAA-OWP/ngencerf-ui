@@ -1,152 +1,35 @@
 <template>
-    <client-only>
-        <div class="min-h-screen">
-            <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
-
-            <!-- Header -->
-            <div>
-                <AppHeader />
-            </div>
-
-            <!-- Middle: centers CenterBox -->
-            <div class="flex items-center justify-center px-4 py-8">
-
-                <div
-                id="CenterBox"
-                class="bg-white mx-auto px-6 py-8 rounded-[10px] max-w-screen-lg shadow-md"
-                >
-                    <!-- Page Title -->
-                    <div class="text-center mb-6">
-                        <h1 class="text-4xl font-bold">Next Generation Water Prediction Capability</h1>
-                        <div class="text-lg sm:text-xl text-gray-700 mt-2">
-                        Welcome <strong>{{ getUserFullName() }}</strong>
-                        </div>
-                    </div>
-
-                    <hr class="my-6 border-black" />
-
-                    <!-- Dashboard Section -->
-                    <div class="text-center font-bold text-2xl mb-4">Dashboard</div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-                        <!-- Running Processes Card -->
-                        <div class="bg-teal-100 text-teal-800 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer"
-                            @click="gotoCalibrationAndFilter({'status': 'Running'})">
-                            <i class="pi pi-cog text-teal-600 text-3xl mb-2"
-                                :class="{ 'pi-spin': runningCalibrationJobs > 0 }"></i>
-                                <div class="text-3xl sm:text-4xl font-extrabold text-teal-800">
-                                {{ runningCalibrationJobs }}
-                            </div>
-                            <div class="text-sm sm:text-base text-gray-700 mt-2">
-                                Calibrations Running
-                            </div>
-                        </div>
-
-                        <!-- Ready to Run Card -->
-                        <div class="bg-green-50 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer"
-                            @click="gotoCalibrationAndFilter({'status': 'Ready'})">
-                            <i class="pi pi-play-circle text-green-600 text-3xl mb-2"></i>
-                            <div class="text-3xl sm:text-4xl font-extrabold text-green-600">
-                                {{ readyCalibrationJobs }}
-                            </div>
-                            <div class="text-sm sm:text-base text-gray-700 mt-2">
-                                Calibrations Ready to Run
-                            </div>
-                        </div>
-
-                        <!-- Setups to Complete Card -->
-                        <div class="bg-amber-50 p-6 rounded-lg shadow-md flex flex-col items-center hover:cursor-pointer"
-                            @click="gotoCalibrationAndFilter({'status': 'Saved'})">
-                            <i class="pi pi-sliders-h text-amber-600 text-3xl mb-2"></i>
-                            <div class="text-3xl sm:text-4xl font-extrabold text-amber-600">
-                                {{ savedCalibrationJobs }}
-                            </div>
-                            <div class="text-sm sm:text-base text-gray-700 mt-2">
-                                Calibrations In Setup
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="row-span-1">
-                <AppFooter />
-            </div>
+  <div class="h-full min-h-screen ">
+    <div class="grid grid-rows-12">
+      <div class="row-span-1">
+        <div>
+          <AppHeader />
         </div>
+      </div>
+      <div class="grid row-span-10 gap-2">
+        <div class="grid grid-cols-12">
+          <div class="col-span-12">
+            <div class="grid grid-rows-12 mx-auto px-4 py-2">
+              <div class="grid row-span-12 w-full px-1 py-2 text-left rounded-[10px] h-screen-inner">
+                <div id="MainLeftDataParent" class="overflow-auto">
+                  <div id="MainLeftDataArea" class="overflow-auto"> 
+                    <LandingPageContentBlock />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>      
+      <div class="row-span-1">
+        <AppFooter />
+      </div>
     </div>
-</client-only>
-
+  </div>
 </template>
-<script setup lang="ts">
-import { onMounted } from "vue";
-import { storeToRefs } from "pinia";
 
+<script setup lang="ts">
 import AppHeader from '@/components/Common/AppHeader.vue';
 import AppFooter from '@/components/Common/AppFooter.vue';
-
-import { useUserDataStore } from '@/stores/common/UserDataStore';
-import { useCalibrationJobStore } from "@/stores/common/CalibrationJobStore";
-import { useGageStore } from "@/stores/calibration/GageStore";
-import { useFormulationStore } from "@/stores/calibration/FormulationStore";
-import { useOptimizationStore } from "@/stores/calibration/OptimizationStore";
-import { useRunStatusStore } from "@/stores/calibration/RunStatusStore";
-import { useTuningStore } from "@/stores/calibration/TuningStore";
-import { generalStore } from "~/stores/common/GeneralStore";
-
-import { useToast } from "primevue/usetoast";
-import type { ToastMessageOptions } from "primevue/toast";
-import { ToastTimeout } from "@/composables/NgencerfEnums";
-const toast = useToast();
-
-const { popupActive } = storeToRefs(generalStore());
-
-const { resetGageStore, loadGageTabStaticData } = useGageStore();
-const { resetFormulationStore, loadFormulationModels } = useFormulationStore();
-const { hardResetTuningStore } = useTuningStore();
-const { resetOptimizationStore, loadOptimizationTabStaticData } = useOptimizationStore();
-const { hardResetRunStatusStore } = useRunStatusStore();
-const { addToastRecord } = generalStore();
-
-const formulationStore = useFormulationStore;
-const { formulationTabData } = storeToRefs(formulationStore());
-const { statusTypeFilterList, preFilterList } = storeToRefs(useUserDataStore());
-const { fetchUserCalibrationJobsListIDsOnly } = useUserDataStore();
-
-const { getUserFullName } = useUserDataStore()
-
-const runningCalibrationJobs = ref<number | null>(null);
-const readyCalibrationJobs = ref<number | null>(null);
-const savedCalibrationJobs = ref<number | null>(null);
-
-onMounted(async () => {
-  popupActive.value = false;
-  resetGageStore();
-  resetFormulationStore();
-  resetOptimizationStore();
-  hardResetRunStatusStore();
-  hardResetTuningStore();
-  await loadGageTabStaticData();
-  await loadFormulationModels();
-  await loadOptimizationTabStaticData();
-
-  statusTypeFilterList.value = ['Running'];
-  const runningCalibrationJobsList = await fetchUserCalibrationJobsListIDsOnly();
-  runningCalibrationJobs.value = runningCalibrationJobsList.length;
-
-  statusTypeFilterList.value = ['Ready'];
-  const readyCalibrationJobsList = await fetchUserCalibrationJobsListIDsOnly();
-  readyCalibrationJobs.value = readyCalibrationJobsList.length;
-
-  statusTypeFilterList.value = ['Saved'];
-  const savedCalibrationJobsList = await fetchUserCalibrationJobsListIDsOnly();
-  savedCalibrationJobs.value = savedCalibrationJobsList.length;
-})
-
-const gotoCalibrationAndFilter = (filterList: DynamicObject={}) => {
-  preFilterList.value = filterList;
-  const e = document.getElementById('MainMenuCalibration');
-  e.click();
-}
-
+import LandingPageContentBlock from '@/components/Common/LandingPageContent.vue';
 </script>

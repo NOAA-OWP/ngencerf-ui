@@ -40,43 +40,36 @@
 
                 <!-- Rules -->
                 <div class="ml-2 space-y-3">
-                    <p><strong>1. Calibration Time Controls</strong></p>
-                    <ul class="list-disc list-outside ml-9 space-y-0">
-                        <li>Calibration period must fall within the <strong>Calibration Simulation</strong> period.</li>
-                        <li>Calibration period cannot overlap the <strong>Validation</strong> period.</li>
-                    </ul>
-
-                    <p><strong>2. Validation Time Controls</strong></p>
-                    <ul class="list-disc list-outside ml-9 space-y-0">
-                        <li>Validation period must fall within the <strong>Validation Simulation</strong> period.</li>
-                        <li>Validation Simulation period must encompass the entire <strong>Calibration</strong> period.</li>
-                    </ul>
-
-                    <p><strong>3. Hourly requirement</strong></p>
-                    <ul class="list-disc list-outside ml-9 space-y-1">
-                        <li>All times are in full hours and must be specified at the top of the hour (hh:00).</li>
-                    </ul>
-                </div>
-
-                <!-- Example -->
-                <div class="mt-4">
-                    <p class="font-bold mb-2">Example</p>
-
-                    <div class="ml-2 space-y-2">
-                        <p><strong>Calibration Times:</strong></p>
-                        <ul class="list-disc list-outside ml-6 space-y-0">
-                            <li>Simulation period: 2015-10-01 00:00 → 2017-09-30 23:00</li>
-                            <li>Calibration period: 2016-10-01 00:00 → 2017-09-30 23:00</li>
-                        </ul>
-
-                        <p><strong>Validation Times:</strong></p>
-                        <ul class="list-disc list-outside ml-6 space-y-0">
-                            <li>Simulation period: 2016-10-01 00:00 → 2020-09-30 23:00</li>
-                            <li>Validation period: 2019-10-30 00:00 → 2020-09-30 23:00</li>
-                        </ul>
-                    </div>
+                    <p>Calibration and validation periods follow scheduling rules that make 
+                       timing them by hand impractical. Instead, the user provides a few key 
+                       inputs and the program computes the run periods automatically. Note:
+                       Start times are always at 00:00; end times are always set to 23:00.
+                    </p>
                 </div>
             </div>
+
+
+            <div class="ml-2 space-y-3">
+                <p>The diagrams below show how the <strong>Calibration Manager</strong> translates these fields into 
+                   the actual periods it runs against. It iteratively runs ngen, evaluates the results,
+                   tunes the selected calibratable parameters (next tab), and repeats until the stop 
+                   criteria are met. The calibration simulation is always run first.
+                </p>
+            </div>
+            <div class="mt-2">
+                <a :href="validationAfter" target="_blank" rel="noopener">
+                    <img class="mx-auto" width="100%" :src="validationAfter" 
+                        alt="Validation Window: After Calibration - timeline diagram showing warmup, calibration, and validation periods" />
+                </a>
+            </div>
+
+            <div>
+                <a :href="validationBefore" target="_blank" rel="noopener">
+                    <img class="mx-auto" width="100%" :src="validationBefore" 
+                        alt="Validation Window: Before Calibration - timeline diagram showing warmup, calibration, and validation periods" />
+                </a>
+            </div>
+
         </div>
         <hr>
         <br />
@@ -89,34 +82,58 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="td1">Entering Times</td>
-                    <td class="td2">Times are UTC.<br>
-                        Times can be selected using the date picker or entered manually.<br />
-                        Manual Format: YYYY-MM-DD HH:MM<br />
-                        Cut and paste can be used.<br />
-                    </td>
-                </tr>
-                <tr>
-                    <td class="td1">&nbsp;</td>
-                    <td class="td2">&nbsp;</td>
-                </tr>
-                <tr>
                     <td class="td1">Range</td>
                     <td class="td2">Non-editable field displaying the available time range for running calibration and
                         validation. This is determined by the time ranges available in the forcing and observational 
                         data selected in the Headwater Basin Gage tab. All time controls are constrained by this range.</td>
                 </tr>
                 <tr>
-                    <td class="td1">Calibration Time Controls<span class="required-asterisk" aria-hidden="true">*</span></td>
-                    <td class="td2">The user selects four times to run the calibration. The Simulation Start and End
-                        times reflect the period of time to perform the entire run. The Calibration Start and End times
-                        reflect the period of time to actually calibrate using the tuning parameters. This allows for 
-                        a “warm-up” period prior to performing the calibration.</td>
+                    <td class="td1">&nbsp;</td>
+                    <td class="td2">&nbsp;</td>
                 </tr>
                 <tr>
-                    <td class="td1">Validation Time Controls<span class="required-asterisk" aria-hidden="true">*</span></td>
-                    <td class="td2">Same rules as the Calibration Time Controls except the Validation time range is
-                        further constrained in that it cannot overlap the Calibration time range.
+                    <td class="td1">Simulation Configuration</td>
+                </tr>
+                <tr>
+                    <td class="td1">Simulation Start<span class="required-asterisk" aria-hidden="true">*</span></td>
+                    <td class="td2">The date/time the calibration simulation begins.<br />
+                        Manual Format: YYYY-MM-DD<br />
+                        Cut and paste can be used.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td1">Warmup Duration<span class="required-asterisk" aria-hidden="true">*</span></td>
+                    <td class="td2">A run-up period in months before calibration/validation begins, allowing parameter values 
+                        to stabilize from arbitrary initial conditions before calibration starts<br />
+                        Minimum: 0
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td1">Cailbration Duration<span class="required-asterisk" aria-hidden="true">*</span></td>
+                    <td class="td2">Length of the period (in months) over which the formulation is calibrated against observed data,
+                        starting right after the warmup period ends.<br />
+                        Minimum: 1
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td1">Validation Window<span class="required-asterisk" aria-hidden="true">*</span></td>
+                    <td class="td2">Whether the validation period falls Before or After the calibration period,
+                        determining which side of calibration the formulation is tested on.<br />
+                        Default: After
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td1">Validation Window Gap<span class="required-asterisk" aria-hidden="true">*</span></td>
+                    <td class="td2">A buffer (in months) separating the end of one period from the start of the other,
+                        keeping calibration and validation on non-overlapping dates.<br />
+                        Minimum: 0
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td1">Validation Duration<span class="required-asterisk" aria-hidden="true">*</span></td>
+                    <td class="td2">Length of the period (in months) over which the calibrated formulation is evaluated 
+                        against data it wasn't calibrated on.<br />
+                        Minimum: 1
                     </td>
                 </tr>
                 <tr>
@@ -143,7 +160,7 @@
                             <li>Valid model names: CFE-S, CFE-X, LASAM, Noah-OWP-Modular, Sac-SMA, SFT, SMP, Snow-17, T-Route, TopModel, UEB</li>
                         </ul>
                         Example:<br />
-                        <img class="mx-auto" width="90%" :src="image1" alt="Example Load Parameter File Image" />
+                        <img class="mx-auto" width="90%" :src="parmFileExample" alt="Example Load Parameter File Image" />
                     </td>
                 </tr>
                 <tr>
@@ -222,7 +239,9 @@
 </template>
 
 <script setup lang="ts">
-import image1 from "@/assets/styles/img/TuningParameterLoadFileExample.png"
+import parmFileExample  from "@/assets/styles/img/TuningParameterLoadFileExample.png"
+import validationAfter  from "@/assets/styles/img/validation_after_calibration.png"
+import validationBefore from "@/assets/styles/img/validation_before_calibration.png"
 </script>
 
 <style lang="scss" scoped>

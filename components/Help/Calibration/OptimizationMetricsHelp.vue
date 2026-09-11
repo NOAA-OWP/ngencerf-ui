@@ -48,8 +48,8 @@
                 <td class="td1">Objective Function<span class="required-asterisk" aria-hidden="true">*</span></td>
                 <td class="td2">
                 Select the metric to use as the objective function. All metrics in the table (MFDC, FBIAS, NSWwt) are valid choices.<br />
-                - For Categorical metrics (POD, CSI, FAR), the <strong>Flow Threshold</strong> is required.<br />
-                - For Event-based metrics (PKBIAS, PKTE, EVBIAS), the <strong>Peak Flow Threshold</strong> is required.
+                - For Categorical metrics (POD, CSI, FAR), the <strong>Categorical Threshold</strong> is required.<br />
+                - For Event-based metrics (PKBIAS, PKTE, EVBIAS), the <strong>Event Threshold</strong> is required.
                 </td>
             </tr>
             <tr>
@@ -57,7 +57,7 @@
                 <td class="td2">
                 Select this option to calculate <strong>Categorical Metrics</strong> when they are <strong>not</strong> chosen as the Objective Function.  
                 If a Categorical metric (POD, CSI, FAR) is selected as the Objective Function, this option is automatically disabled.
-                When enabled, the <strong>Flow Threshold</strong> field is required.
+                When enabled, the <strong>Categorical Threshold</strong> field is required.
                 </td>
             </tr>
             <tr>
@@ -65,7 +65,7 @@
                 <td class="td2">
                     Select this option to calculate <strong>Event-Based Metrics</strong> when they are <strong>not</strong> chosen as the Objective Function.
                     If an Event-Based metric (PKBIAS, PKTE, EVBIAS) is selected as the Objective Function, this option is automatically disabled.
-                    When enabled, the <strong>Peak Flow Threshold</strong> field is required.
+                    When enabled, the <strong>Event Threshold</strong> field is required.
                 </td>
             </tr>
             <tr>

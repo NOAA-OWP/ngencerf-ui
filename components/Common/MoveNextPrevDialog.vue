@@ -28,10 +28,10 @@ onMounted(() => {
 
 const stayOnTab = (w: boolean) => {
   dialogRef.value.data = true;
-    dialogRef.value.close({
-      moveToNextResponse: w,
-      goNext: goNext.value
-    });
+  dialogRef.value.close({
+    moveToNextResponse: w,
+    goNext: goNext.value
+  });
 }
 
 </script>

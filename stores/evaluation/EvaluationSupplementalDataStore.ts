@@ -71,9 +71,9 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   /**
    * set gridStartDateTime
    */
-  const setgridStartDateTime = (): void => {
+  const setGridStartDateTime = (): void => {
     if (gridTimeSeriesData.value.length > 0) {
-      gridStartDateTime.value = DateTime.fromISO(gridTimeSeriesData.value[0].timestamp, { zone: 'utc' });
+      gridStartDateTime.value = DateTime.fromISO(gridTimeSeriesData.value[0].timestamp.replace(" ", "T"), { zone: 'utc' });
     } else {
       gridStartDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_start_time as string, { zone: 'utc' });
     }
@@ -85,9 +85,9 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
   /**
    * set gridEndDateTime
    */
-  const setgridEndDateTime = (): void => {
+  const setGridEndDateTime = (): void => {
     if (gridTimeSeriesData.value.length > 0) {
-      gridEndDateTime.value = DateTime.fromISO(gridTimeSeriesData.value[gridTimeSeriesData.value.length - 1].timestamp, { zone: 'utc' });
+      gridEndDateTime.value = DateTime.fromISO(gridTimeSeriesData.value[gridTimeSeriesData.value.length - 1].timestamp.replace(" ", "T"), { zone: 'utc' });
     } else {
       gridEndDateTime.value = DateTime.fromISO(userCalibrationRunData?.value?.validation_times?.simulation_end_time as string, { zone: 'utc' });
     }
@@ -263,7 +263,6 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
    * @return {any}
    */
   const queryGetLogData = async (
-    log_category: string,
     log_name: string,
     validation_run_id: number,
     start?: number,
@@ -277,7 +276,6 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
       },
       body: JSON.stringify({
         validation_run_id: validation_run_id,
-        log_category: log_category,
         log_name: log_name,
         start: start !== undefined ? start : 0,
         limit: limit !== undefined ? limit : 1000
@@ -347,8 +345,8 @@ export const useEvaluationSupplementalDataStore = defineStore('EvaluationSupplem
     selectedGridImages,
     gridTimeSeriesData,
     isEvaluationLoading,
-    setgridStartDateTime,
-    setgridEndDateTime,
+    setGridStartDateTime,
+    setGridEndDateTime,
     getGridTimeRange,
     queryGetIterations,
     queryGetPerformanceMetrics,

@@ -36,7 +36,10 @@
         </ul>
         <br />
         <p class="font-bold">Select the iteration and click Next.</p>
-        <p style="position: relative; left: 20px;">You may have to scroll the tab down a bit to see the Next button.</p>
+        <ul style="list-style-type: disc;margin-left:100px;">
+            <li>You may have to scroll the tab down a bit to see the Next button.</li>
+            <li>Double-clicking the iteration is equivalent to clicking the Next button.</li>
+        </ul>
         <br />
         <p class="font-bold">HINTS</p>
         <p style="position: relative; left: 20px;">Iterations in grey have already been run and are unselectable.</p>

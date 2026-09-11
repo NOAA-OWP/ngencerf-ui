@@ -2,13 +2,17 @@ name: ngencerf-ui
 
 services:
   ngencerf-app:
-    image: registry.sh.nextgenwaterprediction.com/ngwpc/nwm-ngen/ngencerf_ui:latest
+    image: ghcr.io/ngwpc/ngencerf-ui:${NGENCERF_UI_TAG:-latest}
     pull_policy: build
-    build: 
+    build:
       context: .
+      args:
+        # Local: pw_platform_host unset -> empty -> app uses its default base URL.
+        # Parallel Works: set pw_platform_host (+ basepath) to bake the real API URL.
+        NGENCERF_BASE_URL: ${pw_platform_host:+https://${pw_platform_host}${basepath}/api/}
     ports:
-      - "3000:3000"
+      - "${ngencerf_port:-3000}:3000"
     environment:
       - NUXT_HOST=0.0.0.0
       - NUXT_PORT=3000
-
+      - NUXT_APP_BASE_URL=${basepath:-}/

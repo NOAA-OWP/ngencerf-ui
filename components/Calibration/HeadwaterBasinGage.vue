@@ -15,7 +15,7 @@
             <div class="col-span-1">
               <div class="col-span-1">
                 <label for="Domain">Domain</label><br />
-                <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="name"
+                <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="display_name"
                   optionValue="name" placeholder=" ... " aria-label="Domain Select" title="Domain Select"
                   @change="onDomainSelectionChange"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
@@ -30,11 +30,11 @@
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
             </div>
 
-            <div class="col-span-1" v-if="getForcingOptionsList.length > 1">
+            <div class="col-span-1" v-if="displayForcingOptionsList?.length > 0">
               <label for="Forcing" class="required-label">Forcing Source</label><br />
-              <Select id="Forcing" v-model="selectedForcingValue" :options="getForcingOptionsList" optionLabel="name"
-                optionValue="name" class="user-select" @change="uploadForcingDlgOpen($event)"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+              <Select id="Forcing" v-model="selectedForcingValue" :options="displayForcingOptionsList" 
+                optionLabel="display_name" optionValue="name" class="user-select" @change="uploadForcingDlgOpen($event)"
+                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status) || displayForcingOptionsList?.length === 1"
                 aria-label="Forcing Source Select" title="Forcing Source Select"></Select>
             </div>
           </div>
@@ -68,10 +68,10 @@
               <table class="table-auto">
                 <caption><span style="font-size:1.2em;font-weight: bold;">Gage Detail</span></caption>
                 <tbody>
-                  <tr v-if="selectedDomainValue" class="rowOdd" :aria-label="'Domain: ' + selectedDomainValue"
-                    :title="'Domain: ' + selectedDomainValue">
+                  <tr v-if="selectedDomain" class="rowOdd" :aria-label="'Domain: ' + selectedDomain?.display_name"
+                    :title="'Domain: ' + selectedDomain?.display_name">
                     <th scope="row" class="dataName td1">Domain:</th>
-                    <td class="dataText td2">{{ selectedDomainValue }}</td>
+                    <td class="dataText td2">{{ selectedDomain?.display_name }}</td>
                   </tr>
                   <tr v-if="gageData?.gage_id" lass="rowEven" :aria-label="'Gage ID: ' + gageData?.gage_id"
                     :title="'>Gage ID: ' + gageData?.gage_id">
@@ -116,7 +116,7 @@
             <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
               <div class="col-span-1 mr-6 h-8" @click="saveTabData()">
                 <Button id="HBGSaveButton" class="font-normal ngenButtonDiv-green " title="Save"
-                  aria-label="Save Button">
+                  aria-label="Save Button" :disabled="isLoading">
                   Save
                 </Button>
               </div>
@@ -129,7 +129,7 @@
             <span v-if="jobNameHasChanged || (gageHasChanged && userCalibrationRunData?.gage !== null) || gageDataSourceHasChanged">
               <div class="col-span-1 mr-3">
                 <Button class="ngenButtonDiv-yellow" title="Revert All Changes"
-                  @click="gageSelectionReset()" aria-label="Revert All Changes">Revert</Button>
+                  @click="restoreTab()" aria-label="Revert All Changes" :disabled="isLoading">Revert</Button>
               </div>
             </span>
             <span v-else>
@@ -141,7 +141,7 @@
             <div class="col-span-1">&nbsp;</div>
             <div class="col-span-1 mr-4">
               <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next" aria-label="Next"
-                @click="goNextTab()">Next</Button>
+                @click="goNextTab()" :disabled="isLoading">Next</Button>
             </div>
           </div>
         </div>
@@ -199,11 +199,43 @@ const { loadGageTabStaticData, fetchSelectedGageData, saveGageTabData, resetUser
   saveUserForcingFiles, saveUserObservationalFile, saveUserGeopackageFile } = useGageStore();
 const { calibrationJobId, gageHasChanged, gageDataSourceHasChanged } = storeToRefs(generalStore());
 const { submitTimeDate } = storeToRefs(useRunStatusStore());
+
+const props = defineProps({
+  callGoToTab: {
+    type: Function,
+    required: false,
+  },
+  callNavDialog: {
+    type: Function,
+    required: false,
+  }
+});
+
 const toast = useToast();
 const dialog = useDialog();
 const fileUploadDialogOpened = ref<boolean>(false);
 const nextPrevDialogOpened = ref<boolean>(false);
 const jobNameHasChanged = ref<boolean>(false);
+
+const selectedDomain = computed(() => {
+  if (gageData?.value?.gage_id) {
+    let gage = (gageTabData.value?.gages.find(gage => gage.gage_id === gageData.value.gage_id));
+    if (gage) {
+      let domain = (getDomainOptionsList.value.find(domain => domain.name === gage.domain || domain.display_name === gage.domain));
+      return domain;
+    }
+  }
+  return '';
+});
+
+const displayForcingOptionsList = computed(() => {
+  if (selectedDomainValue.value !== 'CONUS') {
+    return getForcingOptionsList.value?.filter(option => {
+      return option.name !== 'AORC'
+    }) ?? [];
+  }
+  return getForcingOptionsList.value ?? [];
+});
 
 const resetData = ref<GageResetData>({
   external_data_status: {
@@ -213,7 +245,7 @@ const resetData = ref<GageResetData>({
   },
   geopackage_source: "",
   observational_source: "",
-  forcing_source_requested: "",
+  forcing_source: "",
   geopackage_image_url: ""
 })
 
@@ -221,7 +253,7 @@ const setResetDataValues = () => {
   if (userCalibrationRunData.value) {
     // Save all information from the external data JSON.parse(JSON.stringify(obj));
     resetData.value.external_data_status = JSON.parse(JSON.stringify(userCalibrationRunData.value.external_data_status));
-    resetData.value.forcing_source_requested = userCalibrationRunData.value.forcing_source_requested ? userCalibrationRunData.value.forcing_source_requested : (getForcingOptionsList.value ? getForcingOptionsList.value[0].name : '');
+    resetData.value.forcing_source = userCalibrationRunData.value.forcing_source ? userCalibrationRunData.value.forcing_source : (getForcingOptionsList.value ? getForcingOptionsList.value[0].name : '');
     resetData.value.observational_source = userCalibrationRunData.value.observational_source ? userCalibrationRunData.value.observational_source : (getObservationalOptionsList.value ? getObservationalOptionsList.value[0].name : '');
     resetData.value.geopackage_source = userCalibrationRunData.value.geopackage_source ? userCalibrationRunData.value.geopackage_source : (getGeopackageOptionsList.value ? getGeopackageOptionsList.value[0].name : '');
     resetData.value.geopackage_image_url = userCalibrationRunData.value.geopackage_image_url;
@@ -242,13 +274,18 @@ onMounted(async() => {
       submitTimeDate.value = new Date(userCalibrationRunData.value.submit_date);
     }
     if (userCalibrationRunData?.value?.gage?.gage_id) {
-      gageSelectionReset();
+      restoreTab();
     } else {
-      selectedForcingValue.value = resetData.value.forcing_source_requested;
+      selectedForcingValue.value = resetData.value.forcing_source;
       selectedObservationalValue.value = resetData.value.observational_source;
       selectedGeopackageValue.value = resetData.value.geopackage_source;
     }
     gageDataSourceHasChanged.value = false;
+    if (selectedDomainValue.value === 'CONUS' && selectedForcingValue.value === 'AORC') {
+      nextTick(() => {
+        selectedForcingValue.value = displayForcingOptionsList.value[0].name;
+      });
+    }
     isLoading.value = false;
   });
 })
@@ -258,6 +295,22 @@ watch(jobNameInput, () => {
     jobNameHasChanged.value = true;
   } else {
     jobNameHasChanged.value = false;
+  }
+})
+
+watch(selectedDomain, () => {
+  // update domain dropdown
+  if (selectedDomain.value) {
+    selectedDomainValue.value = selectedDomain?.value?.name ?? '';
+  }
+});
+
+watch(selectedDomainValue, () => {
+  // update selected orcing source if we have an OCONUS domain and AORC was previously selected
+  if (selectedDomainValue.value !== 'CONUS' && selectedForcingValue.value === 'AORC') {
+    nextTick(() => {
+      selectedForcingValue.value = displayForcingOptionsList.value[0].name;
+    });
   }
 })
 
@@ -280,7 +333,7 @@ const onGageSelectionChange = () => {
     nextTick(() => {
       const gage = document.getElementById('Gage');
       (gage?.childNodes[0] as HTMLInputElement).innerText = selectedGageValue.value;
-      document.getElementById("HBGSaveButton")?.focus();
+      document.getElementById("HBGSaveButton")?.focus()
     });
   }
   fetchSelectedGageData();
@@ -289,7 +342,7 @@ const onGageSelectionChange = () => {
 /**
  * Resets the Gage to the previous gage if it was changed and not saved.
  */
-const gageSelectionReset = () => {
+const restoreTab = () => {
   jobNameInput.value = userCalibrationRunData?.value?.job_name ?? "";
   selectedDomainValue.value = getSavedDomainValue.value ?? '';
   selectedGageValue.value = userCalibrationRunData?.value?.gage?.gage_id ? userCalibrationRunData.value.gage.gage_id : '';
@@ -316,12 +369,12 @@ const gageSelectionReset = () => {
     userCalibrationRunData.value.external_data_status = JSON.parse(JSON.stringify(resetData.value.external_data_status))
     userCalibrationRunData.value.geopackage_source = resetData.value.geopackage_source;
     userCalibrationRunData.value.observational_source = resetData.value.observational_source;
-    userCalibrationRunData.value.forcing_source_requested = resetData.value.forcing_source_requested;
+    userCalibrationRunData.value.forcing_source = resetData.value.forcing_source;
     userCalibrationRunData.value.geopackage_image_url = resetData.value.geopackage_image_url;
   }
   selectedGeopackageValue.value = resetData.value.geopackage_source;
   selectedObservationalValue.value = resetData.value.observational_source;
-  selectedForcingValue.value = resetData.value.forcing_source_requested;
+  selectedForcingValue.value = resetData.value.forcing_source;
 }
 
 const clearDataDueToGageChange = () => {
@@ -395,7 +448,7 @@ const showForcingFileUploadDialog = (headerText: string) => {
         saveFunction: saveUserForcingFiles
       },
       onClose: (opt) => {
-        if (selectedForcingValue.value !== userCalibrationRunData?.value?.forcing_source_requested) {
+        if (selectedForcingValue.value !== userCalibrationRunData?.value?.forcing_source) {
           gageDataSourceHasChanged.value = true;
         }
         handleDialogClose(opt)
@@ -501,12 +554,6 @@ const showGeopackageFileUploadDialog = (headerText: string) => {
   }
 }
 
-const gotoNext = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[CalibrationTabs.tab_formulation];
-  e.click();
-}
-
 /**
  * follow section waiting further detail to be implemented
  */
@@ -538,10 +585,10 @@ const saveTabData = async() => {
   } else {
     toast.removeAllGroups();
 
+    jobNameHasChanged.value = false;
     // Check for gage / data source change
     if (gageHasChanged.value || gageDataSourceHasChanged.value) {
       clearDataDueToGageChange();
-      jobNameHasChanged.value = false;
       gageHasChanged.value = false;
       gageDataSourceHasChanged.value = false;
       isLoading.value = true;
@@ -586,14 +633,15 @@ const updateJobData = async (response: any) => {
     }
 
     userCalibrationRunData.value.gage = newGage;
-    userCalibrationRunData.value.forcing_source_requested = response?._data?.forcing_source_requested as string;
-    userCalibrationRunData.value.forcing_source_actual = response?._data?.forcing_source_actual as string;
+    userCalibrationRunData.value.forcing_source = response?._data?.forcing_source as string;
     userCalibrationRunData.value.observational_source = gagePayload.value.observational_source as string;
     userCalibrationRunData.value.geopackage_source = gagePayload.value.geopackage_source as string;
-    userCalibrationRunData.value.geopackage_image_url = response?._data?.geopackage_image_url ?? "";
+    if (response?._data?.geopackage_image_url) {
+      userCalibrationRunData.value.geopackage_image_url = response._data.geopackage_image_url;
+    }
 
     // Assume EDS status is true if sources are set
-    if (userCalibrationRunData.value.forcing_source_actual !== '') {
+    if (userCalibrationRunData.value.forcing_source !== '') {
       userCalibrationRunData.value.external_data_status.forcing = true;
     }
     if (userCalibrationRunData.value.observational_source !== '') {
@@ -607,7 +655,6 @@ const updateJobData = async (response: any) => {
     if(response?._data?.eds_errors) {
       response._data.eds_errors.forEach((eds_error: edsError) => {
         if (eds_error.name === 'forcing') {
-          userCalibrationRunData.value.forcing_source_actual = '';
           userCalibrationRunData.value.external_data_status.forcing = false;
         }
         else if (eds_error.name === 'observational') {
@@ -640,7 +687,7 @@ const resetTabData = () => {
   }
 };
 
-const validateTab = () => {
+const validateTab = (tabNumber?: number) => {
   let error = false;
   let text = [];
   /* Check if Job Name changed */
@@ -658,15 +705,17 @@ const validateTab = () => {
     error = true;
     text.push("Gage value has been changed");
   }
-  if (selectedForcingValue.value != resetData.value.forcing_source_requested) {
+  if (selectedForcingValue.value != resetData.value.forcing_source) {
     error = true;
     text.push("Forcing Source has been changed");
   }
-  if (selectedObservationalValue.value !== resetData.value.observational_source) {
+  if (getObservationalOptionsList?.value && getObservationalOptionsList?.value?.length > 1 && 
+    selectedObservationalValue.value !== resetData.value.observational_source) {
     error = true;
     text.push("Observational Source has been changed");
   }
-  if (selectedGeopackageValue.value != resetData.value.geopackage_source) {
+  if (getGeopackageOptionsList?.value && getGeopackageOptionsList?.value?.length > 1 &&
+    selectedGeopackageValue.value != resetData.value.geopackage_source) {
     error = true;
     text.push("GeoPackage has been changed");
   }
@@ -675,46 +724,17 @@ const validateTab = () => {
 
 const goNextTab = () => {
   const errors = validateTab();
-  if (errors.error) {
-    showPrevNextDialog(errors.text, true);
-  } else {
-    gotoNext();
+  if (props.callNavDialog && errors.error) {
+    props.callNavDialog(errors.text, true, 3);
+  } else if (props.callGoToTab) {
+    props.callGoToTab(3);
   }
-
 };
 
-const showPrevNextDialog = (body: string[], next: boolean) => {
-  if (!nextPrevDialogOpened.value) {
-    dialog.open(MoveNextPrevDialog, {
-      props: {
-        header: "Unsaved changes!",
-        style: {
-          width: 'auto',
-        },
-        modal: true,
-      },
-      data: {
-        body: body,
-        direction: next
-      },
-      onClose: (opt) => {
-        nextPrevDialogOpened.value = false;
-        handleNextPrevDialogClose(opt);
-      },
-    })
-    nextPrevDialogOpened.value = true
-  }
-}
-
-const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data && opt.data.moveToNextResponse) {
-    gageSelectionReset();
-    gotoNext();
-  }
-  if (opt.type && opt.type === 'dialog-close') {
-    return;
-  }
-}
+defineExpose({
+  validateTab,
+  restoreTab
+});
 
 </script>
 <style lang="scss" scoped>

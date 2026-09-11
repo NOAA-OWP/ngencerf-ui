@@ -46,6 +46,7 @@ export const useUserDataStore = defineStore(
     const userSelectedCalibrationIterationId = ref<number | null>(null);
     const uiGageId = ref<string>("");
     const uiGageList = ref<string[]>([]);
+    const uiDomainName = ref<string>("");
 
     // Used for Job Filters
     const modulesFilterList = ref<string[]>([]);
@@ -63,11 +64,13 @@ export const useUserDataStore = defineStore(
     const selectedBulkJobAction = ref<number>(0);
     const selectedBulkJobActionScope = ref<boolean>(false);
     const preFilterList = ref<DynamicObject>({});
+    const startTab = ref<number>(1);
 
     const lastServerError = ref<ServerStatus>();
 
-    // sets value for global logging
+    // sets values for global logging and log file mode
     const calibrationJobNgenGlobalLogging = ref<boolean>(true);
+    const calibrationJobLogFileMode = ref<boolean>(true);
 
     // set ngen log level
     const ngenLogLevel = ref<LogLevel>("info");
@@ -269,6 +272,22 @@ export const useUserDataStore = defineStore(
       return tokenExpired.value;
     }
 
+    /** 
+     * fetch job counts for landing page
+     */
+    async function fetchUserCalibrationJobCounts() {
+      return await makeProtectedApiCall<CalibrationJobsList>(
+        `${ngencerfBaseUrl}/calibration/get_jobs_summary/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          }
+        }
+      );
+    }
+
     /**
      * fetch user created calibration job list datauser created calibration
      * @return {void}
@@ -282,6 +301,7 @@ export const useUserDataStore = defineStore(
           direction: calibrationRunListSort.value.direction === -1 ? 'desc' : 'asc'
         },
         filters: {
+          domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
           gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
           module_filter: {
             modules: modulesFilterList.value,
@@ -315,8 +335,7 @@ export const useUserDataStore = defineStore(
           ,
           status: statusTypeFilterList.value,
           include_archived: includeArchivedJobs.value
-        },
-        get_gages: uiGageList.value.length === 0
+        }
       }
       const jobsListDataResult =
         await makeProtectedApiCall<CalibrationJobsList>(
@@ -337,10 +356,6 @@ export const useUserDataStore = defineStore(
       calibrationRunListStartRow.value = (calibrationRunListPageSize.value * (calibrationRunListCurrentPage.value - 1)) + 1;
       calibrationRunListEndRow.value = Math.min(calibrationRunListStartRow.value + (calibrationRunListPageSize.value - 1), calibrationRunListTotalSize.value);
       
-      if (jobsListDataResult?._data?.gages) {
-        uiGageList.value = jobsListDataResult?._data?.gages;
-        uiGageList.value.sort();
-      }
       if (jobsListDataResult?._data?.date_range && jobsListDataResult?._data?.date_range.length === 2) {
         minCreatedAt.value = jobsListDataResult?._data?.date_range[0];
         maxCreatedAt.value = jobsListDataResult?._data?.date_range[1];
@@ -355,10 +370,11 @@ export const useUserDataStore = defineStore(
      * fetch list of calibration job IDs only (for bulk actions)
      * @return {void}
      */
-    async function fetchUserCalibrationJobsListIDsOnly() {
+    async function fetchUserCalibrationJobsListIdsOnly() {
       // apply user's filters without paging, since we want the entire list
       let requestBody = {
         filters: {
+          domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
           gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
           module_filter: {
             modules: modulesFilterList.value,
@@ -395,7 +411,7 @@ export const useUserDataStore = defineStore(
         },
         ids_only: true
       }
-      const jobsListIDsResult =
+      const jobsListIdsResult =
         await makeProtectedApiCall<CalibrationJobsList>(
           `${ngencerfBaseUrl}/calibration/get_calibration_jobs/`,
           {
@@ -408,7 +424,36 @@ export const useUserDataStore = defineStore(
           }
         );
 
-      return jobsListIDsResult?._data?.jobs ?? [];
+      return jobsListIdsResult?._data?.jobs ?? [];
+    }
+
+    /**
+     * fetch list of gage IDs
+     * @return {void}
+     */
+    async function fetchGageList() {
+      // only apply domain and archived filters
+      let requestBody = {
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+        include_archived: includeArchivedJobs.value
+      }
+      const gageListResult =
+        await makeProtectedApiCall<any>(
+          `${ngencerfBaseUrl}/calibration/get_calibration_gages/`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${getAccessToken()}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          }
+        );
+      
+      if (gageListResult?._data?.gages) {
+        return gageListResult._data.gages.sort();
+      }
+      return [];
     }
 
     /**
@@ -503,6 +548,7 @@ export const useUserDataStore = defineStore(
     const clearUserCalibrationRunData = () => {
       userCalibrationRunData.value = undefined;
       calibrationJobNgenGlobalLogging.value = true;
+      calibrationJobLogFileMode.value = false;
       ngenLogLevel.value = "info";
       forcingLogLevel.value = "info";
 
@@ -516,6 +562,7 @@ export const useUserDataStore = defineStore(
      * reset job filters
      */
     const resetFilters = () => {
+      uiDomainName.value = 'All';
       uiGageId.value = 'All';
       modulesFilterList.value = []; 
       moduleOperator.value = 'All';
@@ -537,6 +584,7 @@ export const useUserDataStore = defineStore(
       userSelectedCalibrationIterationId,
       uiGageId,
       uiGageList,
+      uiDomainName,
       isLoggedIn,
       userName,
       firstName,
@@ -559,6 +607,7 @@ export const useUserDataStore = defineStore(
       selectedBulkJobAction,
       selectedBulkJobActionScope,
       preFilterList,
+      startTab,
       lastServerError,
       userCalibrationJobsListData,
       userCalibrationRunData,
@@ -571,6 +620,7 @@ export const useUserDataStore = defineStore(
       calibrationRunListEndRow,
       calibrationRunListSort,
       calibrationJobNgenGlobalLogging,
+      calibrationJobLogFileMode,
       ngenLogLevel,
       forcingLogLevel,
       logLevels,
@@ -591,8 +641,10 @@ export const useUserDataStore = defineStore(
       setLastName,
       getAccessToken,
       getRefreshToken,
+      fetchUserCalibrationJobCounts,
       fetchUserCalibrationJobsListData,
-      fetchUserCalibrationJobsListIDsOnly,
+      fetchUserCalibrationJobsListIdsOnly,
+      fetchGageList,
       getValidationJobs,
       queryUserCalibrationRunData,
       fetchUserCalibrationRunData,

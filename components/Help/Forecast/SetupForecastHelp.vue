@@ -16,16 +16,32 @@
             <!-- Forecast configuration details -->
             <div class="space-y-4">
                 <p>
-                    To set up a forecast, <strong>select one of the available forecast configurations</strong> 
-                    from the table. Once selected, you will be prompted to provide the following input 
-                    fields for the forecast:
+                    To set up a forecast, <strong>select one of the available forecast configurations</strong>
+                    from the table. Each configuration has its own available cycle hours and forecast window —
+                    selecting a row determines which cycle hours are valid below. Once selected, you will be
+                    prompted to provide the following fields:
                 </p>
 
-                <ul class="list-disc list-outside space-y-0 ml-6">
-                    <li><strong>Cold Start Date</strong></li>
-                    <li><strong>Cold Start Hour</strong></li>
-                    <li><strong>Cycle Date<span class="required-asterisk" aria-hidden="true">*</span></strong></li>
-                    <li><strong>Cycle Hour<span class="required-asterisk" aria-hidden="true">*</span></strong></li>
+                <ul class="list-disc list-outside space-y-2 ml-6">
+                    <li>
+                        <strong>Cold Start Date</strong> / <strong>Cold Start Hour</strong>
+                        <div class="text-sm text-gray-700 mt-1">
+                            Model configurations need an internal state (soil moisture, streamflow, channel
+                            storage, etc.) before they can run — they can't start from nothing at the Cycle
+                            time. Cold Start tells the model to build that state itself by running from this
+                            earlier date/hour forward, up through the Cycle Date/Hour, before the actual
+                            forecast begins. Think of it as a "warm-up" run.
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Cycle Date<span class="required-asterisk" aria-hidden="true">*</span></strong>
+                        / <strong>Cycle Hour<span class="required-asterisk" aria-hidden="true">*</span></strong>
+                        <div class="text-sm text-gray-700 mt-1">
+                            The start time of the forecast itself — the moment the model "issues" its
+                            prediction from (also called T=0). Everything after this point is the forecast
+                            horizon.
+                        </div>
+                    </li>
                 </ul>
 
                 <p>

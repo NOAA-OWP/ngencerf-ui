@@ -44,8 +44,8 @@
               <td class="td2">Displays the performance metrics for comparison.</td>
             </tr>
             <tr>
-              <td class="td1"  style="font-weight: normal;">Elapsed Time</td>
-              <td class="td2">The job's elapsed time</td>
+              <td class="td1"  style="font-weight: normal;">Run Time</td>
+              <td class="td2">The job's actual run time</td>
             </tr>              
             <tr>
               <td class="td1"  style="font-weight: normal;">Num Cpus</td>
@@ -53,7 +53,7 @@
             </tr>              
             <tr>
               <td class="td1"  style="font-weight: normal;">Cpu Time</td>
-              <td class="td2">Elapsed time * CPU count</td>
+              <td class="td2">Run time * CPU count</td>
             </tr>              
             <tr>
               <td class="td1"  style="font-weight: normal;">Max Rss</td>

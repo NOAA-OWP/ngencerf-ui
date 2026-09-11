@@ -4,8 +4,9 @@
         <div id="TopBar">&nbsp;</div>
         <div class="grid grid-cols-12 gap-1" style="height: 80px">
             <div v-if="isUserLoggedIn()" id="PgmName" class="col-span-2 mt-6">
-                <NuxtLink title="Link to Landing Page" to="LandingPage"
-                    oncontextmenu="return false;">ngenCERF</NuxtLink>
+                <NuxtLink id="MainMenuLandingPage" to="LandingPage">
+                  ngenCERF
+                </NuxtLink>
             </div>
             <div v-else id="PgmName" class="col-span-2 mt-6">
                 <div>ngenCERF</div>
@@ -14,27 +15,30 @@
 
                 <ul v-show="userLoggedIn && location.name !== 'Login'" id="MainMenu">
                     <li aria-label="Calibration" title="Calibration">
-                        <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''"
-                            to="calibration" data-menu='1' @click="MenuChanged"
-                            oncontextmenu="return false;">Calibration</NuxtLink>
+                      <NuxtLink id="MainMenuCalibration" :class="location.name === 'Calibration' ? 'isActive' : ''"
+                        to="calibration">
+                        Calibration
+                      </NuxtLink>
                     </li>
                     <li aria-label="Evaluation" title="Evaluation">
-                        <NuxtLink id="MainMenuEvaluation" :class="location.name === 'Evaluation' ? 'isActive' : ''"
-                            to="evaluation" data-menu='2' @click="MenuChanged"
-                            oncontextmenu="return false;">Evaluation</NuxtLink>
+                      <NuxtLink id="MainMenuEvaluation" :class="location.name === 'Evaluation' ? 'isActive' : ''"
+                        to="evaluation">
+                        Evaluation
+                      </NuxtLink>
                     </li>
                     <li aria-label="Forecast" title="Forecast">
-                        <NuxtLink id="MainMenuForecast" :class="location.name === 'Forecast' ? 'isActive' : ''"
-                            to="forecast" data-menu='3' @click="MenuChanged"
-                            oncontextmenu="return false;">Forecast</NuxtLink>
+                      <NuxtLink id="MainMenuForecast" :class="location.name === 'Forecast' ? 'isActive' : ''"
+                        to="forecast">
+                        Forecast
+                      </NuxtLink>
                     </li>
-                    <li aria-label="Verification" title="Verification">
-                        <NuxtLink id="MainMenuVerification" :class="location.name === 'Verification' ? 'isActive' : ''"
-                            to="verification" data-menu='4' @click="MenuChanged"
-                            oncontextmenu="return false;">Verification</NuxtLink>
+                    <li aria-label="Hindcast" title="Hindcast">
+                      <NuxtLink id="MainMenuHindcast" :class="location.name === 'Hindcast' ? 'isActive' : ''"
+                        to="hindcast">
+                        Hindcast
+                      </NuxtLink>
                     </li>
                 </ul>
-
             </div>
 
             <div id="Circles" class="col-span-2">
@@ -69,6 +73,9 @@
                         <div v-if="location.name === 'LandingPage'" class="py-10 px-6">
                             <LazyHelpLandingPageHelp />
                         </div>
+                        <div v-else-if="location.name === 'DownloadCli'" class="py-10 px-6">
+                            <LazyHelpDownloadCliPageHelp />
+                        </div>
 
                         <div v-if="location.name === 'Calibration'" class="py-10 px-1">
                             <div v-if="getMenuIndex() === 1">
@@ -98,16 +105,16 @@
                                 <span v-if="getEvaluationTabIndex() === 1">
                                     <LazyEvaluationCalibrationRunsHelp />
                                 </span>
-                                <span v-if="getEvaluationTabIndex() === 2">
+                                <span v-else-if="getEvaluationTabIndex() === 2">
                                     <LazyEvaluationEvaluatesHelp />
                                 </span>
-                                <span v-if="getEvaluationTabIndex() === 3">
+                                <span v-else-if="getEvaluationTabIndex() === 3">
                                     <LazyEvaluationComparePermutationsHelp />
                                 </span>
-                                <span v-if="getEvaluationTabIndex() === 4">
+                                <span v-else-if="getEvaluationTabIndex() === 4">
                                     <LazyEvaluationCalibrationSelectAltInterationssHelp />
                                 </span>
-                                <span v-if="getEvaluationTabIndex() === 5">
+                                <span v-else-if="getEvaluationTabIndex() === 5">
                                     <LazyEvaluationRunStatusHelp />
                                 </span>
                             </div>
@@ -118,34 +125,46 @@
                                 <span v-if="getForecastTabIndex() === 1">
                                     <LazyForecastCalibrationRunsHelp />
                                 </span>
-                                <span v-if="getForecastTabIndex() === 2">
+                                <span v-else-if="getForecastTabIndex() === 2">
                                     <LazyForecastForecastRunsHelp />
                                 </span>
-                                <span v-if="getForecastTabIndex() === 3">
+                                <span v-else-if="getForecastTabIndex() === 3">
                                     <LazyForecastSetupForecastHelp />
                                 </span>
-                                <span v-if="getForecastTabIndex() === 4">
+                                <span v-else-if="getForecastTabIndex() === 4">
                                     <LazyForecastRunStatusHelp />
                                 </span>
-                                <span v-if="getForecastTabIndex() === 5">
+                                <span v-else-if="getForecastTabIndex() === 5">
                                     <LazyForecastResultsHelp />
                                 </span>
                             </div>
                         </div>
 
-                        <div v-else-if="location.name === 'Verification'" class="py-10 px-1">
+                        <div v-else-if="location.name === 'Hindcast'" class="py-10 px-1">
                             <div v-if="getMenuIndex() === 4">
-                                <span v-if="getVerificationTabIndex() === 1">
-                                    <LazyVerificationForecastRunsHelp />
+                                <span v-if="getHindcastTabIndex() === 1">
+                                    <LazyHindcastCalibrationRunsHelp />
                                 </span>
-                                <span v-if="getVerificationTabIndex() === 2">
-                                    <LazyVerificationVerificationRunsHelp />
+                                <span v-else-if="getHindcastTabIndex() === 2">
+                                    <LazyHindcastHindcastRunsHelp />
                                 </span>
-                                <span v-if="getVerificationTabIndex() === 3">
-                                    <LazyVerificationtRunStatusHelp />
+                                <span v-else-if="getHindcastTabIndex() === 3">
+                                    <LazyHindcastSetupHindcastHelp />
                                 </span>
-                                <span v-if="getVerificationTabIndex() === 4">
-                                    <LazyVerificationResultsHelp />
+                                <span v-else-if="getHindcastTabIndex() === 4">
+                                    <LazyHindcastRunStatusHelp />
+                                </span>
+                                <span v-else-if="getHindcastTabIndex() === 5">
+                                    <LazyHindcastResultsHelp />
+                                </span>
+                                <span v-else-if="getHindcastTabIndex() === 6">
+                                    <LazyHindcastVerificationRunsHelp />
+                                </span>
+                                <span v-else-if="getHindcastTabIndex() === 7">
+                                    <LazyHindcastVerificationRunStatusHelp />
+                                </span>
+                                <span v-else-if="getHindcastTabIndex() === 8">
+                                    <LazyHindcastVerificationResultsHelp />
                                 </span>
                             </div>
                         </div>
@@ -165,12 +184,11 @@
     <div id="ErrorLogOverlay" class="hidden" ref="errorOverlay">
         <LazyErrorLog />
     </div>
-
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter, onBeforeRouteLeave } from "vue-router";
 import ContextMenu from 'primevue/contextmenu';
 import Swal from 'sweetalert2';
 
@@ -180,12 +198,19 @@ import { generalStore } from "@/stores/common/GeneralStore";
 import { useLogout, useLogoutListen } from "@/composables/UseEventBus";
 import { getErrorTextFromStatus } from "@/utils/CommonHelpers";
 
+import { useDialog } from "primevue/usedialog";
+import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
+
+const dialog = useDialog();
+const navDialogOpened = ref<boolean>(false);
+
 const LazyAboutBox = defineAsyncComponent(() => import("@/components/Common/AboutBox.vue"))
 const LazyErrorLog = defineAsyncComponent(() => import("@/components/Common/ErrorLog.vue"))
 const LazyUserAccount = defineAsyncComponent(() => import("@/components/Common/UserAccount.vue"))
 
 // Lazy Load for Help Files
 const LazyHelpLandingPageHelp = defineAsyncComponent(() => import("@/components/Help/LandingPageHelp.vue"))
+const LazyHelpDownloadCliPageHelp = defineAsyncComponent(() => import("@/components/Help/DownloadCliPageHelp.vue"))
 
 // Calibration Workflow Help Files
 const LazyCalibrationHelpPreviousRunsHelp = defineAsyncComponent(() => import("@/components/Help/Calibration/PreviousRunsHelp.vue"))
@@ -205,16 +230,30 @@ const LazyEvaluationRunStatusHelp = defineAsyncComponent(() => import("@/compone
 // Forecast Workflow Help Files
 const LazyForecastCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/CalibrationRunsHelp.vue"));
 const LazyForecastForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ForecastRunsHelp.vue"));
-const LazyForecastResultsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
 const LazyForecastSetupForecastHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/SetupForecastHelp.vue"));
 const LazyForecastRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/RunStatusHelp.vue"));
+const LazyForecastResultsHelp = defineAsyncComponent(() => import("@/components/Help/Forecast/ResultsHelp.vue"));
 
-// Forecast Workflow Help Files
-const LazyVerificationForecastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/ForecastRunsHelp.vue"));
-const LazyVerificationVerificationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/VerificationRunsHelp.vue"));
-const LazyVerificationtRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Verification/RunStatusHelp.vue"));
-const LazyVerificationResultsHelp = defineAsyncComponent(() => import("@/components/Help/Verification/ResultsHelp.vue"));
+// Hindcast Workflow Help Files
+const LazyHindcastCalibrationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/CalibrationRunsHelp.vue"));
+const LazyHindcastHindcastRunsHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/HindcastRunsHelp.vue"));
+const LazyHindcastSetupHindcastHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/SetupHindcastHelp.vue"));
+const LazyHindcastRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/RunStatusHelp.vue"));
+const LazyHindcastResultsHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/ResultsHelp.vue"));
+const LazyHindcastVerificationRunsHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/VerificationRunsHelp.vue"));
+const LazyHindcastVerificationRunStatusHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/VerificationRunStatusHelp.vue"));
+const LazyHindcastVerificationResultsHelp = defineAsyncComponent(() => import("@/components/Help/Hindcast/VerificationResultsHelp.vue"));
 
+const props = defineProps({
+  callTabValidator: {
+    type: Function,
+    required: false,
+  },
+  callTabRestore: {
+    type: Function,
+    required: false,
+  }
+});
 
 const { popupActive } = storeToRefs(generalStore());
 
@@ -224,23 +263,27 @@ const accountOverlay = ref();
 const aboutOverlay = ref();
 const errorOverlay = ref();
 
-const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getVerificationTabIndex } = generalStore();
+const { getMenuIndex, setMenuIndex, getCalibrationTabIndex, getEvaluationTabIndex, getForecastTabIndex, getHindcastTabIndex, validateCurrentTab } = generalStore();
 
 const { isUserLoggedIn, getUserInitials, setIsTokenExpired, getIsTokenExpired } = useUserDataStore();
 
 const { userInitials, lastServerError } = storeToRefs(useUserDataStore());
 
 const location = useRoute();
+const router = useRouter();
+const pendingRoute = ref<any>(null);
+const allowNavigation = ref<boolean>(false);
 
 const userLoggedIn = ref<boolean>();
 
 import pdfUrl from '@/assets/styles/pdfs/NGWPC_NgenCERF_Users_Guide.pdf';
 
 const userItems = ref([
-    { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() },
     { label: 'Account', icon: 'pi pi-fw-times', command: () => gotoAccount() },
+    { label: 'About', icon: 'pi pi-fw-times', command: () => aboutBox() },
     { label: 'Notifications', icon: 'pi pi-fw-times', command: () => errorLog() },
     { label: 'Users Guide', icon: 'pi pi-fw-times', command: () => window.open(pdfUrl, '_blank') },
+    { label: 'Download CLI', icon: 'pi pi-fw-times', command: () => navigateTo("DownloadCli") },
     { label: 'Logout', icon: 'pi pi-fw-times', command: () => logoutUser() }
 ])
 
@@ -345,6 +388,7 @@ const errorLog = async () => {
     setTimeout(function () { sizeLogWindow() }, 0);
 }
 
+
 useAccountEventListen('accountEvent', () => {
     const ele = document.getElementById('UserAccountOverlay') as HTMLElement;
     ele.style.display = "none";
@@ -410,26 +454,89 @@ const displayHelp = () => {
     }
 }
 
-const MenuChanged = (e: MouseEvent) => {
-    nextTick(() => {
-        const currentMenu = getMenuIndex();
-        let ele = e.currentTarget as HTMLElement;
-        if (!ele) {
-            ele = e.target as HTMLElement;
-        }
-        const m = ele.getAttribute('data-menu');
-        const tabs = document.getElementsByClassName("tabs");
-        const tab = <HTMLElement>tabs[0];
-        if (m && e) {
-            if (currentMenu && currentMenu.toString() === m) {
-                if (tab) { tab.click(); }
-            } else {
-                setMenuIndex(parseInt(m, 10));
-            }
-        }
-    });
+onBeforeRouteLeave(async(to, from) => {
+  // IMPORTANT:
+  // allow the second navigation attempt through
+  if (allowNavigation.value) {
+    allowNavigation.value = false
+    setMenuIndexByRoute(to.path.split('/')[1]);
+    return true
+  }
+
+  const errors = await validateCurrentTab()
+
+  if (!errors.error) {
+    setMenuIndexByRoute(to.path.split('/')[1]);
+    return true
+  }
+
+  pendingRoute.value = to
+
+  showTabNavDialog(errors.text)
+
+  return false
+})
+
+const setMenuIndexByRoute = (path: string) => {
+  switch(path) {
+    case 'calibration':
+      setMenuIndex(1);
+      break;
+    case 'evaluation':
+      setMenuIndex(2);
+      break;
+    case 'forecast':
+      setMenuIndex(3);
+      break;
+    case 'hindcast':
+      setMenuIndex(4);
+      break;
+    default:
+      setMenuIndex(0);
+      break;
+  }
 }
 
+const showTabNavDialog = (body: string[]) => {
+  if (navDialogOpened.value) return
+
+  navDialogOpened.value = true
+
+  dialog.open(MoveNextPrevDialog, {
+    props: {
+      header: 'Unsaved changes!',
+      modal: true,
+      style: {
+        width: 'auto'
+      }
+    },
+
+    data: {
+      body,
+      direction: true
+    },
+
+    onClose: async (opt) => {
+
+      navDialogOpened.value = false
+
+      if (opt?.data?.moveToNextResponse && pendingRoute.value) {
+
+        if (props.callTabRestore) {
+          props.callTabRestore()
+        }
+
+        // bypass next guard execution
+        allowNavigation.value = true
+
+        const route = pendingRoute.value
+        pendingRoute.value = null
+
+        await router.push(route.fullPath)
+      }
+    }
+  })
+}
 </script>
 
 <style lang="scss" scoped>

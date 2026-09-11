@@ -29,12 +29,40 @@
 
               </template>
             </Listbox>
-            <div class="pt-4 pl-2" v-if="selectedModuleValues.some(item => item.toLowerCase() === 'cfe-s') || selectedModuleValues.some(item => item.toLowerCase() === 'cfe-x')">
-              <Checkbox id="isAETRootzone" inputId="isAETRootzone" class="h-5 w-5 mr-3" style="display:inline-block"
-                :binary="true" v-model="isAETRootzone" aria-label="CFE AET Rootzone Checkbox"
-                title="CFE AET Rootzone Checkbox" @change="isAETRootzoneHasChanged = true" 
-                :disabled="disableAll || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"/>
-              <label for="isAETRootzone" class="inline">CFE AET Rootzone</label>
+            <div class="pt-4 pl-2" v-for="(module, m) in moduleProperties" :key="m">
+              <div class="font-bold text-lg">{{ module.name }}:</div>
+              <div v-for="(property, p) in module.properties" :key="p">
+                <span v-if="property.data_type === 'boolean'">
+                  <Checkbox :id="property.name + '_' + m" :inputId="property.name + '_' + m" 
+                    class="h-5 w-5 mr-3" style="display:inline-block" :binary="true"
+                    :title="module.name + ' ' + property.display_name + ' Checkbox'" 
+                    :aria-label="module.name + ' ' + property.display_name + ' Checkbox'"
+                    v-model="property.value" true-value="true" false-value="false"
+                    @change="modulePropertiesHaveChanged = true" 
+                    :disabled="disableAll || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"/>
+                </span>
+                <label :for="property.name" :class="'inline' + (property.data_type !== 'boolean' ? ' required-label' : '')">{{ property.display_name }}</label>
+                <span v-if="property.choices">
+                  <Select :id="property.name + '_' + m"
+                    :title="module.name + ' ' + property.display_name + ' Select'" 
+                    :aria-label="module.name + ' ' + property.display_name + ' Select'"
+                    v-model="property.value"
+                    :options="property.choices" optionLabel="label" optionValue="value"
+                    @change="modulePropertiesHaveChanged = true" 
+                    :disabled="disableAll || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
+                  </Select>
+                </span>
+                <span v-else-if="property.data_type !== 'boolean'">
+                  <input :type="property.data_type === 'string' ? 'text' : 'number'" 
+                    :step="property.data_type === 'double' ? 'any' : null"
+                    :id="property.name + '_' + m"
+                    :title="module.name + ' ' + property.display_name + ' Input'" 
+                    :aria-label="module.name + ' ' + property.display_name + ' Input'"
+                    v-model="property.value"
+                    @input="modulePropertiesHaveChanged = true" 
+                    :disabled="disableAll || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">
+                </span>
+              </div>
             </div>
           </div>
           <div class="col-span-2">&nbsp;</div>
@@ -74,89 +102,12 @@
           </div>
           <div class="col-span-1">&nbsp;</div>
         </div>
-        <!--        <div class="mt-3 mb-5 hr"></div> -->
       </div>
-      <!--
-      /* Don't Display this implemented SLoTH capability until available to send SLoTH variables to ngen-cal */
-      <div class="row-span-2 -mt-2">
-
-        <div class="flex">
-          <span class="text-left pt-1">
-            <input type="checkbox" id="SlothCheck" class="ml-2" v-model="useSlothParameters" />
-            <label class="inline-block text-[18px]" for="SlothCheck">&nbsp;Add SLoTH output variable for
-              formulation</label>
-          </span>
-          <span v-show="useSlothParameters" class="ml-auto pr-2">
-            <label class="inline-block  text-[16px] pl-10 pr-4" for="SlothName">SLoTH Name</label>
-            <input class="inline-block w-auto" id="SlothName" type="text" v-model="new_sloth_variable_name"
-              @keypress="addSlothOnEnter($event)">
-            <div class="ngenButtonDiv ml-3 inline-block">
-              <Button id="SlothAddBtn" @click="addSlothVariable">Add</Button>
-            </div>
-          </span>
-        </div>
-
-        <div id="SlothDataTable" v-show="useSlothParameters"
-          class="items-center pl-2 pr-2 mt-2 overflow-auto max-h-[157px]">
-
-          <ContextMenu :pt="{ root: { id: 'loth-param-context-menu' } }" class="bg-white" ref="slothParamContextMenu"
-            :model="cmSlothParameterData"></ContextMenu>
-          <DataTable class="stripe" id="sloth-params-list" :value="slothParameterInputs" editMode="cell" scrollable
-            scroll-height="157px" table-style="min-width: 50rem" v-model:selection="selectedSlothParameterData"
-            selectionMode="single" contextMenu v-model:contextMenuSelection="selectedSlothParameterData"
-            @rowContextmenu="onRowContextMenu">
-            <Column :pt="ptColumn" field="param_name" header="SLoTH Output Var" sortable></Column>
-            <Column :pt="ptColumn" field="param_count" header="Count" sortable>
-              <template #editor="{ index }">
-                <InputNumber v-model="slothParameterInputs[index].param_count" autofocus class="w-12 p-1">
-                </InputNumber>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="param_type" header="Type" sortable>
-              <template #editor="{ index }">
-                <Select v-model="slothParameterInputs[index].param_type"
-                  :options="fetchFormulationSlothParameterTypeOptions" optionLabel="name" optionValue="name"></Select>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="param_units" header="Units" sortable>
-              <template #editor="{ index }">
-                <Select v-model="slothParameterInputs[index].param_units"
-                  :options="fetchFormulationSlothParameterUnitOptions" optionLabel="name" optionValue="name"></Select>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="param_location" header="Location" sortable>
-              <template #editor="{ index }">
-                <InputText v-model="slothParameterInputs[index].param_location" autofocus class="w-20 p-1">
-                </InputText>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="maps_to_module" header="For Module" sortable>
-              <template #editor="{ index }">
-                <Select v-model="slothParameterInputs[index].maps_to_module" filter
-                  :options="fetchSelectedFormulationModuleOptions" optionLabel="name" optionValue="name"></Select>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="maps_to_variable_name" header="Module Param" sortable>
-              <template #editor="{ index }">
-                <InputText v-model="slothParameterInputs[index].maps_to_variable_name" autofocus fluid>
-                </InputText>
-              </template>
-            </Column>
-            <Column :pt="ptColumn" field="param_value" header="Value" sortable>
-              <template #editor="{ index }">
-                <InputNumber v-model="slothParameterInputs[index].param_value" autofocus :minFractionDigits="0"
-                  :maxFractionDigits="2" class="w-12 p-1" fluid>
-                </InputNumber>
-              </template>
-            </Column>
-          </DataTable>
-        </div>
-      </div>
--->
       <div id="FormulationBottomButtons" class="grid grid-cols-8 mt-3 ActionButtonsBox">
         <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
           <div class="col-span-1 mr-6 h-8" @click="saveFormulationData()">
-            <Button class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button">
+            <Button class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button"
+              :disabled="isLoading">
               Save
             </Button>
           </div>
@@ -167,10 +118,10 @@
           </div>
         </span>
 
-        <span v-if="modulesHaveChanged || isAETRootzoneHasChanged">
+        <span v-if="modulesHaveChanged || modulePropertiesHaveChanged">
           <div class="col-span-1 mr-3">
             <Button class="ngenButtonDiv-yellow" title="Revert Changes" @click="restoreTab()"
-              aria-label="Revert Changes">Revert</Button>
+              aria-label="Revert Changes" :disabled="isLoading">Revert</Button>
           </div>
         </span>
         <span v-else>
@@ -180,11 +131,11 @@
         <div class="col-span-4">&nbsp;</div>
         <div class="col-span-1">
           <Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
-            aria-label="Previous Tab Button" @click="goPrevTab()">Prev</Button>
+            aria-label="Previous Tab Button" @click="goPrevTab()" :disabled="isLoading">Prev</Button>
         </div>
         <div class="col-span-1 mr-4">
           <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
-            @click="goNextTab()">Next</Button>
+            @click="goNextTab()" :disabled="isLoading">Next</Button>
         </div>
 
       </div>
@@ -202,7 +153,7 @@ import { storeToRefs } from "pinia";
 import { useDialog } from "primevue/usedialog";
 import { useToast } from "primevue/usetoast";
 
-import type { SlothParameterData } from '@/composables/NgencerfModels';
+import type { ModulePropertyData, SlothParameterData } from '@/composables/NgencerfModels';
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 
@@ -228,6 +179,7 @@ const dialog = useDialog();
 const nextPrevDialogOpened = ref<boolean>(false);
 import { useCalibrationFormulationTabSaveWarning, useApiErrorResponsePreprocess,useApiResponseToastSeverityLife } from "@/composables/ValidationHandlers";
 import type { ListboxChangeEvent } from "primevue/listbox";
+import { setProperty } from "@primeuix/styled";
 
 const new_sloth_variable_name = ref<string>("")
 const selectedSlothParameterData = ref<SlothParameterData>()
@@ -249,7 +201,7 @@ const {
   filterGroup,
   useSlothParameters,
   selectedModuleValues,
-  isAETRootzone,
+  modulePropertyInputs,
   slothParameterInputs,
   fetchFormulationModuleOptions,
   fetchFormulationModuleCoveredGroupFilterOptions,
@@ -257,6 +209,7 @@ const {
   fetchFormulationSlothParameterTypeOptions,
   fetchFormulationSlothParameterUnitOptions,
   fetchSelectedFormulationModuleOptions,
+  moduleProperties,
   formulationInfoMessages,
   formulationErrorMessages,
   formulationWarningMessages,
@@ -287,8 +240,19 @@ const { submitTimeDate } = storeToRefs(useRunStatusStore());
 let mainLeftAreaElement: HTMLElement | null = null;
 let dataTableElement: HTMLElement | null = null;
 
+const props = defineProps({
+  callGoToTab: {
+    type: Function,
+    required: false,
+  },
+  callNavDialog: {
+    type: Function,
+    required: false,
+  },
+});
+
 const toast = useToast();
-const isAETRootzoneHasChanged = ref<boolean>(false);
+const modulePropertiesHaveChanged = ref<boolean>(false);
 
 onMounted(async() => {
   if (calibrationJobId.value) {
@@ -380,19 +344,12 @@ const resetModuleList = () => {
       modulesHaveChanged.value = false;
     }
   }
-  if (userCalibrationRunData?.value?.is_aet_rootzone) {
-    isAETRootzone.value = userCalibrationRunData.value.is_aet_rootzone;
-  }
 }
 
 /**
 * event bus for calibration button group click
 */
 const saveFormulationData = () => {
-  // de-select AET Rootzone if formulation does not include CFE
-  if (!selectedModuleValues.value.some(item => item.toLowerCase() === 'cfe-s') && !selectedModuleValues.value.some(item => item.toLowerCase() === 'cfe-x')) {
-    isAETRootzone.value = false;
-  }
   if (!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.value?.status)) {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Unable to Save', detail: 'Update of a job already run is not allowed. Please clone to make any changes for a new calibration', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
@@ -407,73 +364,88 @@ const saveFormulationData = () => {
     toast.add(tMsg); addToastRecord(tMsg);
   } else {
     toast.removeAllGroups();
-    // Only validate changes if this isn't a new configuration
-    if (userCalibrationRunData?.value?.modules && userCalibrationRunData?.value?.modules.length > 1) {
-      var valOK = validateModules();
-      if (!valOK) {
-        modulesHaveChanged.value = false;
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Tuning Paramters on the Tuning Control tab", life: ToastTimeout.timeoutInfo };
-        toast.add(tMsg); addToastRecord(tMsg);
-        clearCalibratableParameters();
-      }
-    }
 
-    saveFormulationTabData().then(response => {
-      if (response.status === 200) {
-        formulationIsCalibratable.value = true;
-        if (response._data.eds_errors) {
-          formulationIsCalibratable.value = false;
-          response._data.eds_errors.forEach((err: any) => {
-            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'External Formulation Error', detail: err.message, life: ToastTimeout.timeoutError };
-            toast.add(tMsg); addToastRecord(tMsg);
-          });
-        }
-        if (response._data.formulation_errors) {
-          formulationIsCalibratable.value = false;
-          response._data.formulation_errors.forEach((err: any) => {
-            const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Formulation Error', detail: err, life: ToastTimeout.timeoutError };
-            toast.add(tMsg); addToastRecord(tMsg);
-          });
-        }
-        if (response._data.formulation_warnings) {
-          response._data.formulation_warnings.forEach((err: any) => {
-            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Formulation Warning', detail: err, life: ToastTimeout.timeoutWarn };
-            toast.add(tMsg); addToastRecord(tMsg);
-          });
-        }
-        const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Data Saved', detail: response?._data?.message, life: ToastTimeout.timeoutInfo };
+    let modulePropertyErrors = validateModuleProperties();
+    if (modulePropertyErrors.length > 0) {
+      modulePropertyErrors.forEach((err: any) => {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Module Property Error', detail: err, life: ToastTimeout.timeoutError };
         toast.add(tMsg); addToastRecord(tMsg);
-        isLoading.value = false;
-        modulesHaveChanged.value = false;
-        isAETRootzoneHasChanged.value = false;
-        updateJobData();
-      } else {
-        isLoading.value = false;
-        useApiErrorResponsePreprocess(response).forEach(message => {
-          let msgSummary = '';
-          switch(useApiResponseToastSeverityCode(response?.status)) {
-            case 'error':
-              msgSummary = 'Save Formulation Data Failed';
-              break;
-            case 'warn':
-              msgSummary = 'Formulation Accepted with Notices';
-              break;
-            case 'success':
-              msgSummary = 'Formulation Accepted';
-              break;
-          }
-          const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: msgSummary, detail: message, life: useApiResponseToastSeverityLife(response?.status) };
+      });
+    } else {
+      // Only validate changes if this isn't a new configuration
+      if (userCalibrationRunData?.value?.modules && userCalibrationRunData?.value?.modules.length > 1) {
+        var valOK = validateModules();
+        if (!valOK) {
+          modulesHaveChanged.value = false;
+          const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Modules have changed', detail: "You may need to update the Tuning Parameters on the Tuning Control tab", life: ToastTimeout.timeoutInfo };
           toast.add(tMsg); addToastRecord(tMsg);
-        });
+          clearCalibratableParameters();
+        }
       }
-    });
+
+      saveFormulationTabData().then(async response => {
+        if (response.status === 200) {
+          formulationIsCalibratable.value = true;
+          if (response._data.eds_errors) {
+            formulationIsCalibratable.value = false;
+            response._data.eds_errors.forEach((err: any) => {
+              const tMsg: ToastMessageOptions = { severity: 'error', summary: 'External Formulation Error', detail: err.message, life: ToastTimeout.timeoutError };
+              toast.add(tMsg); addToastRecord(tMsg);
+            });
+          }
+          if (response._data.formulation_errors) {
+            formulationIsCalibratable.value = false;
+            response._data.formulation_errors.forEach((err: any) => {
+              const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Formulation Error', detail: err, life: ToastTimeout.timeoutError };
+              toast.add(tMsg); addToastRecord(tMsg);
+            });
+          }
+          if (response._data.formulation_warnings) {
+            response._data.formulation_warnings.forEach((err: any) => {
+              const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Formulation Warning', detail: err, life: ToastTimeout.timeoutWarn };
+              toast.add(tMsg); addToastRecord(tMsg);
+            });
+          }
+          if (response._data.validation_errors) {
+            response._data.validation_errors.forEach((err: any) => {
+              const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Validation Error', detail: err, life: ToastTimeout.timeoutError };
+              toast.add(tMsg); addToastRecord(tMsg);
+            });
+          }
+          const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Formulation Data Saved', detail: response?._data?.message, life: ToastTimeout.timeoutInfo };
+          toast.add(tMsg); addToastRecord(tMsg);
+          isLoading.value = false;
+          modulesHaveChanged.value = false;
+          modulePropertiesHaveChanged.value = false;
+          updateJobData();
+          await fetchUserCalibrationRunData();
+        } else {
+          isLoading.value = false;
+          useApiErrorResponsePreprocess(response).forEach(message => {
+            let msgSummary = '';
+            switch(useApiResponseToastSeverityCode(response?.status)) {
+              case 'error':
+                msgSummary = 'Save Formulation Data Failed';
+                break;
+              case 'warn':
+                msgSummary = 'Formulation Accepted with Notices';
+                break;
+              case 'success':
+                msgSummary = 'Formulation Accepted';
+                break;
+            }
+            const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: msgSummary, detail: message, life: useApiResponseToastSeverityLife(response?.status) };
+            toast.add(tMsg); addToastRecord(tMsg);
+          });
+        }
+      });
+    }
   }
 }
 
 const updateJobData = () => {
   if (userCalibrationRunData.value) {
     userCalibrationRunData.value.modules = saveFormulationPayload.value.modules as string[];
-    userCalibrationRunData.value.is_aet_rootzone = saveFormulationPayload.value.is_aet_rootzone;
     userCalibrationRunData.value.sloth_parameters = saveFormulationPayload.value.sloth_parameters as [];
     userCalibrationRunData.value.use_sloth = saveFormulationPayload.value.use_sloth as boolean;
     userCalibrationRunData.value.last_updated_on = formatISOStringOrDateToYYYYMMDDHHMM(nowUTC());
@@ -491,7 +463,35 @@ const validateModules = () => {
   return userCalibrationRunData?.value?.modules !== null && arraysEqual(selectedModuleValues.value, userCalibrationRunData?.value?.modules);
 }
 
-const validateTab = () => {
+const validateModuleProperties = () => {
+  let errors = [];
+  // clear modulePropertyInputs - we'll add to it as properties are validated
+  modulePropertyInputs.value = [];
+  moduleProperties.value.forEach((module: any) => {
+    module.properties.forEach((property: any) => {
+      modulePropertyInputs.value.push({
+        module: module.name,
+        property_name: property.name,
+        property_value: property.value
+      })
+
+      if (!property.value || property.value === '') {
+        errors.push(module.name + ': ' + property.display_name + ' is Required');
+      } else if (property.choices && !property.choices.find(choice => choice.value === property.value)) {
+        errors.push(module.name + ': ' + property.display_name + ' has an invalid selection');
+      } else if (property.data_type === 'boolean' && !['true','false'].includes(property.value)) {
+        errors.push(module.name + ': ' + property.display_name + ' must be True or False');
+      } else if (property.data_type === 'integer' && !Number.isInteger(parseInt(property.value))) {
+        errors.push(module.name + ': ' + property.display_name + ' must be an integer');
+      } else if (property.data_type === 'double' && typeof parseFloat(property.value) !== 'number') {
+        errors.push(module.name + ': ' + property.display_name + ' must be numeric');
+      }
+    });
+  });
+  return errors;
+}
+
+const validateTab = (tabNumber?: number) => {
   let error = false;
   let text = [];
   /* check if list of modules changed */
@@ -524,10 +524,10 @@ const validateTab = () => {
       text.push("LSTM can only be paired with T-Route");
     }
   }
-  /* Has user checked/unchecked AET Rootzone? */
-  if (isAETRootzoneHasChanged.value) {
+  /* Have Module Properties changed? */
+  if (modulePropertiesHaveChanged.value) {
     error = true;
-    text.push("CFE AET Rootzone has changed");
+    text.push("Module Properties have changed");
   }
   /* Has user checked/unchecked Add SLoTH output variables? */
   if (useSlothParameters.value !== userCalibrationRunData?.value?.use_sloth) {
@@ -547,79 +547,34 @@ const restoreTab = () => {
   resetModuleList();
   updateFormulationValidRefs();
   if (userCalibrationRunData.value) {
-    isAETRootzone.value = userCalibrationRunData?.value?.is_aet_rootzone;
     useSlothParameters.value = userCalibrationRunData?.value?.use_sloth;
     slothParameterInputs.value = userCalibrationRunData?.value?.sloth_parameters;
-    isAETRootzoneHasChanged.value = false;
+    modulePropertiesHaveChanged.value = false;
   }
-}
-
-const gotoNext = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
-  e.click();
-}
-const gotoPrev = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[CalibrationTabs.tab_headwaterBasinGage];
-  e.click();
 }
 
 const goNextTab = () => {
   const errors = validateTab();
-  if (errors.error) {
-    showPrevNextDialog(errors.text, true);
-  } else {
-    gotoNext();
+  if (props.callNavDialog && errors.error) {
+    props.callNavDialog(errors.text, true, 4);
+  } else if (props.callGoToTab) {
+    props.callGoToTab(4);
   }
 };
 
 const goPrevTab = () => {
   const errors = validateTab();
-  if (errors.error) {
-    showPrevNextDialog(errors.text, false);
-  } else {
-    gotoPrev();
+  if (props.callNavDialog && errors.error) {
+    props.callNavDialog(errors.text, false, 2);
+  } else if (props.callGoToTab) {
+    props.callGoToTab(2);
   }
 };
 
-const showPrevNextDialog = (body: string[], next: boolean) => {
-  if (!nextPrevDialogOpened.value) {
-    dialog.open(MoveNextPrevDialog, {
-      props: {
-        header: "Unsaved changes!",
-        style: {
-          width: 'auto',
-        },
-        modal: true,
-      },
-      data: {
-        body: body,
-        direction: next
-      },
-      onClose: (opt) => {
-        nextPrevDialogOpened.value = false;
-        handleNextPrevDialogClose(opt);
-      },
-
-    })
-    nextPrevDialogOpened.value = true
-  }
-}
-
-const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data && opt.data.moveToNextResponse) {
-    restoreTab();
-    if (opt.data.goNext) {
-      gotoNext();
-    } else {
-      gotoPrev();
-    }
-  }
-  if (opt.type && opt.type === 'dialog-close') {
-    return;
-  }
-}
+defineExpose({
+  validateTab,
+  restoreTab
+});
 
 onUnmounted(() => {
   restoreTab();

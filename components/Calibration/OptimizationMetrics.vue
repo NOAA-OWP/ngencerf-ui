@@ -57,7 +57,7 @@
               <label for="ObjectiveFunction" class="required-label">Objective Function</label>
               <Select id="ObjectiveFunction" class="rounded-md" filter v-model="uiObjectiveFunction"
                 :options="getObjectiveFunctionOptionsList" optionLabel="display_name" optionValue="name" placeholder=""
-                @change="updateMetricFlowFieldVisibility" aria-label="Objective Function" title="Objective Function"
+                @change="updateMetricFlowFieldVisibility()" aria-label="Objective Function" title="Objective Function"
                 :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
               <div v-if="uiObjectiveFunction" class="ml-3 mt-2">
                 For {{ uiObjectiveFunction }} the Objective Function = 
@@ -68,21 +68,21 @@
                     )
                 }}
               </div>
-              <div v-if="showObjectiveFunctionStreamFlow" class="ml-3 mt-2">
-                Flow Threshold<span class="required-asterisk" aria-hidden="true">* </span>
-                <InputNumber inputId="ofCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
-                  :minFractionDigits="2" class="w-24" aria-label="Flow Threshold" title="Flow Threshold"
+              <div v-if="showObjectiveFunctionThresholdCategorical" class="ml-3 mt-2">
+                Categorical Threshold<span class="required-asterisk" aria-hidden="true">* </span>
+                <InputNumber inputId="uiThresholdCategorical" v-model="uiThresholdCategorical"
+                  :minFractionDigits="2" class="w-24" aria-label="Categorical Threshold" title="Categorical Threshold"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                   @input="handleOptimizationDataChange">
                 </InputNumber> m3/s
               </div>
-              <div v-if="showObjectiveFunctionPeakFlow" class="ml-3 mt-2">
-                Peak Flow Threshold<span class="required-asterisk" aria-hidden="true">* </span>
-                <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
-                  :minFractionDigits="2" class="w-24" aria-label="Peak Flow Threshold" title="Peak Flow Threshold"
+              <div v-if="showObjectiveFunctionThresholdEvent" class="ml-3 mt-2">
+                Event Threshold<span class="required-asterisk" aria-hidden="true">* </span>
+                <InputNumber inputId="ofEventBasedFlowThreshold" v-model="uiThresholdEvent"
+                  :minFractionDigits="2" class="w-24" aria-label="Event Threshold" title="Event Threshold"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                   @input="handleOptimizationDataChange">
-                </InputNumber> quantile
+                </InputNumber> percentile (0.0-100.0)
               </div>
             </div>
           </div>
@@ -90,39 +90,43 @@
           <div class="col-span-1">
             <div id="Metrics">
               <div class="font-bold">Metrics</div><br>
-              <Checkbox id="CalcCatMetCB" inputId="CalcCatMetCB" class="h-5 w-5 mr-3" style="display:inline-block"
-                :binary="true" v-model="cbIsCategorical" aria-label="Calculate Categorical Metrics Checkbox"
-                title="Calculate Categorical Metrics Checkbox"
-                :disabled="cbCategoricalDisabled ||!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
-                @change="toggleMetricStreamFlowInput" />
-              <label for="CalcCatMetCB" class="inline">Calculate Categorical Metrics</label>
-              <div class="pl-8">
-                <span class="text-sm ml-2">(POD, CSI, FAR)</span>
-              </div>
-              <div v-if="showMetricStreamFlow && !cbCategoricalDisabled" id="FlowThreshold" class="mt-2 pl-8">
-                Flow Threshold<span class="required-asterisk" aria-hidden="true">* </span>
-                <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiStreamFlowThreshold"
-                  :minFractionDigits="2" class="w-24" aria-label="Flow Threshold" title="Flow Threshold"
+              <span :style="`opacity: ${(cbCategoricalDisabled || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)) ? '50%' : '100%'}`">
+                <Checkbox id="CalcCatMetCB" inputId="CalcCatMetCB" class="h-5 w-5 mr-3" style="display:inline-block"
+                  :binary="true" v-model="cbIsCategorical" aria-label="Calculate Categorical Metrics Checkbox"
+                  title="Calculate Categorical Metrics Checkbox"
+                  :disabled="cbCategoricalDisabled || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                  @change="toggleMetricThresholdCategoricalInput" />
+                <label for="CalcCatMetCB" class="inline">Calculate Categorical Metrics</label>
+                <div class="pl-8">
+                  <span class="text-sm ml-2">(POD, CSI, FAR)</span>
+                </div>
+              </span>
+              <div v-if="showMetricThresholdCategorical && !cbCategoricalDisabled" id="FlowThreshold" class="mt-2 pl-8">
+                Categorical Threshold<span class="required-asterisk" aria-hidden="true">* </span>
+                <InputNumber inputId="metricCategoricalFlowThreshold" v-model="uiThresholdCategorical"
+                  :minFractionDigits="2" class="w-24" aria-label="Categorical Threshold" title="Categorical Threshold"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                   @input="handleOptimizationDataChange"></InputNumber> m3/s
               </div><br />
-
-              <Checkbox id="CalEventMetCB" inputId="CalEventMetCB" class="h-5 w-5 mr-3 inline"
-                style="display:inline-block" :binary="true" v-model="cbIsEventBased"
-                aria-label="Calculate Event Based Metrics Checkbox" title="Calculate Event Based Metrics Checkbox"
-                :disabled="cbEventBasedDisabled || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
-                @change="toggleMetricPeakFlowInput" />
-              <label for="CalEventMetCB" class="inline">Calculate Event Based Metrics</label>
-              <div class="pl-8">
-                <span class="text-sm ml-2">(PKBIAS, PKTE, EVBIAS)</span>
-              </div>
-              <div v-if="showMetricPeakFlow && !cbEventBasedDisabled" id="FlowThreshold" class="mt-2 pl-8">
-                Peak Flow Threshold<span class="required-asterisk" aria-hidden="true">* </span>
-                <InputNumber inputId="metricEventBasedFlowThreshold" v-model="uiPeakFlowThreshold"
-                  :minFractionDigits="2" class="w-24" aria-label=" Peak Flow Threshold" title=" Peak Flow Threshold"
+              
+              <span :style="`opacity: ${(cbEventBasedDisabled || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)) ? '50%' : '100%'}`">
+                <Checkbox id="CalEventMetCB" inputId="CalEventMetCB" class="h-5 w-5 mr-3 inline"
+                  style="display:inline-block" :binary="true" v-model="cbIsEventBased"
+                  aria-label="Calculate Event Based Metrics Checkbox" title="Calculate Event Based Metrics Checkbox"
+                  :disabled="cbEventBasedDisabled || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                  @change="toggleMetricThresholdEventInput" />
+                <label for="CalEventMetCB" class="inline">Calculate Event Based Metrics</label>
+                <div class="pl-8">
+                  <span class="text-sm ml-2">(PKBIAS, PKTE, EVBIAS)</span>
+                </div>
+              </span>
+              <div v-if="showMetricThresholdEvent && !cbEventBasedDisabled" id="ThresholdEvent" class="mt-2 pl-8">
+                Event Threshold<span class="required-asterisk" aria-hidden="true">* </span>
+                <InputNumber inputId="uiThresholdEvent" v-model="uiThresholdEvent" :min="0" :max="100" 
+                  :minFractionDigits="2" class="w-24" aria-label=" Event Threshold" title=" Event Threshold"
                   :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                   @input="handleOptimizationDataChange"></InputNumber>
-                quantile
+                percentile (0.0-100.0)
               </div>
             </div>
           </div>
@@ -171,7 +175,7 @@
         <div class="col-span-1 mr-6 h-8">
           <Button v-if="!userCalibrationRunData?.modules?.includes('LSTM')" 
             class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button"
-            @click="saveOptMetData()">
+            @click="saveOptMetData()" :disabled="isLoading || optimizationStore_data_loading">
             Save
           </Button>
         </div>
@@ -184,17 +188,17 @@
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1">
           <Button v-if="optMetDataHasChanged && !userCalibrationRunData?.modules?.includes('LSTM')" class="ngenButtonDiv-yellow" title="Revert All Changes"
-            @click="restorePage()" aria-label="Revert All Changes">Revert</Button>
+            @click="restoreTab()" aria-label="Revert All Changes" :disabled="isLoading || optimizationStore_data_loading">Revert</Button>
         </div>
       </span>
       <div class="col-span-4">&nbsp;</div>
       <div class="col-span-1">
         <Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
-          aria-label="Previous Tab Button" @click="goPrevTab()">Prev</Button>
+          aria-label="Previous Tab Button" @click="goPrevTab()" :disabled="isLoading || optimizationStore_data_loading">Prev</Button>
       </div>
       <div class="col-span-1 mr-4">
         <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
-          @click="goNextTab()">Next</Button>
+          @click="goNextTab()" :disabled="isLoading || optimizationStore_data_loading">Next</Button>
       </div>
 
     </div>
@@ -233,15 +237,15 @@ const {
   uiObjectiveFunction,
   uiOptimization,
   uiOptimizationInputs,
-  uiPeakFlowThreshold,
+  uiThresholdEvent,
   uiPlotFrequency,
   uiStopCriteria,
-  uiStreamFlowThreshold,
+  uiThresholdCategorical,
   optimizationStore_data_loading,
   getOptimizationAlgorithmOptionsList,
   getObjectiveFunctionOptionsList,
-  showObjectiveFunctionPeakFlow,
-  showObjectiveFunctionStreamFlow,
+  showObjectiveFunctionThresholdEvent,
+  showObjectiveFunctionThresholdCategorical,
   getOptimizationInputUserData,
   optMetDataHasChanged,
   algParamDataHasChanged,
@@ -257,13 +261,24 @@ const toast = useToast();
 const { isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
 
+const props = defineProps({
+  callGoToTab: {
+    type: Function,
+    required: false,
+  },
+  callNavDialog: {
+    type: Function,
+    required: false,
+  },
+});
+
 const selectedMetric = ref<OptimizationMetricData>();
 const cbCategoricalDisabled = ref<boolean>(false);
 const cbEventBasedDisabled = ref<boolean>(false);
 const cbIsCategorical = ref<boolean>(false);
 const cbIsEventBased = ref<boolean>(false);
-const showMetricPeakFlow = ref<boolean>(false);
-const showMetricStreamFlow = ref<boolean>(false);
+const showMetricThresholdEvent = ref<boolean>(false);
+const showMetricThresholdCategorical = ref<boolean>(false);
 const ele = document.getElementById("MainLeftDataArea") as HTMLElement;
 
 onMounted(async() => {
@@ -272,7 +287,6 @@ onMounted(async() => {
   }
   setUserSelection();
   
-  hilightTab(CalibrationTabs.tab_optimizationMetrics);
   toast.removeAllGroups();
   if (ele) { ele.scrollTo(0, 0); }
   
@@ -282,17 +296,21 @@ onMounted(async() => {
 
   updateMetricFlowFieldVisibility();
 
-  if (userCalibrationRunData.value?.streamflow_threshold) {
+  if (userCalibrationRunData.value?.threshold_categorical) {
     cbIsCategorical.value = true;
-    showMetricStreamFlow.value = true;
-    uiStreamFlowThreshold.value = userCalibrationRunData.value?.streamflow_threshold;
+    showMetricThresholdCategorical.value = true;
+    uiThresholdCategorical.value = userCalibrationRunData.value?.threshold_categorical;
   }
 
-  if (userCalibrationRunData.value?.peak_flow_threshold) {
+  if (userCalibrationRunData.value?.threshold_event) {
     cbIsEventBased.value = true;
-    showMetricPeakFlow.value = true;
-    uiPeakFlowThreshold.value = userCalibrationRunData.value?.peak_flow_threshold;
+    showMetricThresholdEvent.value = true;
+    uiThresholdEvent.value = userCalibrationRunData.value?.threshold_event;
   }
+
+  nextTick(() => {
+    hilightTab(CalibrationTabs.tab_optimizationMetrics);
+  });
 
   isLoading.value = false;
 })
@@ -301,45 +319,45 @@ onMounted(async() => {
  * update objective function and metric peak flow/stream flow field visibility
  */
 const updateMetricFlowFieldVisibility = () => {
-  //reset toggleable field available property
-  cbCategoricalDisabled.value = false;
-  cbEventBasedDisabled.value = false;
-  showObjectiveFunctionStreamFlow.value = false;
-  showObjectiveFunctionPeakFlow.value = false;
-  uiStreamFlowThreshold.value = undefined;
-  uiPeakFlowThreshold.value = undefined;
-  showMetricStreamFlow.value = false;
-  showMetricPeakFlow.value = false;
-
   selectedMetric.value = optimizationTabData.value?.metrics.find(
     metric_data => metric_data.name === uiObjectiveFunction.value
   );
 
   if (selectedMetric.value) {
-    cbIsCategorical.value = selectedMetric?.value?.categorical ?? false;
-    cbIsEventBased.value = selectedMetric?.value?.event_based ?? false;
-
     if (selectedMetric?.value?.categorical === true) {
-      showObjectiveFunctionStreamFlow.value = true;
+      showObjectiveFunctionThresholdCategorical.value = true;
+      showMetricThresholdCategorical.value = false;
+      cbIsCategorical.value = true;
       cbCategoricalDisabled.value = true;
+    } else {
+      showObjectiveFunctionThresholdCategorical.value = false;
+      cbCategoricalDisabled.value = false;
+      // if the checkbox remains checked (e.g. carried over from a forced state), keep showing its threshold field
+      showMetricThresholdCategorical.value = cbIsCategorical.value;
     }
     if (selectedMetric?.value?.event_based === true) {
-      showObjectiveFunctionPeakFlow.value = true;
+      showObjectiveFunctionThresholdEvent.value = true;
+      showMetricThresholdEvent.value = false;
+      cbIsEventBased.value = true;
       cbEventBasedDisabled.value = true;
+    } else {
+      showObjectiveFunctionThresholdEvent.value = false;
+      cbEventBasedDisabled.value = false;
+      // if the checkbox remains checked (e.g. carried over from a forced state), keep showing its threshold field
+      showMetricThresholdEvent.value = cbIsEventBased.value;
     }
-    optMetDataHasChanged.value = true;
   }
 };
 
 /**
  * metric stream flow field visibility toggle 
  */
-const toggleMetricStreamFlowInput = () => {
+const toggleMetricThresholdCategoricalInput = () => {
   if (!cbCategoricalDisabled.value && cbIsCategorical.value) {
-    showMetricStreamFlow.value = true;
+    showMetricThresholdCategorical.value = true;
   } else if (!cbIsCategorical.value) {
-    showMetricStreamFlow.value = false;
-    uiStreamFlowThreshold.value = undefined;
+    showMetricThresholdCategorical.value = false;
+    uiThresholdCategorical.value = undefined;
   }
   optMetDataHasChanged.value = true;
 };
@@ -347,12 +365,12 @@ const toggleMetricStreamFlowInput = () => {
 /**
  * metric peak flow field visibility toggle 
  */
-const toggleMetricPeakFlowInput = () => {
+const toggleMetricThresholdEventInput = () => {
   if (!cbEventBasedDisabled.value && cbIsEventBased.value) {
-    showMetricPeakFlow.value = true;
+    showMetricThresholdEvent.value = true;
   } else if (!cbIsEventBased.value) {
-    showMetricPeakFlow.value = false;
-    uiPeakFlowThreshold.value = undefined;
+    showMetricThresholdEvent.value = false;
+    uiThresholdEvent.value = undefined;
   }
   optMetDataHasChanged.value = true;
 };
@@ -374,6 +392,7 @@ const handleAlgorithmParameterChange = () => {
  */
 const optimizationSelectChange = () => {
   uiOptimizationInputs.value = getOptimizationInputUserData.value;
+  algParamDataHasChanged.value = true;
   optMetDataHasChanged.value = true;
 };
 
@@ -383,20 +402,20 @@ const optimizationSelectChange = () => {
  */
 watch(() => optimizationStore_data_loading.value, (loading_status) => {
   if (selectedMetric?.value?.categorical === true) {
-    showObjectiveFunctionStreamFlow.value = true;
+    showObjectiveFunctionThresholdCategorical.value = true;
     cbCategoricalDisabled.value = true;
     cbIsCategorical.value = true;
-  } else if (!selectedMetric?.value?.categorical && uiStreamFlowThreshold.value) {
-    showMetricStreamFlow.value = true;
+  } else if (!selectedMetric?.value?.categorical && uiThresholdCategorical.value) {
+    showMetricThresholdCategorical.value = true;
     cbIsCategorical.value = true;
   }
 
   if (selectedMetric?.value?.event_based === true) {
-    showObjectiveFunctionPeakFlow.value = true;
+    showObjectiveFunctionThresholdEvent.value = true;
     cbEventBasedDisabled.value = true;
     cbIsEventBased.value = true;
-  } else if (!selectedMetric?.value?.event_based && uiPeakFlowThreshold.value) {
-    showMetricPeakFlow.value = true;
+  } else if (!selectedMetric?.value?.event_based && uiThresholdEvent.value) {
+    showMetricThresholdEvent.value = true;
     cbIsEventBased.value = true;
   }
 })
@@ -434,8 +453,8 @@ const updateJobData = () => {
     userCalibrationRunData.value.optimization_inputs = saveOptMetPayload.value.optimization_inputs as [];
     userCalibrationRunData.value.optimization = saveOptMetPayload.value.optimization ?? '';
     userCalibrationRunData.value.objective_function = saveOptMetPayload.value.objective_function as string;
-    userCalibrationRunData.value.streamflow_threshold = saveOptMetPayload.value.streamflow_threshold as number
-    userCalibrationRunData.value.peak_flow_threshold = saveOptMetPayload.value.peak_flow_threshold as number
+    userCalibrationRunData.value.threshold_categorical = saveOptMetPayload.value.threshold_categorical as number
+    userCalibrationRunData.value.threshold_event = saveOptMetPayload.value.threshold_event as number
     userCalibrationRunData.value.stop_criteria = saveOptMetPayload.value.stop_criteria as number
     userCalibrationRunData.value.save_plot_iteration_frequency = saveOptMetPayload.value.save_plot_iteration_frequency as number
     userCalibrationRunData.value.save_output_iteration = saveOptMetPayload.value.save_output_iteration as boolean
@@ -443,7 +462,7 @@ const updateJobData = () => {
   }
 };
 
-const validateTab = () => {
+const validateTab = (tabNumber?: number) => {
   let error = false;
   let text = [];
   if (!userCalibrationRunData?.value?.modules.includes('LSTM')) {
@@ -468,23 +487,19 @@ const validateTab = () => {
       error = true;
       text.push("Plot Generation Frequency has been changed");
     }
-    if (userCalibrationRunData?.value?.optimization_inputs?.length !== uiOptimizationInputs?.value?.length) {
+
+    if ((cbIsCategorical.value && !userCalibrationRunData.value?.threshold_categorical ) ||
+      (!cbIsCategorical.value && userCalibrationRunData.value?.threshold_categorical ) ||
+      (userCalibrationRunData?.value?.threshold_categorical || 0) !== (uiThresholdCategorical.value || 0)) {
       error = true;
-      text.push("Algorithm Parameters have been changed");
+      text.push("Calculate Categorical Metrics (Categorical Threshold) has been changed");
     }
 
-    if ((cbIsCategorical.value && !userCalibrationRunData.value?.streamflow_threshold ) ||
-      (!cbIsCategorical.value && userCalibrationRunData.value?.streamflow_threshold ) ||
-      (userCalibrationRunData?.value?.streamflow_threshold || 0) !== (uiStreamFlowThreshold.value || 0)) {
+    if ((cbIsEventBased.value && !userCalibrationRunData.value?.threshold_event ) ||
+      (!cbIsEventBased.value && userCalibrationRunData.value?.threshold_event ) ||
+      (userCalibrationRunData?.value?.threshold_event || 0) !== (uiThresholdEvent.value || 0)) {
       error = true;
-      text.push("Calculate Categorical Metrics (Flow Threshold) has been changed");
-    }
-
-    if ((cbIsEventBased.value && !userCalibrationRunData.value?.peak_flow_threshold ) ||
-      (!cbIsEventBased.value && userCalibrationRunData.value?.peak_flow_threshold ) ||
-      (userCalibrationRunData?.value?.peak_flow_threshold || 0) !== (uiPeakFlowThreshold.value || 0)) {
-      error = true;
-      text.push("Calculate Event Based Metrics (Peak Flow Threshold) has been changed");
+      text.push("Calculate Event Based Metrics (Event Threshold) has been changed");
     }
 
     if (algParamDataHasChanged.value) {
@@ -495,7 +510,7 @@ const validateTab = () => {
   return { error: error, text: text }
 }
 
-const restorePage = async () => {
+const restoreTab = async () => {
   await fetchUserCalibrationRunData();
   if (userCalibrationRunData.value) {
     uiOptimization.value = userCalibrationRunData?.value?.optimization;
@@ -503,22 +518,22 @@ const restorePage = async () => {
     uiObjectiveFunction.value = userCalibrationRunData?.value?.objective_function;
     uiStopCriteria.value = userCalibrationRunData?.value?.stop_criteria || 0;
     uiPlotFrequency.value = userCalibrationRunData?.value?.save_plot_iteration_frequency || 0;
-    if (userCalibrationRunData.value?.streamflow_threshold) {
+    if (userCalibrationRunData.value?.threshold_categorical) {
       cbIsCategorical.value = true;
-      showMetricStreamFlow.value = true;
-      uiStreamFlowThreshold.value = userCalibrationRunData.value?.streamflow_threshold;
+      showMetricThresholdCategorical.value = true;
+      uiThresholdCategorical.value = userCalibrationRunData.value?.threshold_categorical;
     } else {
       cbIsCategorical.value = false;
-      showMetricStreamFlow.value = false;
+      showMetricThresholdCategorical.value = false;
     }
 
-    if (userCalibrationRunData.value?.peak_flow_threshold) {
+    if (userCalibrationRunData.value?.threshold_event) {
       cbIsEventBased.value = true;
-      showMetricPeakFlow.value = true;
-      uiPeakFlowThreshold.value = userCalibrationRunData.value?.peak_flow_threshold;
+      showMetricThresholdEvent.value = true;
+      uiThresholdEvent.value = userCalibrationRunData.value?.threshold_event;
     } else {
       cbIsEventBased.value = false;
-      showMetricPeakFlow.value = false;
+      showMetricThresholdEvent.value = false;
     }
   }
   optMetDataHasChanged.value = false;
@@ -526,74 +541,30 @@ const restorePage = async () => {
 
 const goNextTab = () => {
   const errors = validateTab();
-  if (errors.error) {
-    showPrevNextDialog(errors.text, true);
-  } else {
-    gotoNext();
+  if (props.callNavDialog && errors.error) {
+    props.callNavDialog(errors.text, true, 6);
+  } else if (props.callGoToTab) {
+    props.callGoToTab(6);
   }
 };
 
 const goPrevTab = () => {
   const errors = validateTab();
-  if (errors.error) {
-    showPrevNextDialog(errors.text, false);
-  } else {
-    gotoPrev();
+  if (props.callNavDialog && errors.error) {
+    props.callNavDialog(errors.text, false, 4);
+  } else if (props.callGoToTab) {
+    props.callGoToTab(4);
   }
 };
 
-const gotoNext = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[CalibrationTabs.tab_runStatus];
-  e.click();
-}
-
-const gotoPrev = () => {
-  const tabs = document.getElementsByClassName("tabs");
-  const e = <HTMLElement>tabs[CalibrationTabs.tab_tuningControls];
-  e.click();
-}
-
-const showPrevNextDialog = (body: string[], next: boolean) => {
-  if (!nextPrevDialogOpened.value) {
-    dialog.open(MoveNextPrevDialog, {
-      props: {
-        header: "Unsaved changes!",
-        style: {
-          width: 'auto',
-        },
-        modal: true,
-      },
-      data: {
-        body: body,
-        direction: next
-      },
-      onClose: (opt) => {
-        nextPrevDialogOpened.value = false;
-        handleNextPrevDialogClose(opt);
-      },
-
-    })
-    nextPrevDialogOpened.value = true
-  }
-}
-
-const handleNextPrevDialogClose = (opt: any) => {
-  if (opt.data && opt.data.moveToNextResponse) {
-    restorePage();
-    if (opt.data.goNext) {
-      gotoNext();
-    } else {
-      gotoPrev();
-    }
-  }
-  if (opt.type && opt.type === 'dialog-close') {
-    return;
-  }
-}
+defineExpose({
+  validateTab,
+  restoreTab
+});
 
 onUnmounted(async () => {
   optMetDataHasChanged.value = false;
+  algParamDataHasChanged.value = false;
 })
 </script>
 

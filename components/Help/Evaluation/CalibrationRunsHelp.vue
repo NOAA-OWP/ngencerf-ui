@@ -26,6 +26,7 @@
                 <li>
                 If the <strong>Evaluate</strong> action is selected and the job has multiple validation runs, the table will display the associated validation runs.
                 <ul class="list-disc list-outside ml-6 space-y-0">
+                    <li>You can double-click as a shortcut for this same action.</li>
                     <li>When the "Associated Validation Runs" table appears, the <strong>View Calibration Runs</strong> button is automatically shown. Click it to return to the main Calibration Runs table.</li>
                     <li>Select a validation run, then right-click to access the available actions for that run.</li>
                 </ul>
@@ -42,6 +43,9 @@
             You can use any combination of filters; only jobs that match <strong>all active filters</strong> will be shown. 
             The table updates automatically as you select filters.
             </p>
+
+            <p><strong>Domain</strong></p>
+            <p class="mb-2">Select a single domains to show jobs with gages in that domain.</p>
 
             <p><strong>Headwater Basin Gage</strong></p>
             <p class="mb-2">Select a single gage to show jobs for that basin.</p>
@@ -134,7 +138,7 @@
                 <tr>
                     <td class="td1">Delete</td>
                     <td class="td2">Selecting this action will <strong>permanently delete the chosen calibration job</strong> along 
-                        with all associated validation, forecast, and verification jobs. All references to this 
+                        with all associated validation, forecast, hindcast, and verification jobs. All references to this 
                         job will also be removed from the database. <strong>This action cannot be undone.</strong> 
                         After deletion, you will remain on the current page.
                     </td>

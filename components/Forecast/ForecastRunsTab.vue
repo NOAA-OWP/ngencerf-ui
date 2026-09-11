@@ -21,11 +21,12 @@
             </h1>
           </div>
 
-          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
-            :show-gage="false" :show-modules="false" :show-archived="false"
+          <JobFilterDialog id="JobFilterDialog" job-type="Forecast" :disable-all="false" 
+            :show-modules="false" :show-archived="false"
             :totalSize="forecastRunListTotalSize" :totalPages="forecastRunListTotalPages"
             v-model:currentPage="forecastRunListCurrentPage"
-            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
+            @UpdateGageList="updateGageList()" ref="jobFilterRef" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="crContextMenu"
@@ -46,11 +47,11 @@
             v-model:sortField="forecastRunListSort.field" v-model:sortOrder="forecastRunListSort.direction"
             v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu"
-            class="boxed">
+            @row-dblclick="onRowDblClick($event)" class="boxed">
             <Column :pt="ptColumn" field="forecast_run_id" sortable>
               <template #header>
                 <div class="column-header">
-                  <span>Forecast</span><br /><span>ID</span>
+                  <span>Forecast</span><br /><span>Job ID</span>
                 </div>
               </template>
               <template #body="slotProps">
@@ -179,11 +180,12 @@
 import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
 
-import type { CalibrationRunForForecast, DataTableContextMenuOption, ForecastJob } from "@/composables/NgencerfModels";
+import type { DataTableContextMenuOption, ForecastJob } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 
 import { useForecastStore } from "@/stores/forecast/ForecastStore";
 import { generalStore } from "~/stores/common/GeneralStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
@@ -194,12 +196,12 @@ import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 const { isLoading } = storeToRefs(generalStore());
+const { uiGageList, userCalibrationRunData } = storeToRefs(useUserDataStore());
 
 const forecastStore = useForecastStore();
 const {
   forecastJobId,
   calibrationRunForForecast,
-  calibrationRunsForForecast,
   forecastRuns,
   forecastRunListPageSize,
   forecastRunListCurrentPage,
@@ -208,7 +210,8 @@ const {
   forecastRunListStartRow,
   forecastRunListEndRow,
   forecastRunListSort,
-  selectedForecastJob
+  selectedForecastJob,
+  forecastJobStatus
 } = storeToRefs(forecastStore);
 
 const {
@@ -217,23 +220,30 @@ const {
   loadSelectedCalibrationRun,
   setSelectedForecastRowData,
   getForecastJobs,
-  getCalibrationJobsForForecast,
   deleteForecastJob,
   resetUserSelectedForecastCalibrationRun,
-  hardResetForecastRunStatusStore,
-  resetFilters
+  hardResetForecastStore,
+  resetFilters,
+  fetchForecastGageList
 } = useForecastStore();
+
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
 const crContextMenu = ref(); //calibration run context menu
 
 const { addToastRecord } = generalStore();
 
+const props = defineProps({
+  callGoToTab: {
+    type: Function,
+    required: false,
+  }
+});
+
 // watch for sort order change - reset current page to 1
 watch(forecastRunListSort, async() => {
   forecastRunListCurrentPage.value = 1;
   await getForecastJobs();
-  await getCalibrationJobsForForecast();
 },{ deep: true });
 
 // Watch for page number changes in job list
@@ -242,7 +252,6 @@ watch(forecastRunListCurrentPage, async () => {
     console.log('ERROR: Page number ' + forecastRunListCurrentPage.value + ' out of bounds');
   } else {
     await getForecastJobs();
-    await getCalibrationJobsForForecast();
   }
 });
 
@@ -259,15 +268,12 @@ const onRowContextMenu = (event: any) => {
   if (selectedForecastJob && selectedForecastJob.value?.forecast_run_id === crRowData.forecast_run_id) {
     crContextMenu.value.show(event.originalEvent);
     setSelectedForecastRunId(parseInt(event.originalEvent.currentTarget.children[0].textContent));
-    if (crRowData.forecast_status === 'Saved') {
-      cmForecastRun.value.push({ label: 'Show Setup', icon: 'pi pi-bars', command: () => navigateToSetupForecast() });
-    }
-    cmForecastRun.value.push({ label: 'View Status', icon: 'pi pi-gauge', command: () => navigateToForecastRunStatus() });
+    cmForecastRun.value.push({ label: 'View Status', icon: 'pi pi-gauge', command: () => goToForecastRunStatus() });
     if (crRowData.forecast_status === 'Done') {
-      cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-chart-line', command: () => navigateToForecastResults() });
+      cmForecastRun.value.push({ label: 'View Results', icon: 'pi pi-chart-line', command: () => goToForecastResults() });
     }
     if (crRowData.calibration_run_id) {
-      cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => clearDataAndNavigateToSetupForecast() });
+      cmForecastRun.value.push({ label: 'Run New Forecast', icon: 'pi pi-chevron-circle-right', command: () => goToSetupForecast() });
       cmForecastRun.value.push({ label: 'View Calibration Details', icon: 'pi pi-list', command: () => viewCalibrationDetails(crRowData.calibration_run_id) })
     }
     if (crRowData.forecast_status !== 'Running') {
@@ -276,13 +282,21 @@ const onRowContextMenu = (event: any) => {
   }
 };
 
+const onRowDblClick = (event: any) => {
+  goToForecastRunStatus(event);
+}
+
 onMounted(async () => {
   isLoading.value = true;
   forecastJobId.value = undefined;
+  calibrationRunForForecast.value = undefined;
+  userCalibrationRunData.value = undefined;
+  selectedForecastJob.value = undefined;
+  forecastJobStatus.value = undefined;
   forecastRunListCurrentPage.value = 1;
 
   //reset Run/Status store in case we have running intervals
-  hardResetForecastRunStatusStore();
+  hardResetForecastStore();
 
   hilightTab(ForecastTabs.tab_forecastRuns);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
@@ -300,12 +314,15 @@ onMounted(async () => {
     // load forecastRuns
     await getForecastJobs();
 
-    // load calibrationRunsForForecast
-    await getCalibrationJobsForForecast();
+    updateGageList();
   });
 
   isLoading.value = false;
 });
+
+const updateGageList = async() => {
+  uiGageList.value = await fetchForecastGageList();
+}
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
   const rowData = event.data as ForecastJob;
@@ -325,62 +342,51 @@ const viewCalibrationDetails = async (calibration_run_id: number) => {
   })
 }
 
-const clearDataAndNavigateToSetupForecast = () => {
-  isLoading.value = true;
-
-  nextTick(async () => {
-    navigateToSetupForecast();
-  });
-};
-
-const navigateToSetupForecast = () => {
+const goToSetupForecast = (new_forecast: boolean=true) => {
   isLoading.value = true;
   nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Setup Forecast Tab"]');
-
-    if (e) {
-      // set calibrationRunForForecast based on selectedForecastJob
-      calibrationRunForForecast.value = calibrationRunsForForecast.value.find((calibrationRun: CalibrationRunForForecast) => {
-        return calibrationRun.calibration_run_id === selectedForecastJob.value?.calibration_run_id;
-      }) as CalibrationRunForForecast;
-
-      // set userCalibrationRunData
-      await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
+    // set userCalibrationRunData
+    await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
+    if (new_forecast) {
+      calibrationRunForForecast.value.forecast_run_id = undefined;
+      calibrationRunForForecast.value.forecast_status = undefined;
+      calibrationRunForForecast.value.configuration = undefined;
+      calibrationRunForForecast.value.cycle_date = undefined;
+      if (calibrationRunForForecast.value?.cold_start) {
+        calibrationRunForForecast.value.cold_start.cold_start_date = undefined;
+      }
       forecastJobId.value = undefined;
-      isLoading.value = false;
-      e.click();
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Setup Forecast Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
+    }
+    isLoading.value = false;
+    if (props.callGoToTab) {
+      props.callGoToTab(3);
+    }
+  });
+}
+
+const goToForecastRunStatus = (event: any=null) => {
+  isLoading.value = true;
+  if (event) {
+    setSelectedForecastRowData(event.data);
+  }
+  nextTick(async () => {
+    await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
+    if (props.callGoToTab) {
+      props.callGoToTab(4);
     }
     isLoading.value = false;
   });
 }
 
-const navigateToForecastRunStatus = () => {
+const goToForecastResults = (event: any=null) => {
   isLoading.value = true;
+  if (event) {
+    setSelectedForecastRowData(event.data);
+  }
   nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
-
-    if (e) {
-      await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
-      e.click();
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
-    }
-    isLoading.value = false;
-  });
-}
-
-const navigateToForecastResults = () => {
-  isLoading.value = true;
-  nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Results tab"]');
-
-    if (e) {
-      await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
-      e.click();
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
+    await loadSelectedCalibrationRun(selectedForecastJob?.value?.calibration_run_id as number);
+    if (props.callGoToTab) {
+      props.callGoToTab(5);
     }
     isLoading.value = false;
   });
@@ -418,7 +424,7 @@ const acceptDelete = (selectedRunId: number) => {
       resetSelectedForecastRunData();
     } else {
       useApiErrorResponsePreprocess(response).forEach(message => {
-        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Verification Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
+        const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Delete Forecast Job Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
         toast.add(tMsg); addToastRecord(tMsg);
       });
     }

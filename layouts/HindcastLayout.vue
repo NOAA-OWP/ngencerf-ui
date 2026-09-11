@@ -13,7 +13,7 @@
               <div class="grid row-span-12 white-tall-content-box">
                 <div id="MainLeftDataParent" class="overflow-auto">
                   <div id="MainLeftDataArea" class="overflow-auto"> 
-                    <VerificationLeftBlock />
+                    <HindcastLeftBlock />
                   </div>
                 </div>
               </div>
@@ -32,16 +32,16 @@
 import { onUnmounted } from "vue";
 import AppFooter from "~/components/Common/AppFooter.vue";
 import AppHeader from "~/components/Common/AppHeader.vue";
-import VerificationLeftBlock from "~/components/Verification/VerificationLeftBlock.vue";
+import HindcastLeftBlock from "~/components/Hindcast/HindcastLeftBlock.vue";
 
 import { generalStore } from "@/stores/common/GeneralStore";
 
-const { getMenuIndex, getVerificationTabIndex, setVerificationTabIndex } = generalStore();
+const { getMenuIndex, getHindcastTabIndex, setHindcastTabIndex } = generalStore();
 
 onUnmounted(() => {
   // Reset tab index to 1 when we leave this layout, 
   // so that it doesn't try to mount the wrong tab when you return
-  setVerificationTabIndex(1);
+  setHindcastTabIndex(1);
 })
 
 </script>

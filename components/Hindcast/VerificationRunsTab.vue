@@ -15,16 +15,17 @@
         <br />
         <p class="prompt-txt mb-2" style="margin-top:-10px;">
           Double click on a row to open, or right click for more options. To create a new Verification job,
-          go to "Forecast Runs" and right-click on a Forecast.
+          go to "Hindcast Runs" and right-click on a Hindcast.
         </p>
       </div>
       <div id="verificationRunList">
         <div id="VerTable">
-          <JobFilterDialog id="JobFilterDialog" :disable-all="false" 
-            :show-gage="false" :show-modules="false" :show-archived="false"
+          <JobFilterDialog id="JobFilterDialog" job-type="Verification" :disable-all="false" 
+            :show-modules="false" :show-archived="false"
             :totalSize="verificationRunListTotalSize" :totalPages="verificationRunListTotalPages"
             v-model:currentPage="verificationRunListCurrentPage"
-            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" ref="jobFilterDialog" />
+            @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
+            @UpdateGageList="updateGageList()" ref="jobFilterRef" />
 
           <ConfirmDialog></ConfirmDialog>
           <ContextMenu :pt="{ root: { id: 'cr-context-menu' } }" class="bg-white" ref="vrContextMenu"
@@ -45,8 +46,13 @@
             v-model:sortField="verificationRunListSort.field" v-model:sortOrder="verificationRunListSort.direction"
             v-model:selection="selectedVerificationJob" selectionMode="single" :rowStyle="rowStyle"
             @rowSelect="onVerificationRowSelect" @rowUnselect="onVerificationRowUnSelect"
-            @rowContextmenu="onRowContextMenu" class="boxed">
-            <Column :pt="ptColumn" field="verification_run_id" header="Job ID" sortable>
+            @rowContextmenu="onRowContextMenu" @row-dblclick="onRowDblClick($event)"class="boxed">
+            <Column :pt="ptColumn" field="verification_run_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Verification Job ID</span>
+                </div>
+              </template>
               <template #body="slotProps">
                 <span v-if="slotProps.data.verification_run_id"
                   :aria-label="'Job ID ' + slotProps.data.verification_run_id"
@@ -55,11 +61,16 @@
                 </span>
               </template>
             </Column>
-            <Column :pt="ptColumn" field="forecast_run_id" header="Forecast Job ID" sortable>
+            <Column :pt="ptColumn" field="hindcast_run_id" sortable>
+              <template #header>
+                <div class="column-header">
+                  <span>Hindcast Job ID</span>
+                </div>
+              </template>
               <template #body="slotProps">
-                <span v-if="slotProps.data.forecast_run_id" :aria-label="'Forecast Job ID ' + slotProps.data.forecast_run_id"
-                  :title="'Forecast Job ID ' + slotProps.data.forecast_run_id">
-                  {{ slotProps.data.forecast_run_id }}
+                <span v-if="slotProps.data.hindcast_run_id" :aria-label="'Hindcast Job ID ' + slotProps.data.hindcast_run_id"
+                  :title="'Hindcast Job ID ' + slotProps.data.hindcast_run_id">
+                  {{ slotProps.data.hindcast_run_id }}
                 </span>
                 <span v-else>N/A</span>
               </template>
@@ -104,8 +115,10 @@ import { useToast } from "primevue/usetoast";
 import type { DataTableContextMenuOption, VerificationJob } from "@/composables/NgencerfModels";
 import type { ToastMessageOptions } from "primevue/toast";
 
-import { useVerificationStore } from "@/stores/verification/VerificationStore";
+import { useHindcastStore } from "~/stores/hindcast/HindcastStore";
+import { useVerificationStore } from "~/stores/hindcast/VerificationStore.js";
 import { generalStore } from "~/stores/common/GeneralStore";
+import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
 import { hilightTab } from '@/composables/TabHilight';
@@ -116,6 +129,9 @@ import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 const { isLoading } = storeToRefs(generalStore());
+const { uiGageList } = storeToRefs(useUserDataStore());
+
+const { resetFilters } = useHindcastStore();
 
 const verificationStore = useVerificationStore();
 const {
@@ -127,8 +143,7 @@ const {
   verificationRunListStartRow,
   verificationRunListEndRow,
   verificationRunListSort,
-  selectedVerificationJob,
-  verificationJobId
+  selectedVerificationJob
 } = storeToRefs(verificationStore);
 
 const {
@@ -136,13 +151,20 @@ const {
   setSelectedVerificationRowData,
   getVerificationJobs,
   deleteVerificationJob,
-  resetFilters
+  fetchVerificationGageList
 } = useVerificationStore();
 const showMessagesGroup = ref<boolean>(false);
 const toast = useToast();
 const vrContextMenu = ref(); //calibration run context menu
 
 const { addToastRecord } = generalStore();
+
+const props = defineProps({
+  callGoToTab: {
+    type: Function,
+    required: false,
+  }
+});
 
 const cmVerificationJob = ref<DataTableContextMenuOption[]>([]);
 
@@ -180,9 +202,9 @@ const onRowContextMenu = (event: any) => {
   const vrRowData = event.data as VerificationJob;
   if (selectedVerificationJob && selectedVerificationJob.value?.verification_run_id === vrRowData.verification_run_id) {
     vrContextMenu.value.show(event.originalEvent);
-    cmVerificationJob.value.push({ label: 'View Status', icon: 'pi pi-gauge', command: () => navigateToVerificationJobStatus() });
+    cmVerificationJob.value.push({ label: 'View Status', icon: 'pi pi-gauge', command: () => goToVerificationJobStatus() });
     if (vrRowData.status === 'Done') {
-      cmVerificationJob.value.push({ label: 'View Results', icon: 'pi pi-chart-line', command: () => navigateToVerificationResults() });
+      cmVerificationJob.value.push({ label: 'View Results', icon: 'pi pi-chart-line', command: () => goToVerificationResults() });
     }
     if (vrRowData.status !== 'Running') {
       cmVerificationJob.value.push({ label: 'Delete', icon: 'pi pi-trash', command: () => deleteSelectedVerificationJob() });
@@ -190,10 +212,14 @@ const onRowContextMenu = (event: any) => {
   }
 };
 
+const onRowDblClick = (event: any) => {
+  goToVerificationJobStatus(event);
+}
+
 onMounted(() => {
   isLoading.value = true;
 
-  hilightTab(VerificationTabs.tab_verificationJobs);
+  hilightTab(HindcastTabs.tab_verificationJobs);
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
@@ -204,10 +230,15 @@ onMounted(() => {
 
     // load verificationJobs
     await getVerificationJobs();
+    updateGageList();
   });
 
   isLoading.value = false;
 })
+
+const updateGageList = async() => {
+  uiGageList.value = await fetchVerificationGageList();
+}
 
 const onVerificationRowSelect = async (event: DataTableRowClickEvent) => {
   const rowData = event.data as VerificationJob;
@@ -257,29 +288,24 @@ const acceptDelete = (selectedRunId: number) => {
   });
 }
 
-const navigateToVerificationJobStatus = () => {
+const goToVerificationJobStatus = (event: any=null) => {
   isLoading.value = true;
+  if (event) {
+    setSelectedVerificationRowData(event.data);
+  }
   nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Run/Status Tab"]');
-
-    if (e) {
-      e.click();
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Run/Status Tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
+    if (props.callGoToTab) {
+      props.callGoToTab(7);
     }
     isLoading.value = false;
   });
 }
 
-const navigateToVerificationResults = () => {
+const goToVerificationResults = () => {
   isLoading.value = true;
   nextTick(async () => {
-    const e: HTMLElement | null = document.querySelector('.tabs[title="Results Tab"]');
-
-    if (e) {
-      e.click();
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Results tab not found', life: ToastTimeout.timeoutError } as ToastMessageOptions);
+    if (props.callGoToTab) {
+      props.callGoToTab(8);
     }
     isLoading.value = false;
   });

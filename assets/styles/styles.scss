@@ -155,6 +155,10 @@ Button, button,
   background-color: inherit;
   border: 0px;
 }
+.ngenButtonDiv-alt:disabled {
+  cursor: not-allowed !important;
+  background-color: global.$ngwcp_primary4;
+}
 
 .ngenButtonDiv-green {
   cursor: pointer;

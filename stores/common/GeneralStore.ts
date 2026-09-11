@@ -13,14 +13,17 @@ export const generalStore = defineStore(
   "generalStore",
   () => {
 
+    const allowSelfRegistration = ref<boolean>(true);
+    const allowPasswordChange = ref<boolean>(true);
+
     const gitInfo = ref<Record<string, GitData>>({});
 
-    const calibrationTabIndex = ref("1");
-    const evaluationTabIndex = ref("1");
-    const forecastTabIndex = ref("1");
-    const verificationTabIndex = ref("1");
+    const calibrationTabIndex = ref("0");
+    const evaluationTabIndex = ref("0");
+    const forecastTabIndex = ref("0");
+    const hindcastTabIndex = ref("0");
 
-    const menuIndex = ref("1");
+    const menuIndex = ref("0");
 
     const calibrationJobId = ref<number>(0);
     // user selected valiation run id from evaluate tab
@@ -33,6 +36,8 @@ export const generalStore = defineStore(
     const evaluateValidationRunStatus = ref<string>("");
     // user seleted iteration run number for display only
     const evaluateDisplayIterationNumber = ref<number>(0);
+    // validation status for display only
+    const validationStatus = ref<string>( "" );
 
     // Has the user selected a previous calibration run for Evaluation?
     const evaluationRunSelected = ref(true);
@@ -50,8 +55,10 @@ export const generalStore = defineStore(
     const gageDataSourceHasChanged = ref<boolean>(false);
     // This is set if the user changes the modules on the Formulation page
     const modulesHaveChanged = ref<boolean>(false);
-    // This is set if Verification Setup has changed
-    const verificationSetupHasChanged = ref<boolean>(false);
+    
+    // This is to allow propagation of individual validation/restore functions from specific tabs
+    const tabRef = ref(null);
+    const navRef = ref(null);
 
     const toastRecords = ref<ToastRecord[]>([]);
 
@@ -80,7 +87,7 @@ export const generalStore = defineStore(
     function setMenuIndex(tab: number) {
       menuIndex.value = tab.toString();
     }
-    // setEvaluationTabIndex
+    
     // Calibration Tab index
     function getCalibrationTabIndex() {
       return parseInt(calibrationTabIndex.value);
@@ -105,12 +112,12 @@ export const generalStore = defineStore(
       forecastTabIndex.value = tab.toString();
     }
 
-    //  Verification Tab index
-    function getVerificationTabIndex() {
-      return parseInt(verificationTabIndex.value);
+    //  Hindcast Tab index
+    function getHindcastTabIndex() {
+      return parseInt(hindcastTabIndex.value);
     }
-    function setVerificationTabIndex(tab: number) {
-      verificationTabIndex.value = tab.toString();
+    function setHindcastTabIndex(tab: number) {
+      hindcastTabIndex.value = tab.toString();
     }
 
     // Previous calibration run for Evaluation
@@ -122,19 +129,56 @@ export const generalStore = defineStore(
       evaluationRunSelected.value = b;
     }
 
+    // generic tab validation - individual validator functions will come from specific tabs
+    function validateCurrentTab(tabNumber?: number) {
+      if (typeof tabRef?.value?.validateTab === 'function') {
+        return tabRef.value.validateTab(tabNumber);
+      }
+      return {
+        error: false,
+        text: []
+      };
+    }
+
+    // generic tab restore - individual restore functions will come from specific tabs
+    function restoreCurrentTab() {
+      if (typeof tabRef?.value?.restoreTab === 'function') {
+        return tabRef?.value?.restoreTab();
+      }
+      return true;
+    }
+
+    // tab clicked function - this can be passed to specific tabs to facilitate previous/next navigation
+    function currentTabNavGo(tabNumber: number) {
+      if (typeof navRef?.value?.goToTab === 'function') {
+        return navRef?.value?.goToTab(tabNumber);
+      }
+      return true;
+    }
+
+    // show tab navigation dialog - this can be passed to specific tabs
+    function showCurrentTabNavDialog(body: string[], next: boolean, tabNumber: number) {
+      if (typeof navRef?.value?.showTabNavDialog === 'function') {
+        return navRef?.value?.showTabNavDialog(body, next, tabNumber);
+      }
+      return true;
+    }
+
     function resetGeneralStore() {
       calibrationJobId.value = 0;
       popupActive.value = false;
 
       // Also reset current menu/tab index so that user doesn't get redirected to a tab from the previous session
-      menuIndex.value = '1';
-      calibrationTabIndex.value = '1';
-      evaluationTabIndex.value = '1';
-      forecastTabIndex.value = '1';
-      verificationTabIndex.value = '1';
+      menuIndex.value = '0';
+      calibrationTabIndex.value = '0';
+      evaluationTabIndex.value = '0';
+      forecastTabIndex.value = '0';
+      hindcastTabIndex.value = '0';
     }
 
     return {
+      allowSelfRegistration,
+      allowPasswordChange,
       gitInfo,
       getMenuIndex,
       setMenuIndex,
@@ -144,8 +188,8 @@ export const generalStore = defineStore(
       setEvaluationTabIndex,
       getForecastTabIndex,
       setForecastTabIndex,
-      getVerificationTabIndex,
-      setVerificationTabIndex,
+      getHindcastTabIndex,
+      setHindcastTabIndex,
       getEvalRunSelected,
       setEvalRunSelected,
       calibrationJobId,
@@ -154,6 +198,7 @@ export const generalStore = defineStore(
       iterationValidationRunId,
       evaluateValidationRunStatus,
       evaluateDisplayIterationNumber,
+      validationStatus,
       calibrationTabIndex,
       evaluationTabIndex,
       forecastTabIndex,
@@ -164,15 +209,20 @@ export const generalStore = defineStore(
       gageHasChanged,
       gageDataSourceHasChanged,
       modulesHaveChanged,
-      verificationSetupHasChanged,
-      verificationTabIndex,
+      hindcastTabIndex,
       menuIndex,
       evaluationRunSelected,
       isLoading,
       toastRecords,
       addToastRecord,
       clearToastRecords,
-      popupActive
+      popupActive,
+      tabRef,
+      navRef,
+      validateCurrentTab,
+      restoreCurrentTab,
+      currentTabNavGo,
+      showCurrentTabNavDialog,
     };
   },
   {

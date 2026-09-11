@@ -8,15 +8,15 @@
       <MessagesGroup />
     </div>
   </Transition>
-  <div id="ForecastRunStatusPage">
+  <div id="HindcastResultsPage">
     <div class="pl-6 pr-2 pt-2">
       <div class="flex mt-3">
         <div class="w-5/6 relative">
-          <div v-if="logList.length > 1" class="inline-block">
+          <div v-if="logListOptions.length > 0" class="inline-block">
             <label for="DisplayOptions" class="pr-2 pt-3">Display </label>
             <div class="inline-block w-2/3">
               <Select id="DisplayOptions" class="p-select" style="width: auto; min-width: 254px;" 
-                v-model="selectedLogCategory" :options="logList" option-label="display_name" optionValue="name">
+                v-model="selectedLogCategory" :options="logListOptions" option-label="display_name" optionValue="name">
               </Select>
             </div>
           </div>
@@ -25,11 +25,11 @@
             <div class="col-span-1">
               <div>
                 <span class="font-medium">Calibration Job ID: </span>
-                {{ calibrationRunForForecast?.calibration_run_id ?? '-'.repeat(15) }}
+                {{ calibrationRunForHindcast?.calibration_run_id ?? '-'.repeat(15) }}
               </div>
               <div>
-                <span class="font-medium">Forecast Job ID: </span>
-                {{ forecastJobId ?? '-'.repeat(15) }}
+                <span class="font-medium">Hindcast Job ID: </span>
+                {{ hindcastJobId ?? '-'.repeat(15) }}
               </div>
               <div>
                 <span class="font-medium">Gage: </span>
@@ -43,21 +43,33 @@
             <div class="col-span-1">
               <div>
                 <span class="font-medium">Configuration: </span>
-                {{ forecastConfigurationName ?? 'Unknown' }}
+                {{ hindcastConfigurationName ?? 'Unknown' }}
               </div>
               <div>
                 <span class="font-medium">Cycle Date: </span>
-                {{ (calibrationRunForForecast?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cycle_date) + ' UTC' : 'None') }}
+                {{ (calibrationRunForHindcast?.cycle_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForHindcast.cycle_date) + ' UTC' : 'None') }}
+              </div>
+              <div v-if="coldStartJobId">
+                <span class="font-medium">Saved State (Cold Start Job ID): </span>
+                {{ coldStartJobId ?? '-'.repeat(15) }}
+              </div>
+              <div v-else>
+                <span class="font-medium">Cold Start Date: </span>
+                {{ (coldStartDate ? formatISOStringOrDateToYYYYMMDDHHMM(coldStartDate) + ' UTC'  : 'None') }}
               </div>
               <div>
-                <span class="font-medium">Cold Start Date: </span>
-                {{ (calibrationRunForForecast?.cold_start_date ? formatISOStringOrDateToYYYYMMDDHHMM(calibrationRunForForecast.cold_start_date) + ' UTC' : 'None') }}
+                <span class="font-medium">Advance Interval: </span>
+                {{ (intervalCycle ?? 'Undefined') }}
+              </div>
+              <div>
+                <span class="font-medium">Number of Intervals: </span>
+                {{ (numIterations ?? 'Undefined') }}
               </div>
             </div>
             <div class="col-span-1">
               <div>
                 <span class="font-medium">Status: </span>
-                {{ overallColdStartForecastStatus ?? 'Unknown' }}
+                {{ overallColdStartHindcastStatus ?? 'Unknown' }}
               </div>
               <div>
                 <span class="font-medium">Submit Time: </span>
@@ -86,14 +98,15 @@
       </div>
     </div>
 
-    <div v-show="selectedLogCategory == 'forecast plot'" class="flex">
-      <div class="flex-grow text-center" id="GraphArea" aria-label="Graph display area" title="Graph display area">
-        <div id="PlotGraphArea" ref="plotGraphArea" v-if="!plotGraphCheckboxesEmpty()">
+    <div v-show="selectedLogCategory == 'hindcast plot'" class="flex">
+      <div class="flex-grow text-center" id="GraphArea">
+        <div id="PlotGraphArea" ref="plotGraphArea" v-show="numPlotGraphCheckboxesChecked() > 0">
           <div id="PlotGraphSVG" ref="plotGraphSVG" class="flex flex-row justify-center"></div>
           <div id="PlotGraphSliderContainer" class="flex flex-row justify-center" :class="plotGraphSliderCursor">
             <div id="PlotGraphSlider" ref="plotGraphSlider" @mousedown="sliderDragStart" @mousemove="sliderDragChange"
               @mouseup="sliderDragEnd" @mouseleave="sliderDragCancel">
-              <div id="PlotGraphSliderBox" ref="plotGraphSliderBox"></div>
+              <div id="PlotGraphSliderBox" ref="plotGraphSliderBox"
+                :style="{ '--handle-color': plotGraphSliderColor }"></div>
             </div>
           </div>
           <div id="PlotGraphSliderDateRange">
@@ -108,19 +121,20 @@
           </div>
         </div>
       </div>
-      <div class="p-4 grow-0" id="PlotGraphControls">
+      <div v-show="false" class="p-4 grow-0" id="PlotGraphControls">
         <a v-if="showPlotGraph" href="#" class="inline-block p-1 c-blue underline mt-1 pb-2"
           @click="toggleCustomizePlot">
           Customize Viewer
         </a>
         <div v-if="plotGraphLines.length > 0">
           <div v-for="item in plotGraphLines" :key="item.id">
-            <input v-if="plotGraphLines.length > 1" type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
-              v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" class="align-top">
+            <input type="checkbox" :id="`plotGraphCheckbox-${item.id}`"
+              v-model="item.checked" @change="drawInteractivePlot(); drawInteractiveSlider();" 
+              :disabled="item.checked && numPlotGraphCheckboxesChecked() <= 1" class="align-top">
             <label :for="`plotGraphCheckbox-${item.id}`" :style="`color: ${item.color}`">{{ item.name }}</label>
           </div>
         </div>
-        <div v-if="plotGraphCheckboxesEmpty()">
+        <div v-if="numPlotGraphCheckboxesChecked() === 0">
           Check at least one box to generate an interactive plot.
         </div>
         <div id="CustomizePlotWindow" v-if="showCustomizePlot">
@@ -147,7 +161,7 @@
         </div>
       </div>
     </div>
-    <div v-show="selectedLogCategory && selectedLogCategory != 'forecast plot'">
+    <div v-show="selectedLogCategory && selectedLogCategory != 'hindcast plot'">
       <LogDisplay/>
     </div>
 
@@ -166,13 +180,14 @@ import type { ToastMessageOptions } from "primevue/toast";
 
 import { generalStore } from '~/stores/common/GeneralStore';
 import { useUserDataStore } from '@/stores/common/UserDataStore';
-import { useForecastStore } from '@/stores/forecast/ForecastStore';
+import { useHindcastStore } from '@/stores/hindcast/HindcastStore';
 import { useLogStore } from '@/stores/common/LogStore';
 
 import { hilightTab } from '@/composables/TabHilight';
 
-import { convertISOStringOrDateToDateTime } from '@/utils/TimeHelpers';
+import { convertISOStringOrDateToDateTime, formatDateTicks } from '@/utils/TimeHelpers';
 import * as Plot from "@observablehq/plot";
+import { normalizeStyle } from 'vue';
 
 const { calibrationJobId, isLoading } = storeToRefs(generalStore());
 const { addToastRecord } = generalStore();
@@ -181,26 +196,31 @@ const { fetchUserCalibrationRunData } = useUserDataStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 
 const {
-  calibrationRunForForecast,
-  forecastJobId,
-  forecastConfigurationName,
+  calibrationRunForHindcast,
+  hindcastJobId,
+  hindcastConfigurationName,
+  coldStartJobId,
+  coldStartDate,
+  cycleDate,
+  intervalCycle,
+  numIterations,
   resultsPathname,
-  forecastPlot,
+  hindcastPlot,
   submitTimeDate,
   submitTime,
   elapsedTime,
-  forecastJobStatus,
+  hindcastJobStatus,
   coldStartJobStatus,
-  overallColdStartForecastStatus,
-} = storeToRefs(useForecastStore());
+  overallColdStartHindcastStatus,
+} = storeToRefs(useHindcastStore());
 
 const {
-  loadForecastResultsTabData,
-} = useForecastStore();
+  loadHindcastResultsTabData,
+  setHindcastPlot
+} = useHindcastStore();
 
 const {
   selectedLogCategory,
-  logList,
   logListOptions
 } = storeToRefs(useLogStore());
 const {
@@ -210,13 +230,14 @@ const {
 
 const toast = useToast();
 
-const showMessagesGroup = ref<Boolean>(false);
+const showMessagesGroup = ref<boolean>(false);
 
 const plotGraphArea = ref<HTMLElement>();
 const plotGraphSVG = ref<HTMLElement>();
 const plotGraphDataRaw = ref<any[]>([]);
 const plotGraphData = ref<any[]>([]);
 const plotGraphColumns = ref<any[]>([]);
+const timeColumn = ref<string>('time');
 const plotGraphOptions = ref<DynamicObject>({});
 const plotGraphLines = ref<any[]>([]);
 const plotGraphDateLimits = ref<DynamicObject>({});
@@ -225,13 +246,14 @@ const plotGraphSlider = ref<HTMLElement>();
 const plotGraphSliderData = ref<any[]>([]);
 const plotGraphSliderOptions = ref<DynamicObject>({});
 const plotGraphSliderBox = ref(null);
+const plotGraphSliderColor = ref<string>('grey');
 const plotGraphSliderCursor = ref<string>('cursor-grab');
 const plotGraphSliderHelpDisplay = ref<string>('');
 const sliderBoxPosition = ref<DynamicObject>({});
 const sliderDragPosition = ref<DynamicObject>({});
 const sliderDragType = ref<string>('');
-const showPlotGraph = ref<Boolean>(false);
-const showCustomizePlot = ref<Boolean>(false);
+const showPlotGraph = ref<boolean>(false);
+const showCustomizePlot = ref<boolean>(false);
 
 const ptColumn = ref({
   columnHeaderContent: { style: { "justify-content": "center" } },
@@ -239,7 +261,8 @@ const ptColumn = ref({
 });
 
 const plotGraphColors = ref<any[]>([
-  'grey', 'blue', 'gold', 'green', 'teal', 'black', 'orange', 'pink', 'purple', 'red', 'yellow'
+  'black', 'blue', 'turquoise', 'aqua', 'teal', 'green', 'lime', 'gold', 'yellow', 'orange', 'coral', 
+  'pink', 'red', 'maroon', 'purple', 'violet'
 ]);
 const plotGraphColorList = ref<any[]>([]);
 for (let c = 0; c < plotGraphColors.value.toSorted().length; c++) {
@@ -272,22 +295,39 @@ onMounted(async () => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
-  hilightTab(ForecastTabs.tab_results);
+  hilightTab(HindcastTabs.tab_hindcastResults);
   
-  await populateLogListOptions([{ name: 'forecast plot', display_name: 'Streamflow Time Series' }]);
-  selectedLogCategory.value = 'forecast plot';
+  await populateLogListOptions([{ name: 'hindcast plot', display_name: 'Streamflow Time Series' }]);
+  selectedLogCategory.value = 'hindcast plot';
 
   resetUserPlotRefs([]);
 
   // load Results tab data
-  const errorMessages: string[] = await loadForecastResultsTabData();
+  const errorMessages: string[] = await loadHindcastResultsTabData();
   errorMessages.forEach((msg: string) => {
     const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg, life: ToastTimeout.timeoutError };
     toast.add(tMsg); addToastRecord(tMsg);
   });
+
   // get calibration job data if we don't already have it
+  calibrationJobId.value = calibrationRunForHindcast?.value?.calibration_run_id;
   if (!userCalibrationRunData.value) {
+    isLoading.value = true;
     await fetchUserCalibrationRunData();
+    isLoading.value = false;
+  }
+
+  if (!cycleDate.value && calibrationRunForHindcast?.value?.cycle_date) {
+    cycleDate.value = calibrationRunForHindcast.value.cycle_date;
+  }
+  if (!coldStartDate.value && calibrationRunForHindcast?.value?.cold_start?.cold_start_date) {
+    coldStartDate.value = calibrationRunForHindcast.value.cold_start.cold_start_date;
+  }
+  if (!intervalCycle.value && calibrationRunForHindcast?.value?.interval_cycle) {
+    intervalCycle.value = calibrationRunForHindcast.value.interval_cycle;
+  }
+  if (!numIterations.value && calibrationRunForHindcast?.value?.num_iterations) {
+    numIterations.value = calibrationRunForHindcast.value.num_iterations;
   }
 });
 
@@ -314,7 +354,8 @@ const resetUserPlotRefs = (exceptions: any): void => {
   plotGraphOptions.value = [];
   plotGraphLines.value = [];
   plotGraphDateLimits.value = {};
-  plotGraphDateRange.value = {};
+  plotGraphDateRange.value.start = null
+  plotGraphDateRange.value.end = null;
   // plotGraphSlider.value = null;
   plotGraphSliderData.value = [];
   plotGraphSliderOptions.value = [];
@@ -328,24 +369,24 @@ const resetUserPlotRefs = (exceptions: any): void => {
   showCustomizePlot.value = false;
 }
 
-watch(forecastPlot, async () => {
-  if (forecastPlot.value.timeseries_data && forecastPlot.value.timeseries_data.length > 0) {
-    showForecastPlot();
+watch(hindcastPlot, async () => {
+  if (hindcastPlot?.value?.timeseries_data && hindcastPlot.value.timeseries_data.length > 0) {
+    plotGraphData.value = [];
+    showHindcastPlot();
   }
 });
 
-const showForecastPlot = async () => {
-  if (!plotGraphData.value || plotGraphData.value.length === 0) {
+const showHindcastPlot = async () => {
+  if (hindcastPlot.value.timeseries_data && !plotGraphData.value || plotGraphData.value.length === 0) {
     // standard interactive plot logic
-    if (forecastPlot.value.timeseries_data) {
-      plotGraphDataRaw.value = forecastPlot.value.timeseries_data;
-      adjustPlotGraphColumns();
-    }
+    // assume the first column is time
+    adjustPlotGraphColumns();
+    plotGraphDataRaw.value = adjustRawValues(hindcastPlot.value.timeseries_data);
     // setting min/max dates will trigger the date filter below
     plotGraphDateLimits.value = {
-      start: plotGraphDataRaw.value[0][plotGraphColumns.value[0].value],
-      end: plotGraphDataRaw.value[plotGraphDataRaw.value.length - 1][plotGraphColumns.value[0].value],
-      span: Math.ceil((new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length - 1][plotGraphColumns.value[0].value]).getTime() - new Date(plotGraphDataRaw.value[0][plotGraphColumns.value[0].value]).getTime()) / (1000 * 3600))
+      start: plotGraphDataRaw.value[0][timeColumn.value],
+      end: plotGraphDataRaw.value[plotGraphDataRaw.value.length - 1][timeColumn.value],
+      span: Math.ceil((new Date(plotGraphDataRaw.value[plotGraphDataRaw.value.length - 1][timeColumn.value] + 'Z').getTime() - new Date(plotGraphDataRaw.value[0][timeColumn.value] + 'Z').getTime()) / (1000 * 3600))
     }
     plotGraphDateRange.value = {
       start: plotGraphDateLimits.value.start,
@@ -368,7 +409,7 @@ watch(plotGraphData, async () => {
   if (plotGraphData.value.length > 0) {
     if (plotGraphLines.value.length === 0) {
       for (let c = 1; c < plotGraphColumns.value.length; c++) {
-        let strokeColor = c < plotGraphColors.value.length ? plotGraphColors.value[c - 1] : plotGraphColors.value[0];
+        let strokeColor = plotGraphColors.value[(c % plotGraphColors.value.length) - 1];
         plotGraphLines.value.push({
           id: c,
           name: plotGraphColumns.value[c].header,
@@ -387,43 +428,62 @@ watch(plotGraphData, async () => {
 });
 
 function adjustPlotGraphColumns() {
-  if (plotGraphDataRaw.value.length > 0) {
-    Object.keys(plotGraphDataRaw.value[0]).forEach(key => {
-      let column_header_words = key.split("_");
-      for (let w = 0; w < column_header_words.length; w++) {
-        let word = column_header_words[w]
-        column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
-      }
-      let column_header = column_header_words.join(" ");
-      plotGraphColumns.value.push({ header: column_header, value: key });
-    });
-    for (let d = 0; d < plotGraphDataRaw.value.length; d++) {
-      Object.keys(plotGraphDataRaw.value[d]).forEach(key => {
-        if (plotGraphDataRaw.value[d][key] && (plotGraphDataRaw.value[d][key] === null || plotGraphDataRaw.value[d][key] === '')) {
-          plotGraphDataRaw.value[d][key] = 'N/A';
-        } else if (!isNaN(parseFloat(plotGraphDataRaw.value[d][key])) && isFinite(plotGraphDataRaw.value[d][key]) && plotGraphDataRaw.value[d][key].toString().indexOf('.') > 0) {
+  plotGraphColumns.value = [];
+  let plotData = plotGraphDataRaw.value.length > 0 ? plotGraphDataRaw.value : hindcastPlot.value.timeseries_data;
+  if (plotData.length > 0) {
+    for (let d = 0; d < plotData.length; d++) {
+      Object.keys(plotData[d]).forEach(key => {
+        if (!plotGraphColumns.value.find(col => col.value == key)) {
+          let column_header_words = key.split("_");
+          for (let w = 0; w < column_header_words.length; w++) {
+            let word = column_header_words[w]
+            column_header_words[w] = word.charAt(0).toUpperCase() + word.slice(1);
+          }
+          let column_header = column_header_words.join(" ");
+          plotGraphColumns.value.push({ header: column_header, value: key });
+        }
+      });
+    }
+    timeColumn.value = plotGraphColumns.value[0].value;
+  }
+}
+
+function adjustRawValues(plotData: any) {
+  if (plotData.length > 0) {
+    for (let d = 0; d < plotData.length; d++) {
+      Object.keys(plotData[d]).forEach(key => {
+        if (plotData[d][key] && (plotData[d][key] === null || plotData[d][key] === '')) {
+          plotData[d][key] = '';
+        } else if (!isNaN(parseFloat(plotData[d][key])) && isFinite(plotData[d][key]) && plotData[d][key].toString().indexOf('.') > 0) {
           // attempt to round to 5 digits - just display as is if there are any problems doing this
           try {
-            plotGraphDataRaw.value[d][key] = parseFloat(Number(plotGraphDataRaw.value[d][key]).toFixed(5));
+            plotData[d][key] = parseFloat(Number(plotData[d][key]).toFixed(5));
           } catch (error) {
-            console.error('Error rounding value ' + plotGraphDataRaw.value[d][key] + ': ', error);
+            console.error('Error rounding value ' + plotData[d][key] + ': ', error);
           }
         }
       });
     }
   }
+  return plotData.sort(
+    (a, b) => {
+      const aTime = new Date(a[timeColumn.value] + 'Z').getTime()
+      const bTime = new Date(b[timeColumn.value] + 'Z').getTime()
+      return aTime - bTime
+    }
+  );
 }
 
 // draw interactive plot when plot graph data is first loaded, and also when checkboxes are clicked
 const drawInteractivePlot = () => {
   let plotLineData = [];
   let plotDotData = [];
-  if (!plotGraphCheckboxesEmpty()) {
+  if (numPlotGraphCheckboxesChecked() > 0) {
     plotGraphOptions.value = {
-      x: { grid: true },
+      x: { grid: true, tickSpacing: 80, tickFormat: (d, i, ticks) => formatDateTicks(d, i, ticks)},
       y: { grid: true, labelAnchor: 'center', labelArrow: 'none' },
       marks: [],
-      width: (plotGraphArea.value as HTMLElement).offsetWidth - 50,
+      width: (plotGraphArea.value?.offsetWidth || document?.getElementById('HindcastResultsPage')?.offsetWidth - 250 ) - 50,
       height: ((document.getElementById('MainLeftDataParent') as HTMLElement).getBoundingClientRect().bottom
         - (document.getElementById('PlotGraphArea') as HTMLElement).getBoundingClientRect().top) - 150
     };
@@ -432,18 +492,18 @@ const drawInteractivePlot = () => {
     plotGraphOptions.value.marginLeft = 50;
 
     for (let c = 1; c < plotGraphColumns.value.length; c++) {
-      if (plotGraphLines.value.length === 1 || (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
+      if ((document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
         for (let d = 0; d < plotGraphData.value.length; d++) {
           if (plotGraphLines.value[c - 1].symbol === 'line') {
             plotLineData.push({
-              'time': convertISOStringOrDateToDateTime(plotGraphData.value[d][plotGraphColumns.value[0].value].replace(" ","T")).toJSDate(),
+              'time': convertISOStringOrDateToDateTime(plotGraphData.value[d][timeColumn.value].replace(" ","T")).toJSDate(),
               'measurement': parseFloat(plotGraphData.value[d][plotGraphColumns.value[c].value]),
               'color': plotGraphLines.value[c - 1].color,
               'name': plotGraphLines.value[c - 1].name
             });
           } else {
             plotDotData.push({
-              'time': convertISOStringOrDateToDateTime(plotGraphData.value[d][plotGraphColumns.value[0].value].replace(" ","T")).toJSDate(),
+              'time': convertISOStringOrDateToDateTime(plotGraphData.value[d][timeColumn.value].replace(" ","T")).toJSDate(),
               'measurement': parseFloat(plotGraphData.value[d][plotGraphColumns.value[c].value]),
               'color': plotGraphLines.value[c - 1].color,
               'symbol': plotGraphLines.value[c - 1].symbol,
@@ -455,7 +515,7 @@ const drawInteractivePlot = () => {
     }
   }
 
-  interface DotTipData {
+  interface PlotTooltipData {
     name: string;
     color: string;
     symbol: string;
@@ -473,7 +533,7 @@ const drawInteractivePlot = () => {
   let lineTipOptions = {
     x: { value: 'time', label: 'Time' },
     y: { value: 'measurement', label: 'Measurement' },
-    title: (d: DotTipData) => `${d.name} (${d.color})`,
+    title: (d: PlotTooltipData) => `${d.name} (${d.color})`,
     fontSize: 14
   }
   let dotOptions = {
@@ -485,15 +545,15 @@ const drawInteractivePlot = () => {
   let dotTipOptions = {
     x: { value: 'time', label: 'Time' },
     y: { value: 'measurement', label: 'Measurement' },
-    title: (d: DotTipData) => `${d.name} (${d.color} ${d.symbol})`,
+    title: (d: PlotTooltipData) => `${d.name} (${d.color} ${d.symbol})`,
     fontSize: 14
   }
   lineOptions.y.label = 'Flow (m^3/s)';
   lineTipOptions.y.label = 'Flow';
-  lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} m^3/s`;
+  lineTipOptions.title = (d) => `${d.name} (${d.color})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}Z\nStreamflow: ${d.measurement} m^3/s`;
   dotOptions.y.label = 'Flow (m^3/s)';
   dotTipOptions.y.label = 'Flow';
-  dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}\nStreamflow: ${d.measurement} m^3/s`;
+  dotTipOptions.title = (d) => `${d.name} (${d.color} ${d.symbol})\nTime: ${d.time.toISOString().split("T")[0]} ${d.time.toISOString().split("T")[1].split(":").slice(0, 2).join(":")}Z\nStreamflow: ${d.measurement} m^3/s`;
   if (plotLineData.length > 0) {
     plotGraphLeftEdge = plotLineData[0].time;
     plotGraphOptions.value.marks.push(
@@ -519,82 +579,88 @@ const drawInteractivePlot = () => {
   (plotGraphSVG.value as HTMLElement).append(plot);
   nextTick(() => {
     if (plotGraphArea.value) {
-      plotGraphOptions.value.width = plotGraphArea.value.offsetWidth - 50;
-      plotGraphSliderOptions.value.width = plotGraphArea.value.offsetWidth - 100;
+      plotGraphOptions.value.width = (plotGraphArea?.value?.offsetWidth || document?.getElementById('HindcastResultsPage')?.offsetWidth - 250) - 50;
+      plotGraphSliderOptions.value.width = (plotGraphArea?.value?.offsetWidth || document?.getElementById('HindcastResultsPage')?.offsetWidth - 250) - 100;
     };
   })
 }
 
 
 const getSliderWidth = () => {
-  return (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().right
-    - (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().left;
+  if (document.getElementById('PlotGraphSlider').offsetWidth > 0) {
+    return (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().right
+      - (document.getElementById('PlotGraphSlider') as HTMLElement).getBoundingClientRect().left;
+  }
+  return (document?.getElementById('HindcastResultsPage')?.offsetWidth - 250) - 100;
 }
 
-const plotGraphCheckboxesEmpty = () => {
+const numPlotGraphCheckboxesChecked = () => {
   if (plotGraphLines.value.length > 1) {
+    let numChecked = 0;
     for (let c = 0; c < plotGraphLines.value.length; c++) {
       if (!(document?.getElementById('plotGraphCheckbox-' + (c + 1)))) {
-        return false;
+        return plotGraphLines.value.length;
       } else if ((document?.getElementById('plotGraphCheckbox-' + (c + 1)) as HTMLInputElement).checked) {
-        return false;
+        numChecked += 1;
       }
     }
-    return true;
+    return numChecked;
   }
-  return false;
+  return plotGraphLines.value.length;
 };
 
 // Create slider as a mini-plot of just the first plot line
 const drawInteractiveSlider = () => {
-  if (!plotGraphCheckboxesEmpty()) {
-    plotGraphSliderData.value = [];
-    let rowSkip = plotGraphDataRaw.value.length / 1000;
-    for (let c = 1; c < plotGraphColumns.value.length; c++) {
-      if (plotGraphLines.value.length === 1 || (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
-        for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
-          let dataPoint = {
-            time: convertISOStringOrDateToDateTime((plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[0].value]).replace(" ","T")).toJSDate(),
-            measurement: parseFloat(plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[c].value])
-          };
-          plotGraphSliderData.value.push(dataPoint);
+  requestAnimationFrame(() => {
+    if (numPlotGraphCheckboxesChecked() > 0) {
+      plotGraphSliderData.value = [];
+      let rowSkip = plotGraphDataRaw.value.length / 1000;
+      for (let c = 1; c < plotGraphColumns.value.length; c++) {
+        if (plotGraphLines.value.length === 1 || (document?.getElementById('plotGraphCheckbox-' + c) as HTMLInputElement).checked) {
+          for (let d = 0; d < plotGraphDataRaw.value.length; d += rowSkip) {
+            let dataPoint = {
+              time: convertISOStringOrDateToDateTime((plotGraphDataRaw.value[Math.floor(d)][timeColumn.value] + 'Z').replace(" ","T")).toJSDate(),
+              measurement: parseFloat(plotGraphDataRaw.value[Math.floor(d)][plotGraphColumns.value[c].value])
+            };
+            plotGraphSliderData.value.push(dataPoint);
+          }
         }
       }
-    }
-    let lineOptions = {
-      x: 'time',
-      y: 'measurement'
-    }
-    plotGraphSliderOptions.value = {
-      x: { tickSize: 0, inset: 0 },
-      y: { axis: null },
-      marks: [
-        Plot.lineY(plotGraphSliderData.value, lineOptions)
-      ],
-      width: (plotGraphArea.value as HTMLElement).offsetWidth - 100,
-      height: 100,
-      marginLeft: 0,
-      marginRight: 0
-    };
-    while (plotGraphSlider.value && plotGraphSlider.value.children.length > 1) {
-      plotGraphSlider.value.removeChild(plotGraphSlider.value.children[1]);
-    }
-
-    plotGraphSlider?.value?.append(Plot.plot(plotGraphSliderOptions.value));
-
-    if (!sliderBoxPosition.value || Object.keys(sliderBoxPosition.value).length !== 2) {
-      // we don't have a previous position to remember
-      // start with the entire available range
-      sliderBoxPosition.value = {
-        start: 0,
-        end: getSliderWidth()
+      let lineOptions = {
+        x: 'time',
+        y: 'measurement'
       }
+      plotGraphSliderOptions.value = {
+        x: { inset: 0, tickFormat: (d, i, ticks) => formatDateTicks(d, i, ticks)},
+        y: { axis: null },
+        marks: [
+          Plot.lineY(plotGraphSliderData.value, lineOptions)
+        ],
+        width: ((plotGraphArea.value as HTMLElement)?.offsetWidth || document?.getElementById('HindcastResultsPage')?.offsetWidth - 250) - 100,
+        height: 100,
+        marginLeft: 20,
+        marginRight: 20
+      };
+      while (plotGraphSlider.value && plotGraphSlider.value.children.length > 1) {
+        plotGraphSlider.value.removeChild(plotGraphSlider.value.children[1]);
+      }
+
+      plotGraphSlider?.value?.append(Plot.plot(plotGraphSliderOptions.value));
+
+      if (!sliderBoxPosition.value || Object.keys(sliderBoxPosition.value).length !== 2) {
+        // we don't have a previous position to remember
+        // start with the entire available range
+        sliderBoxPosition.value = {
+          start: 0,
+          end: getSliderWidth()
+        }
+      }
+      (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.left = sliderBoxPosition.value.start + 'px';
+      (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
+      setSliderDateRange();
+      plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[0];
     }
-    (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.left = sliderBoxPosition.value.start + 'px';
-    (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
-    setSliderDateRange();
-    plotGraphSliderHelpDisplay.value = plotGraphSliderHelpText[0];
-  }
+  });
 }
 
 // Filter interactive plot when date range is changed
@@ -602,30 +668,50 @@ const updatePlotGraphDates = () => {
   interactivePlotDateFilter();
 }
 
-watch(plotGraphDateRange, async () => {
-  if (plotGraphDataRaw.value && plotGraphDataRaw.value.length > 0) {
-    interactivePlotDateFilter();
+watch(
+  () => [plotGraphDateRange.value.start, plotGraphDateRange.value.end],
+  ([start, end]) => {
+    if (!start || !end) return
+
+    let newStart = start
+    let newEnd = end
+
+    // normalize
+    if (newStart > newEnd) {
+      [newStart, newEnd] = [newEnd, newStart];
+    }
+
+    // clamp
+    if (newStart < plotGraphDateLimits.value.start) {
+      newStart = plotGraphDateLimits.value.start
+    }
+    if (newEnd > plotGraphDateLimits.value.end) {
+      newEnd = plotGraphDateLimits.value.end
+    }
+
+    // only write if changed (CRITICAL)
+    if (
+      newStart !== plotGraphDateRange.value.start ||
+      newEnd !== plotGraphDateRange.value.end
+    ) {
+      plotGraphDateRange.value.start = newStart
+      plotGraphDateRange.value.end = newEnd
+      return // avoid filtering this cycle
+    }
+
+    // ✅ only run when stable
+    if (plotGraphDataRaw.value?.length) {
+      interactivePlotDateFilter()
+    }
   }
-});
+)
 
 const interactivePlotDateFilter = () => {
   let tempPlotGraphData = [];
-  if (plotGraphDateRange.value.start > plotGraphDateRange.value.end) {
-    plotGraphDateRange.value = {
-      start: plotGraphDateRange.value.end,
-      end: plotGraphDateRange.value.start
-    }
-  }
-  if (plotGraphDateRange.value.start < plotGraphDateLimits.value.start) {
-    plotGraphDateRange.value.start = plotGraphDateLimits.value.start;
-  }
-  if (plotGraphDateRange.value.end > plotGraphDateLimits.value.end) {
-    plotGraphDateRange.value.end = plotGraphDateLimits.value.end;
-  }
   let startDate = plotGraphDateRange.value.start;
   let endDate = plotGraphDateRange.value.end;
   for (let r = 0; r < plotGraphDataRaw.value.length; r++) {
-    let currentDate = plotGraphDataRaw.value[r][plotGraphColumns.value[0].value];
+    let currentDate = plotGraphDataRaw.value[r][timeColumn.value];
     if (currentDate >= startDate && currentDate <= endDate) {
       tempPlotGraphData.push(plotGraphDataRaw.value[r]);
     }
@@ -753,20 +839,20 @@ const setSliderDateRange = () => {
     };
   }
 
-  let hoursFromStart = Math.ceil(sliderBoxPosition.value.start * (plotGraphDateLimits.value.span / getSliderWidth()));
-  let newStartDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.start).replace(" ","T")).toJSDate();
-  newStartDate.setHours(newStartDate.getHours() + hoursFromStart);
+  nextTick(async() => {
+    let hoursFromStart = Math.ceil(sliderBoxPosition.value.start * (plotGraphDateLimits.value.span / getSliderWidth()));
+    let newStartDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.start).replace(" ","T")).toJSDate();
+    newStartDate.setHours(newStartDate.getHours() + hoursFromStart);
+    
+    let hoursFromEnd = Math.ceil((getSliderWidth() - sliderBoxPosition.value.end) * (plotGraphDateLimits.value.span / getSliderWidth()));
+    let newEndDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.end.replace(" ","T"))).toJSDate();
+    newEndDate.setHours(newEndDate.getHours() - hoursFromEnd);
 
-  let hoursFromEnd = Math.ceil((getSliderWidth() - sliderBoxPosition.value.end) * (plotGraphDateLimits.value.span / getSliderWidth()));
-  let newEndDate = convertISOStringOrDateToDateTime((plotGraphDateLimits.value.end.replace(" ","T"))).toJSDate();
-  newEndDate.setHours(newEndDate.getHours() - hoursFromEnd);
-
-  (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.left = sliderBoxPosition.value.start + 'px';
-  plotGraphDateRange.value.start = (newStartDate.toISOString()).replace("T"," ").split(".")[0];
-  (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
-  plotGraphDateRange.value.end = (newEndDate.toISOString()).replace("T"," ").split(".")[0];
-  
-  updatePlotGraphDates();
+    (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.left = sliderBoxPosition.value.start + 'px';
+    plotGraphDateRange.value.start = (newStartDate.toISOString()).replace("T"," ").split(".")[0];
+    (document.getElementById('PlotGraphSliderBox') as HTMLElement).style.right = (getSliderWidth() - sliderBoxPosition.value.end) + 'px';
+    plotGraphDateRange.value.end = (newEndDate.toISOString()).replace("T"," ").split(".")[0];
+  });
 }
 
 const toggleCustomizePlot = async () => {
@@ -777,10 +863,22 @@ const toggleCustomizePlot = async () => {
   }
 }
 
+// Handle hindcast plot changes
+watch(selectedLogCategory, async () => {
+  if(selectedLogCategory.value == 'hindcast plot') {
+    nextTick(async() => {
+      const errorMessages: string[] = await setHindcastPlot();
+      errorMessages.forEach((msg: string) => {
+        const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: msg, life: ToastTimeout.timeoutError };
+        toast.add(tMsg); addToastRecord(tMsg);
+      });
+    });
+  }
+})
+
 onUnmounted(() => {
   // make sure page clears all plot/log data when the user leaves
   resetUserPlotRefs([]);
-  logList.value = [];
   logListOptions.value = [];
   resetUserLogRefs();
 })
@@ -826,15 +924,33 @@ onUnmounted(() => {
 }
 
 #PlotGraphSliderBox {
-  position: absolute;
-  border: 1px solid #000000;
-  background-color: #ffffff;
-  opacity: 0.5;
-  z-index: 2;
-  left: 0px;
-  right: 0px;
-  height: 100%;
+    position: absolute;
+    border: 1px solid #000;
+    background: rgba(255,255,255,0.5);
+    z-index: 2;
+    left: 0;
+    right: 0;
+    height: 100%;
 }
+
+#PlotGraphSliderBox::before,
+#PlotGraphSliderBox::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 10px;
+    height: 25%;
+
+    background-color: var(--handle-color); /* Solid fill */
+
+    border-radius: 3px; /* Optional: slightly rounded edges */
+    cursor: ew-resize;
+}
+
+#PlotGraphSliderBox::before { left: -6px; }
+#PlotGraphSliderBox::after  { right: -6px; }
 
 #PlotGraphSliderDateRange {
   position: relative;

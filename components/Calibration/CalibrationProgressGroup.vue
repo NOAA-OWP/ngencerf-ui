@@ -13,13 +13,13 @@
             class="pi pi-check font-bold"></i></td>
         <td data-tab="2" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing Source</td>
       </tr>
-      <tr>
+      <tr v-if="getObservationalOptionsList?.length > 1">
         <td><i v-if="userCalibrationRunData?.external_data_status?.observational"
             :class="userCalibrationRunData?.external_data_status?.observational ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
         <td data-tab="2" title="Observational" aria-label="Observational" @click="tabClicked">Observational</td>
       </tr>
-      <tr>
+      <tr v-if="getGeopackageOptionsList?.length > 1">
         <td><i v-if="userCalibrationRunData?.external_data_status?.geopackage"
             :class="userCalibrationRunData?.external_data_status?.geopackage ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
@@ -33,8 +33,8 @@
       </tr>
       <tr>
         <td><i v-if="checkStartEndTimeValues()" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="4" title="Start and End Times" aria-label="Start and End Times" @click="tabClicked">
-          Start and End Times</td>
+        <td data-tab="4" title="Start and Duration Times" aria-label="Start and Duration Times" @click="tabClicked">
+          Start and Duration Times</td>
       </tr>
       <tr>
         <td><i v-if="(checkStartEndTimeValues() || userCalibrationRunData?.parameters_selected) && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
@@ -42,7 +42,7 @@
           @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">Output Variable to Calibrate</td>
       </tr>
       <tr>
-        <td><i v-if="userCalibrationRunData?.parameters_selected && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
+        <td><i v-if="userCalibrationRunData?.parameters_selected && tuningParametersAreValid && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
         <td data-tab="4" title="Tuning Parameters" aria-label="Tuning Parameters" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">Tuning Parameters
         </td>
       </tr>
@@ -75,37 +75,42 @@
 <script lang="ts" setup>
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 import { generalStore } from "@/stores/common/GeneralStore";
+import { useGageStore } from "@/stores/calibration/GageStore";
 import { useFormulationStore } from "@/stores/calibration/FormulationStore";
+import { useTuningStore } from "@/stores/calibration/TuningStore";
+import { useToast } from 'primevue/usetoast';
+
+import type { ToastMessageOptions } from "primevue/toast";
+import { ToastTimeout } from "@/composables/NgencerfEnums";
 
 const { getCalibrationTabIndex, getMenuIndex } = generalStore();
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
-const { selectedModuleValues, formulationIsCalibratable } = storeToRefs(useFormulationStore());
-const { validateFormulationTabData } = useFormulationStore();
-
-const currentCalibrationTab = ref(getCalibrationTabIndex());
+const { getGeopackageOptionsList, getObservationalOptionsList } = storeToRefs(useGageStore());
+const { selectedModuleValues, formulationIsCalibratable, moduleProperties } = storeToRefs(useFormulationStore());
+const { loadFormulationTabData, setUserSelection } = useFormulationStore();
+const { tuningParametersAreValid } = storeToRefs(useTuningStore());
+const { validateTuningParameters } = useTuningStore();
+const { addToastRecord, validateCurrentTab, currentTabNavGo, showCurrentTabNavDialog } = generalStore();
+const toast = useToast();
 
 const emit = defineEmits(["tabNumber"]);
 
 onMounted(async() => {
   if (userCalibrationRunData.value) {
     // check to see if formulation is calibratable
-    if (userCalibrationRunData.value?.modules != null) {
-      try {
-        selectedModuleValues.value = JSON.parse(
-          JSON.stringify(userCalibrationRunData.value.modules)
-        );
-      } catch (e) {
-        console.error("Failed to clone modules:", e);
-        selectedModuleValues.value = [];
-      }
-    } else {
-      selectedModuleValues.value = [];
-    }
-    formulationIsCalibratable.value = false;
-    if (selectedModuleValues.value.length > 0) {
-      validateFormulationTabData().then(response => {
-        if (!response._data.formulation_errors) {
-          formulationIsCalibratable.value = true;
+    setUserSelection();
+    tuningParametersAreValid.value = false;
+    if (userCalibrationRunData?.value.parameters_selected && !userCalibrationRunData?.value.modules?.includes('LSTM')) {
+      validateTuningParameters().then(response => {
+        if (response._data.parameter_warnings) {
+          tuningParametersAreValid.value = false;
+          /* toast.removeAllGroups();
+          response._data.parameter_warnings.forEach((err: any) => {
+            const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'Tuning Parameters Warning', detail: err, life: ToastTimeout.timeoutWarn };
+            toast.add(tMsg); addToastRecord(tMsg);
+          }); */
+        } else {
+          tuningParametersAreValid.value = true;
         }
       });
     }
@@ -128,16 +133,15 @@ const checkStartEndTimeValues = () => {
 
 const tabClicked = (event: Event) => {
   event.preventDefault();
-  const ele = event.currentTarget as HTMLElement;
-  const allTabs = document.getElementsByClassName("tabs");
-  const tabNum = Number(ele.getAttribute("data-tab")) - 1;
-  const e = allTabs[tabNum] as HTMLElement;
-  e.click();
-
-  // Send the selected tab info to the active tab set with emit
-  if (getMenuIndex() === 2) {
-    currentCalibrationTab.value = Number(ele.getAttribute("data-tab"));
-    emit("tabNumber", currentCalibrationTab.value);
+  const ele: HTMLElement = event.currentTarget as HTMLElement;
+  const tabNumber = Number(ele.getAttribute("data-tab"));
+  if (tabNumber !== getCalibrationTabIndex()) {
+    const errors = validateCurrentTab();
+    if (errors.error) {
+      showCurrentTabNavDialog(errors.text, true, tabNumber);
+    } else {
+      currentTabNavGo(tabNumber);
+    }
   }
-}
+};
 </script>

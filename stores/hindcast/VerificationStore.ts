@@ -3,7 +3,7 @@ import { defineStore, storeToRefs } from "pinia";
 
 import type { VerificationJob, VerificationJobs } from "@/composables/NgencerfModels";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
-import { useForecastStore } from "@/stores/forecast/ForecastStore";
+import { useHindcastStore } from "@/stores/hindcast/HindcastStore";
 
 import { makeProtectedApiCall } from "@/composables/UserAuth";
 import { useBackendConfig } from "@/composables/UseBackendConfig";
@@ -15,6 +15,8 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   const { ngencerfBaseUrl } = useBackendConfig();
   const { getAccessToken } = useUserDataStore();
   const { 
+    uiGageId,
+    uiDomainName,
     createdAtStart,
     createdAtEnd,
     minCreatedAt,
@@ -26,20 +28,17 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     statusTypeFilterList 
   } = storeToRefs(useUserDataStore());
 
-  const forecastStore = useForecastStore();
-  const { selectedForecastJob } = storeToRefs(forecastStore);
+  const hindcastStore = useHindcastStore();
+  const { 
+    hindcastJobId,
+    selectedHindcastJob,
+    failureMessages,
+    elapsedTime,
+    submitTimeDate,
+    submitTime
+  } = storeToRefs(hindcastStore);
 
   // refs
-  const forecastJobId = ref<number>();
-  const forecastRunsForVerification = ref<ForecastJob[]>([]);
-  const forecastRunsForVerificationListPageSize = ref<number>(50);
-  const forecastRunsForVerificationListCurrentPage = ref<number>(1);
-  const forecastRunsForVerificationListTotalPages = ref<number>(0);
-  const forecastRunsForVerificationListTotalSize = ref<number>(0);
-  const forecastRunsForVerificationListStartRow = ref<number>(1);
-  const forecastRunsForVerificationListEndRow = ref<number>(forecastRunsForVerificationListPageSize.value);
-  const forecastRunsForVerificationListSort = ref<DynamicObject>({'field': 'forecast_run_id', 'direction': -1});
-  
   const verificationJobId = ref<number>();
   const verificationJobs = ref<VerificationJob[]>([]);
   const selectedVerificationJob = ref<VerificationJob>();
@@ -55,91 +54,10 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   const yamlConfigData = ref<DynamicObject>({});
 
   const verificationJobStatus = ref<string>();
-  const failureMessages = ref<any>();
-  const elapsedTime = ref<string>();
-  const submitTimeDate = ref<Date>();
-  const submitTime = ref<string>();
   const verificationStatusCheckingInterval = ref<any>();
   const verificationRunningTimeInterval = ref<any>();
-  const verificationPlotNames = ref<any>(); // TODO: create verificationPlotNames interface
-  const verificationPlot = ref<any>(); // TODO: create verificationPlot interface
-
-  /**
-   * fetch get_forecast_jobs_for_verification
-   * @return {void}
-   */
-  const getForecastRunsForVerification = async (): Promise<any> => {
-    forecastRunsForVerification.value = [];
-    let requestBody = {
-      limit: forecastRunsForVerificationListPageSize.value,
-      offset: (forecastRunsForVerificationListCurrentPage.value - 1) * forecastRunsForVerificationListPageSize.value,
-      sort: {
-        field: forecastRunsForVerificationListSort.value.field,
-        direction: forecastRunsForVerificationListSort.value.direction === -1 ? 'desc' : 'asc'
-      },
-      filters: {
-        date_filter:
-            (createdAtStart.value && createdAtEnd.value) ? {
-              start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
-              end_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
-              operator: "between"
-            } : createdAtStart.value ? {
-              create_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
-              operator: "after"
-            } : createdAtEnd.value ? {
-              create_date: formatISOStringOrDateToYYYYMMDD(createdAtEnd.value) + 'T23:59:59',
-              operator: "before"
-            } : {}
-          ,
-        id_filter:
-          (jobIdStart.value && jobIdEnd.value) ? {
-            start_id: jobIdStart.value,
-            end_id: jobIdEnd.value,
-            operator: "between"
-          } : jobIdStart.value ? {
-            id: jobIdStart.value,
-            operator: "after"
-          } : jobIdEnd.value ? {
-            id: jobIdEnd.value,
-            operator: "before"
-          } : {}
-        ,
-        status: statusTypeFilterList.value
-      }
-    }
-    const runListDataResult = await makeProtectedApiCall<ForecastJobs>(`${ngencerfBaseUrl}/calibration/get_forecast_jobs_for_verification/`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`,
-        "Content-Type": 'application/json'
-      },
-      body: JSON.stringify(requestBody)
-    });
-
-    forecastRunsForVerification.value = runListDataResult?._data?.forecast_jobs ?? [];
-    forecastRunsForVerificationListTotalSize.value = runListDataResult?._data?.total_count ?? 0;
-    forecastRunsForVerificationListTotalPages.value = Math.ceil(forecastRunsForVerificationListTotalSize.value / forecastRunsForVerificationListPageSize.value);
-    forecastRunsForVerificationListStartRow.value = (forecastRunsForVerificationListPageSize.value * (forecastRunsForVerificationListCurrentPage.value - 1)) + 1;
-    forecastRunsForVerificationListEndRow.value = Math.min(forecastRunsForVerificationListStartRow.value + (forecastRunsForVerificationListPageSize.value - 1), forecastRunsForVerificationListTotalSize.value);
-    
-    if (runListDataResult?._data?.date_range && runListDataResult?._data?.date_range.length === 2) {
-      minCreatedAt.value = runListDataResult?._data?.date_range[0];
-      maxCreatedAt.value = runListDataResult?._data?.date_range[1];
-    }
-    if (runListDataResult?._data?.id_range && runListDataResult?._data?.id_range.length === 2) {
-      minJobId.value = runListDataResult?._data?.id_range[0];
-      maxJobId.value = runListDataResult?._data?.id_range[1];
-    }
-  }
-
-  const setSelectedForecastRunId = (forecast_job_id: number): void => {
-    forecastJobId.value = forecast_job_id;
-  }
-
-  const setSelectedForecastRowData = async (forecast_row_data: ForecastJob): Promise<void> => {
-    selectedForecastJob.value = forecast_row_data;
-    setSelectedForecastRunId(forecast_row_data.forecast_run_id);
-  }
+  const verificationPlotNames = ref<any>();
+  const verificationPlot = ref<any>();
 
   /**
    * fetch get_verification_jobs
@@ -155,6 +73,8 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
         direction: verificationRunListSort.value.direction === -1 ? 'desc' : 'asc'
       },
       filters: {
+        domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+        gage_id: uiGageId.value && uiGageId.value !== "All" ? uiGageId.value: "",
         date_filter:
             (createdAtStart.value && createdAtEnd.value) ? {
               start_date: formatISOStringOrDateToYYYYMMDD(createdAtStart.value) + 'T00:00:00',
@@ -181,7 +101,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
             operator: "before"
           } : {}
         ,
-        status: statusTypeFilterList.value
+        status: statusTypeFilterList.value,
       }
     }
     const runListDataResult = await makeProtectedApiCall<VerificationJobs>(`${ngencerfBaseUrl}/calibration/get_verification_jobs/`, {
@@ -210,6 +130,35 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   }
 
   /**
+   * fetch list of gage IDs for verification runs
+   * @return {void}
+   */
+  async function fetchVerificationGageList() {
+    // only apply domain and archived filters
+    let requestBody = {
+      domain_name: uiDomainName.value && uiDomainName.value !== "All" ? uiDomainName.value : "",
+      include_archived: false
+    }
+    const gageListResult =
+      await makeProtectedApiCall<any>(
+        `${ngencerfBaseUrl}/calibration/get_verification_gages/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+    
+    if (gageListResult?._data?.gages) {
+      return gageListResult._data.gages.sort();
+    }
+    return [];
+  }
+
+  /**
    * Load Verification Run/Status tab data
    */
   const loadVerificationRunStatusTabData = async (): Promise<string[]> => {
@@ -223,10 +172,11 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
         // set verificationJobStatus, elapsedTime and submitTime
         verificationJobStatus.value = getVerificationStatusResponse?._data?.status;
         if (isValidDate(getVerificationStatusResponse?._data?.submit_date)) {
+          submitTimeDate.value = new Date(getVerificationStatusResponse._data.submit_date);
           submitTime.value = formatDateForRunOnString(getVerificationStatusResponse._data.submit_date);
         }
 
-        if (verificationJobStatus?.value?.toLocaleUpperCase() === "RUNNING") {
+        if (['Submitted','Running'].includes(verificationJobStatus?.value)) {
           if (verificationStatusCheckingInterval.value) {
             clearInterval(verificationStatusCheckingInterval.value);
           }
@@ -237,15 +187,11 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
           verificationRunningTimeInterval.value = setInterval(updateRunningTime, 1000);
         }
 
-        if (selectedVerificationJob?.value?.submit_date) {
-          submitTimeDate.value = new Date(selectedVerificationJob.value.submit_date as string);
-          if (isValidDate(submitTimeDate.value)) {
-            submitTime.value = formatDateForRunOnString(submitTimeDate.value);
-            // set elapsedTime
-            updateRunningTime();
-          } else {
-            errorMessages.push(`Invalid submit date: ${selectedVerificationJob.value.submit_date}`);
-          }
+        // set elapsedTime
+        if (getVerificationStatusResponse?._data?.elapsed_time) {
+          elapsedTime.value = formatElapsedTime(getVerificationStatusResponse._data.elapsed_time);
+        } else {
+          updateRunningTime();
         }
       } else {
         return useApiErrorResponsePreprocess(getVerificationStatusResponse);
@@ -256,7 +202,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
 
   const updateRunningTime = (): void => {
     if (submitTimeDate.value) {
-      elapsedTime.value = calculateElapsedTime( submitTimeDate.value, new Date() );
+      elapsedTime.value = formatDuration(calculateElapsedTime( submitTimeDate.value, new Date() ));
     }
   }
 
@@ -308,7 +254,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
 
   const setSelectedVerificationJobId = async(verification_run_id: number): Promise<void> => {
     verificationJobId.value = verification_run_id;
-    forecastJobId.value = selectedVerificationJob.value?.forecast_run_id;
+    hindcastJobId.value = selectedVerificationJob?.value?.hindcast_run_id;
   }
 
   const setSelectedVerificationRowData = async (verification_row_data: VerificationJob): Promise<void> => {
@@ -317,9 +263,9 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
   }
 
   const resetSelectedVerificationJobData = (): void => {
-    // clear previously selected forecast/verification jobs
-    selectedForecastJob.value = undefined;
-    forecastJobId.value = undefined;
+    // clear previously selected hindcast/verification jobs
+    selectedHindcastJob.value = undefined;
+    hindcastJobId.value = undefined;
     selectedVerificationJob.value = undefined;
     verificationJobId.value = undefined;
   }
@@ -334,7 +280,9 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
         "Authorization": `Bearer ${getAccessToken()}`,
         "Content-Type": 'application/json'
       },
-      body: JSON.stringify({ forecast_run_id: selectedForecastJob?.value?.forecast_run_id })
+      body: JSON.stringify({
+        hindcast_run_id: selectedHindcastJob?.value?.hindcast_run_id
+      })
     });
   };
   
@@ -349,7 +297,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
           if (isValidDate(submitTimeDate.value)) {
             submitTime.value = formatDateForRunOnString(submitTimeDate.value);
           }
-          if ( verificationJobStatus?.value?.toLocaleUpperCase() !== "RUNNING" ) {
+          if (!['Submitted','Running'].includes(verificationJobStatus?.value) ) {
             elapsedTime.value = response._data.elapsed_time ? formatElapsedTime(response._data.elapsed_time) : '';
             clearInterval(verificationStatusCheckingInterval.value);
             clearInterval(verificationRunningTimeInterval.value);
@@ -429,39 +377,10 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     });
   };
 
-  /**
-   * reset job filters
-   */
-  const resetFilters = () => {
-    statusTypeFilterList.value = [];
-    createdAtStart.value = null;
-    createdAtEnd.value = null;
-    minCreatedAt.value = null;
-    maxCreatedAt.value = null;
-    jobIdStart.value = null;
-    jobIdEnd.value = null;
-    minJobId.value = null;
-    maxJobId.value = null;
-  };
-
 
   return {
-    forecastJobId,
-    forecastRunsForVerification,
-    selectedForecastJob,
-    forecastRunsForVerificationListPageSize,
-    forecastRunsForVerificationListCurrentPage,
-    forecastRunsForVerificationListTotalPages,
-    forecastRunsForVerificationListTotalSize,
-    forecastRunsForVerificationListStartRow,
-    forecastRunsForVerificationListEndRow,
-    forecastRunsForVerificationListSort,
     verificationJobId,
     verificationJobStatus,
-    failureMessages,
-    elapsedTime,
-    submitTimeDate,
-    submitTime,
     verificationStatusCheckingInterval,
     verificationRunningTimeInterval,
     verificationJobs,
@@ -477,9 +396,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     yamlConfigData,
     verificationPlotNames,
     verificationPlot,
-    getForecastRunsForVerification,
-    setSelectedForecastRunId,
-    setSelectedForecastRowData,
     getVerificationJobs,
     loadVerificationRunStatusTabData,
     loadVerificationResultsTabData,
@@ -495,7 +411,7 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
     getVerificationPlotNames,
     getVerificationPlot,
     deleteVerificationJob,
-    resetFilters
+    fetchVerificationGageList
   };
 });
 

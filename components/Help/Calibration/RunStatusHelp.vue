@@ -18,13 +18,17 @@
                     Once all required data has been entered, all checkmarks are set and the status becomes <strong>Ready</strong>. Otherwise, the status remains <strong>Saved</strong> or one of the finished statuses.
                 </li>
                 <li>
+                    Set the desired <strong>Log</strong> settings before clicking the <strong>Run</strong> button.<br />
+                    <strong>Logs are not shared across MPI processes — each MPI process writes its own log file(s).</strong>
+                </li>
+                <li>
                     Clicking <strong>Run</strong> triggers the final subsetting and validation of acquired data. Depending on the size of the headwater basin, this may delay the start of the calibration run. Additional delays may occur while waiting for available resources.
                 </li>
                 <li><p class="mb-0">Normal status transitions</p>
                     <div class="ml-2"><strong>Calibration Ready -&gt; Submitted -&gt; Calibration Running -&gt; Calibration Done,
                         Validation Control
                         Running -&gt;
-                        Calibration Done, Validation Best Running -&gt; Done </strong>
+                        Calibration Calibration Done, Valid Best Running -&gt; Done </strong>
                     </div>
                 </li>
                 <li>
@@ -54,9 +58,12 @@
                 <li>
                     If a job fails during the calibration run:
                     <ol class="list-decimal list-outside ml-4">
-                        <li>The <strong>ngen.log</strong> file is automatically displayed to help identify the problem.</li>
-                        <li>If the issue is not clear, select <strong>Calibration logs</strong> from <strong>Display</strong> 
-                            and scroll through the console output (stdout/stderr) to investigate further.</li>
+                        <li>Select the <strong>Calibration Logs</strong> from the <strong>Display</strong> pulldown menu to help 
+                            identify the problem.
+                        </li>
+                        <li>Suggest looking at an <strong>ngen</strong> log. If it not available or the issue is not clear, select 
+                            another log and scroll through the console output (stdout/stderr) to investigate further.
+                        </li>
                     </ol>
                 </li>
             </ul>
@@ -107,6 +114,15 @@
                 <tr>
                     <td class="td1">Global Logging</td>
                     <td class="td2">Enable or Disable the Error Warning and Trapping system for ngen and modules.</td>
+                </tr>
+                <tr>
+                    <td class="td1">Log File Mode</td>
+                    <td class="td2">Logs are not shared across MPI processes. Each MPI process writes its own log file(s).<br />
+                                            <ol class="list-disc list-outside ml-4">
+                        <li><strong>Unifed</strong> Places log messages for all modules in single log file per rank.</li>
+                        <li><strong>Split By Module</strong> Places log messages in module prefixed log files per rank.</li>
+                    </ol>
+                </td>
                 </tr>
                 <tr>
                     <td class="td1">Log Levels</td>
@@ -208,7 +224,7 @@
             </tr>
             <tr class="odd:bg-white even:bg-gray-50  border-t-2 border-gray-900">
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 align-top border-r-2 border-gray-200">
-                Calibration Done, Validation Control Running
+                Calibration Calibration Done, Valid Control Running
               </td>
               <td class="px-4 py-3 text-sm text-gray-700 align-top">
                 The calibration has completed the iterative running ngen. The calibration manager is currently 
@@ -217,7 +233,7 @@
             </tr>
             <tr class="odd:bg-white even:bg-gray-50  border-t-2 border-gray-900">
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 align-top border-r-2 border-gray-200">
-                Calibration Done, Validation Best Running
+                Calibration Calibration Done, Valid Best Running
               </td>
               <td class="px-4 py-3 text-sm text-gray-700 align-top">
                 Both the calibration run, and validation control run have completed successfully. 
@@ -246,7 +262,7 @@
             </tr>
             <tr class="odd:bg-white even:bg-gray-50  border-t-2 border-gray-900">
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 align-top border-r-2 border-gray-200">
-                Calibration Done, Validation Control Failed
+                Calibration Calibration Done, Valid Control Failed
               </td>
               <td class="px-4 py-3 text-sm text-gray-700 align-top">
                 A failure occurred causing the Validation Control Job to crash. Logs and Plots are viewable in the 
@@ -257,7 +273,7 @@
             </tr>
             <tr class="odd:bg-white even:bg-gray-50  border-t-2 border-gray-900">
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 align-top border-r-2 border-gray-200">
-                Calibration Done, Validation Best Failed
+                Calibration Calibration Done, Valid Best Failed
               </td>
               <td class="px-4 py-3 text-sm text-gray-700 align-top">
                 A failure occurred causing the Validation Best Job to crash. Logs and Plots are viewable in the 

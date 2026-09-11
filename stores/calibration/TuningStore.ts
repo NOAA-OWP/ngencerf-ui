@@ -22,32 +22,31 @@ export const useTuningStore = defineStore(
     const { ngencerfBaseUrl } = useBackendConfig();
 
     // user-data properties
-    const simStartTime = ref<any>("");
-    const simEndTime = ref<any>("");
-
-    const calStartTime = ref<any>("");
-    const calEndTime = ref<any>("");
+    const calSimStartTime = ref<any>();
+    const calSimEndTime = ref<any>();
+    const calStartTime = ref<any>();
+    const calEndTime = ref<any>();
 
     const calibrationTuningModules = ref<any>();
     const calibrationTuningParameters = ref<any[]>([]);
     const userSelectedCalibrationTuningParameters = ref<any[]>([]);
 
-    const automatic_validation = ref<boolean>(true);
+    const valSimStartTime = ref<any>();
+    const valSimEndTime = ref<any>();
+    const valStartTime = ref<any>();
+    const valEndTime = ref<any>();
 
-    const avSimStartTime = ref<any>("");
-    const avSimEndTime = ref<any>("");
-    const avCalStartTime = ref<any>("");
-    const avCalEndTime = ref<any>("");
-
-    const rangeDateFrom = ref<any>();
-    const rangeDateTo = ref<any>();
+    const dateRangeBegin = ref<any>();
+    const dateRangeEnd = ref<any>();
 
     const tuningStore_data_loading = ref(true);
+    const validateTuningTimesRequestBody = ref<any>({});
     const saveTuningTabRequestBody = ref<any>({});
 
     const selectedOutputVariableToCalibrate = ref<string>("Streamflow");
     const calibratableParametersHaveChanged = ref<boolean>(false);
     const tuningDataHasChanged = ref<boolean>(false);
+    const tuningParametersAreValid = ref<boolean>(false);
 
     /**
      * Load Tuning Tab data
@@ -72,12 +71,12 @@ export const useTuningStore = defineStore(
       const timeRange = loadTuningTabData.value?._data?.time_range;
       // check if timeRange is provided and not empty
       if (timeRange?.start_time && timeRange?.end_time) {
-        rangeDateFrom.value = timeRange?.start_time;
-        rangeDateTo.value = timeRange?.end_time;
+        dateRangeBegin.value = timeRange?.start_time;
+        dateRangeEnd.value = timeRange?.end_time;
         if (userCalibrationRunData.value) {
           userCalibrationRunData.value.time_range.start_time =
-            rangeDateFrom.value;
-          userCalibrationRunData.value.time_range.end_time = rangeDateTo.value;
+            dateRangeBegin.value;
+          userCalibrationRunData.value.time_range.end_time = dateRangeEnd.value;
         }
       }
 
@@ -118,6 +117,44 @@ export const useTuningStore = defineStore(
     }
 
     /**
+     * return validate tuning parameters response from the server
+     * @returns {GeneralApiSaveResponse}
+     */
+    async function validateTuningParameters() {
+      return await makeProtectedApiCall<GeneralApiSaveResponse>(
+        `${ngencerfBaseUrl}/calibration/validate_parameters/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            calibration_run_id: calibrationJobId.value
+          }),
+        }
+      );
+    }
+
+    /**
+     * return validate tuning times response from the server
+     * @returns {GeneralApiSaveResponse}
+     */
+    async function validateTuningTimes() {
+      return await makeProtectedApiCall<any>(
+        `${ngencerfBaseUrl}/calibration/validate_tuning_times/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(validateTuningTimesRequestBody.value),
+        }
+      );
+    }
+
+    /**
      * Save Tuning Tab data
      * @returns {Promise<any>} SaveTuningTab data
      */
@@ -151,14 +188,14 @@ export const useTuningStore = defineStore(
      * Hard Reset Tuning Store
      */
     const hardResetTuningTimeConrols = (): void => {
-      simStartTime.value = "";
-      simEndTime.value = "";
+      calSimStartTime.value = "";
+      calSimEndTime.value = "";
       calStartTime.value = "";
       calEndTime.value = "";
-      avSimStartTime.value = "";
-      avSimEndTime.value = "";
-      avCalStartTime.value = "";
-      avCalEndTime.value = "";
+      valSimStartTime.value = "";
+      valSimEndTime.value = "";
+      valStartTime.value = "";
+      valEndTime.value = "";
     };
 
     /**
@@ -166,20 +203,19 @@ export const useTuningStore = defineStore(
      */
     const hardResetTuningStore = (): void => {
       loadTuningTabData.value = null;
-      simStartTime.value = "";
-      simEndTime.value = "";
+      calSimStartTime.value = "";
+      calSimEndTime.value = "";
       calStartTime.value = "";
       calEndTime.value = "";
       calibrationTuningModules.value = null;
       calibrationTuningParameters.value = [];
       userSelectedCalibrationTuningParameters.value = [];
-      automatic_validation.value = true;
-      avSimStartTime.value = "";
-      avSimEndTime.value = "";
-      avCalStartTime.value = "";
-      avCalEndTime.value = "";
-      rangeDateFrom.value = null;
-      rangeDateTo.value = null;
+      valSimStartTime.value = "";
+      valSimEndTime.value = "";
+      valStartTime.value = "";
+      valEndTime.value = "";
+      dateRangeBegin.value = null;
+      dateRangeEnd.value = null;
       tuningStore_data_loading.value = true;
     };
 
@@ -187,23 +223,26 @@ export const useTuningStore = defineStore(
       tuningStore_data_loading,
       loadTuningTabStaticData,
       loadTuningTabData,
-      simStartTime,
-      simEndTime,
+      calSimStartTime,
+      calSimEndTime,
       calStartTime,
       calEndTime,
-      avSimStartTime,
-      avSimEndTime,
-      avCalStartTime,
-      avCalEndTime,
-      rangeDateFrom,
-      rangeDateTo,
+      valSimStartTime,
+      valSimEndTime,
+      valStartTime,
+      valEndTime,
+      dateRangeBegin,
+      dateRangeEnd,
       selectedOutputVariableToCalibrate,
       calibrationTuningParameters,
       userSelectedCalibrationTuningParameters,
-      automatic_validation,
       calibratableParametersHaveChanged,
       tuningDataHasChanged,
+      validateTuningTimesRequestBody,
       saveTuningTabRequestBody,
+      tuningParametersAreValid,
+      validateTuningTimes,
+      validateTuningParameters,
       saveTuningTabData,
       clearCalibratableParameters,
       hardResetTuningTimeConrols,

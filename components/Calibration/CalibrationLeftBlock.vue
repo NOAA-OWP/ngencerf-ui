@@ -1,25 +1,26 @@
 <template>
-  <!-- LeftBlock.vue -->
+  <!-- CalibrationLeftBlock.vue -->
   <div>
-    <Tabs @tabNumber="tabChanged" />
+    <Tabs @tabNumber="tabChanged" ref="navRef" :call-tab-validator="validateCurrentTab" 
+      :call-tab-restore="restoreCurrentTab"/>
     
     <div v-if="activeTab === 1">
-      <CalibrationCalibrationRunsTab />
+      <CalibrationCalibrationRunsTab :call-go-to-tab="currentTabNavGo"/>
     </div> 
     <div v-else-if="activeTab === 2">
-      <CalibrationHeadwaterBasinGage />
+      <CalibrationHeadwaterBasinGage ref="tabRef" :call-go-to-tab="currentTabNavGo" :call-nav-dialog="showCurrentTabNavDialog"/>
     </div>
     <div v-else-if="activeTab === 3">
-      <CalibrationFormulation />
+      <CalibrationFormulation ref="tabRef" :call-go-to-tab="currentTabNavGo" :call-nav-dialog="showCurrentTabNavDialog"/>
     </div>
     <div v-else-if="activeTab === 4">
-      <CalibrationTuningControls />
+      <CalibrationTuningControls ref="tabRef" :call-go-to-tab="currentTabNavGo" :call-nav-dialog="showCurrentTabNavDialog"/>
     </div>
     <div v-else-if="activeTab === 5">
-      <CalibrationOptimizationMetrics />
+      <CalibrationOptimizationMetrics ref="tabRef" :call-go-to-tab="currentTabNavGo" :call-nav-dialog="showCurrentTabNavDialog"/>
     </div>
     <div v-else-if="activeTab === 6">
-      <CalibrationRunStatus />
+      <CalibrationRunStatus/>
     </div>
     
   </div>
@@ -37,10 +38,14 @@ import CalibrationTuningControls from '@/components/Calibration/TuningControls.v
 import CalibrationOptimizationMetrics from '@/components/Calibration/OptimizationMetrics.vue';
 import CalibrationRunStatus from '@/components/Calibration/RunStatus.vue';
 import CalibrationCalibrationRunsTab from '@/components/Calibration/PreviousCalibrationRuns.vue';
+import { ThemeUtils } from "@primeuix/styled";
 
-const { getCalibrationTabIndex, setCalibrationTabIndex } = generalStore();
+const { tabRef, navRef } = storeToRefs(generalStore());
+const { getCalibrationTabIndex, setCalibrationTabIndex, validateCurrentTab, restoreCurrentTab, currentTabNavGo, showCurrentTabNavDialog} = generalStore();
+
 // Default to Tab 1, HeadwaterBasinGage
 const activeTab = ref(getCalibrationTabIndex());
+
 // Activate new tab
 const tabChanged = (tabNum: number) => {
   if (activeTab.value !== tabNum) {

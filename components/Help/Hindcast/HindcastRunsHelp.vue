@@ -1,24 +1,30 @@
 <template>
     <div class="_help-page">
-        <div class="_help-title">Verification - Verification Runs Tab</div>
+        <div class="_help-title">Hindcast - Hindcast Runs Tab</div>
         <p id="help-subtitle" class="_help-subtitle">
-            Displays table of previous verification runs with some basic details.
+            Displays table of previous hindcast runs with some basic details.
         </p>
         <p class="text-center" style="color:#cc5500;font-size:0.8em;">
-            WARNING: Clicking the browser refresh button takes you to the Forecast Runs tab.
+            WARNING: Clicking the browser refresh button takes you to the Calibration Runs tab.
         </p>
        <hr class="my-6 border-black" />
 
-        <div id="filters" class="text-center font-bold text-xl mb-3">Filtering Verification Jobs</div>
+        <div id="filters" class="text-center font-bold text-xl mb-3">Filtering Hindcast Jobs</div>
         <div class="ml-2">
             <p class="mb-4">
-            Use the filters at the top of the table to narrow down the list of Verification jobs. 
+            Use the filters at the top of the table to narrow down the list of hindcast jobs. 
             You can use any combination of filters; only jobs that match <strong>all active filters</strong> will be shown. 
             The table updates automatically as you select filters.
             </p>
 
+            <p><strong>Domain</strong></p>
+            <p class="mb-2">Select a single domains to show jobs with gages in that domain.</p>
+
             <p><strong>Headwater Basin Gage</strong></p>
             <p class="mb-2">Select a single gage to show jobs for that basin.</p>
+
+            <p><strong>Status</strong></p>
+            <p class="mb-2">Multi-select filter. Jobs matching any selected status will be shown.</p>
 
             <p><strong>Created After</strong></p>
             <p class="mb-2">Show jobs created on or after the selected date.</p>
@@ -26,10 +32,10 @@
             <p><strong>Created Before</strong></p>
             <p class="mb-2">Show jobs created on or before the selected date.</p>
 
-            <p><strong>Job ID Start</strong></p>
+            <p><strong>Hindcast Job ID Start</strong></p>
             <p class="mb-2">Show jobs with ID greater than or equal to this number.</p>
 
-            <p><strong>Job ID End</strong></p>
+            <p><strong>Hindcast Job ID End</strong></p>
             <p class="mb-2">Show jobs with ID less than or equal to this number.</p>
 
             <p class="mt-4 mb-4 italic">
@@ -47,7 +53,7 @@
         </div>
 
         <hr class="my-6 border-black" />
-        <div id="calibration-jobs" class="text-center font-bold text-xl mb-3">Verification Runs Table</div>
+        <div id="calibration-jobs" class="text-center font-bold text-xl mb-3">Hindcast Runs Table</div>
         <p class="text-center">Sort table by clicking on the sort icon in a column.</p>
         <br />
         <p class="text-center"><strong>Right Click Actions</strong></p>
@@ -61,16 +67,29 @@
             <tbody>
                 <tr>
                     <td class="td1">View Status</td>
-                    <td class="td2">View the status of a running job the job statistics from a completed job.</td>
+                    <td class="td2">View the status of a running job, and the job statistics from a completed job.<br/>
+                        Double clicking on a row is equivalent to this action.</td>
                 </tr>
                 <tr>
                     <td class="td1">View Results</td>
-                    <td class="td2">View results from this forecast run.</td>
+                    <td class="td2">View results from this hindcast run.</td>
+                </tr>
+                <tr>
+                    <td class="td1">Run New Hindcast</td>
+                    <td class="td2">Run a new hindcast using the same calibration as the basis for the job.</td>
+                </tr>
+                <tr>
+                    <td class="td1">Run New Verification</td>
+                    <td class="td2">Run a new verification using this hindcast as the basis for the job.</td>
+                </tr>
+                <tr>
+                    <td class="td1">View Calibration Details</td>
+                    <td class="td2">View more details about the calibration job than what is shown in the table.</td>
                 </tr>
                 <tr>
                     <td class="td1">Delete</td>
                     <td class="td2">Selecting this action will <strong>permanently delete the chosen calibration job</strong> along 
-                        with all associated validation, forecast, and verification jobs. All references to this 
+                        with all associated validation, forecast, hindcast, and verification jobs. All references to this 
                         job will also be removed from the database. <strong>This action cannot be undone.</strong> 
                         After deletion, you will remain on the current page.
                     </td>
