@@ -24,7 +24,8 @@
           <JobFilterDialog id="JobFilterDialog" job-type="Forecast" :disable-all="false" 
             :show-modules="false" :show-archived="false"
             :totalSize="forecastRunListTotalSize" :totalPages="forecastRunListTotalPages"
-            v-model:currentPage="forecastRunListCurrentPage"
+            v-model:currentPage="forecastRunListCurrentPage" 
+            v-model:selectedJobs="selectedForecastJobAsArray" :running-job-in-list="runningJobInList"
             @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
             @UpdateGageList="updateGageList()" ref="jobFilterRef" />
 
@@ -45,7 +46,7 @@
           <DataTable id="ForecastRuns" :value="forecastRuns" 
             scrollable scroll-height="400px" table-style="min-width: 50rem"
             v-model:sortField="forecastRunListSort.field" v-model:sortOrder="forecastRunListSort.direction"
-            v-model:selection="selectedForecastJob" selectionMode="single" :rowStyle="rowStyle"
+            v-model:selection="selectedForecastJob" selectionMode="single" :metaKeySelection="false" :rowStyle="rowStyle"
             @rowSelect="onForecastRowSelect" @rowUnselect="onForecastRowUnSelect" @rowContextmenu="onRowContextMenu"
             @row-dblclick="onRowDblClick($event)" class="boxed">
             <Column :pt="ptColumn" field="forecast_run_id" sortable>
@@ -188,7 +189,6 @@ import { generalStore } from "~/stores/common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
-import { hilightTab } from '@/composables/TabHilight';
 
 import type { DataTableRowClickEvent } from "primevue/datatable";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
@@ -288,6 +288,7 @@ const onRowDblClick = (event: any) => {
 
 onMounted(async () => {
   isLoading.value = true;
+  forecastRuns.value = [];
   forecastJobId.value = undefined;
   calibrationRunForForecast.value = undefined;
   userCalibrationRunData.value = undefined;
@@ -297,8 +298,7 @@ onMounted(async () => {
 
   //reset Run/Status store in case we have running intervals
   hardResetForecastStore();
-
-  hilightTab(ForecastTabs.tab_forecastRuns);
+  
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
@@ -323,6 +323,20 @@ onMounted(async () => {
 const updateGageList = async() => {
   uiGageList.value = await fetchForecastGageList();
 }
+
+const selectedForecastJobAsArray = computed(() => {
+  if (selectedForecastJob.value) {
+    return [selectedForecastJob.value];
+  }
+  return [];
+})
+
+const runningJobInList = computed(() => {
+  if (forecastRuns.value?.length) {
+    return forecastRuns.value.some(run => run.forecast_status.includes('Submitted') || run.forecast_status.includes('Running'));
+  }
+  return false;
+})
 
 const onForecastRowSelect = async (event: DataTableRowClickEvent) => {
   const rowData = event.data as ForecastJob;
@@ -450,6 +464,7 @@ const toggleMessagesGroup = () => {
  */
 const refreshJobList = async () => {
   isLoading.value = true;
+  selectedForecastJob.value = undefined;
   await getForecastJobs();
   isLoading.value = false;
 }

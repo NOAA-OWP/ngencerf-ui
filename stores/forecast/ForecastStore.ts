@@ -132,7 +132,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    * @return {void}
    */
   const getForecastJobs = async (): Promise<any> => {
-    forecastRuns.value = [];
     let requestBody = {
       limit: forecastRunListPageSize.value,
       offset: (forecastRunListCurrentPage.value - 1) * forecastRunListPageSize.value,
@@ -246,7 +245,12 @@ export const useForecastStore = defineStore('ForecastStore', () => {
         forecastConfigurationName.value = getStatusResponse?._data?.configuration;
         forecastJobStatus.value = getStatusResponse?._data?.status;
         coldStartJobStatus.value = getStatusResponse?._data?.cold_start_run?.status;
-        failureMessages.value = getStatusResponse?._data?.failure_messages;
+        if (getStatusResponse._data?.failure_messages) {
+          failureMessages.value = getStatusResponse._data.failure_messages.flatMap(failure_message => [
+            ...(failure_message.message ? [failure_message.message] : []),
+            ...(failure_message.errors ?? [])
+          ]);
+        }
 
         if (getStatusResponse?._data?.cold_start_run?.submit_date) {
           submitTimeDate.value = new Date(getStatusResponse?._data?.cold_start_run.submit_date as string);
@@ -408,7 +412,6 @@ export const useForecastStore = defineStore('ForecastStore', () => {
    * Query get_calibration_jobs_for_forecast endpoint
    */
   const getCalibrationJobsForForecast = async (): Promise<any> => {
-    calibrationRunsForForecast.value = [];
     let requestBody = {
       limit: calibrationRunsForForecastListPageSize.value,
       offset: (calibrationRunsForForecastListCurrentPage.value - 1) * calibrationRunsForForecastListPageSize.value,

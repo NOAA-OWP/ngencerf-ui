@@ -50,7 +50,7 @@
           <DataTable id="CalibrationRunForHindcastTable" :value="calibrationRunsForHindcast" 
             scrollable scroll-height="400px" :rowStyle="rowStyle" table-style="min-width: 50rem"
             v-model:sortField="calibrationRunsForHindcastListSort.field" v-model:sortOrder="calibrationRunsForHindcastListSort.direction"
-            v-model:selection="selectedCalibrationRuns" selectionMode="multiple" :metaKeySelection="true" 
+            v-model:selection="selectedCalibrationRuns" selectionMode="multiple" :metaKeySelection="false" 
             v-model:contextMenuSelection="contextMenuSelection" contextMenu @rowContextmenu="onRowContextMenu"
             @rowSelect="onCalibrationRunForHindcastRowSelect" @rowUnselect="onCalibrationRunForHindcastRowUnSelect"
             @row-dblclick="onRowDblClick($event)" dataKey="calibration_run_id" class="boxed">
@@ -223,7 +223,6 @@ import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
-import { hilightTab } from '@/composables/TabHilight';
 import { HindcastTabs } from "@/composables/NgencerfEnums";
 
 const { 
@@ -257,7 +256,9 @@ const {
   calibrationRunsForHindcastListEndRow,
   calibrationRunsForHindcastListSort,
   selectedHindcastJob,
-  hindcastJobStatus
+  hindcastJobStatus,
+  intervalCycle,
+  numIterations
 } = storeToRefs(HindcastStore);
 const { 
   getCalibrationJobsForHindcast, 
@@ -395,11 +396,12 @@ onMounted(async () => {
   selectedHindcastJob.value = undefined;
   hindcastJobStatus.value = undefined; 
   calibrationRunsForHindcastListCurrentPage.value = 1;
+  intervalCycle.value = undefined;
+  numIterations.value = undefined;
 
   //reset Run/Status store in case we have running intervals
   hardResetHindcastStore();
-
-  hilightTab(HindcastTabs.tab_calibrationRuns);
+  
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
@@ -441,6 +443,7 @@ watch(calibrationRunsForHindcastListCurrentPage, () => {
 
 const refreshJobList = async () => {
   isLoading.value = true;
+  selectedCalibrationRuns.value = undefined;
   await getCalibrationJobsForHindcast();
   visibleCalibrationRunIds.value = calibrationRunsForHindcast.value.map(job => job.calibration_run_id);
   if (calibrationRunsForHindcastListTotalPages.value > 1) {

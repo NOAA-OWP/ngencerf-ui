@@ -170,7 +170,6 @@ import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { generalStore } from '~/stores/common/GeneralStore';
 
-import { hilightTab } from '@/composables/TabHilight';
 import { useDialog } from 'primevue/usedialog';
 
 import MessagesGroup from "../Common/MessagesGroup.vue";
@@ -261,9 +260,6 @@ onMounted(async () => {
     // scroll to top of the page
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
-
-    // highlight the tab when selected
-    hilightTab(ForecastTabs.tab_setupForecast);
 
     nextTick(async () => {
         calibrationJobId.value = calibrationRunForForecast.value?.calibration_run_id;

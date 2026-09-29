@@ -109,7 +109,7 @@
               <div v-if="failureMessages && failureMessages.length > 0">
                 <span class="font-bold">{{ failureMessages.length > 1 ? 'Messages' : 'Message' }}: </span>
                 <span v-for="failure_message in failureMessages">
-                  {{ failure_message.message }}<br/>
+                  {{ failure_message }}<br/>
                 </span>
               </div>
             </div>
@@ -227,7 +227,6 @@ import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { useForecastStore } from '@/stores/forecast/ForecastStore';
 import { useLogStore } from '@/stores/common/LogStore';
 
-import { hilightTab } from '@/composables/TabHilight';
 import { useDialog } from 'primevue/usedialog';
 import { isValidDate } from '@/utils/CommonHelpers';
 import { calculateElapsedTime } from '@/utils/TimeHelpers';
@@ -301,9 +300,6 @@ onMounted(async () => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
-  // highlight the tab when selected
-  hilightTab(ForecastTabs.tab_forecastRunStatus);
-
   clearInterval(forecastJobStatusIntervalId.value);
   clearInterval(elapsedTimeIntervalId.value);
   forecastJobStatusIntervalId.value = undefined;
@@ -311,7 +307,7 @@ onMounted(async () => {
   
   // get calibration job data if we don't already have it
   calibrationJobId.value = calibrationRunForForecast?.value?.calibration_run_id;
-  if (!userCalibrationRunData.value) {
+  if (!userCalibrationRunData.value || userCalibrationRunData?.value?.calibration_run_id !== calibrationJobId.value) {
     isLoading.value = true;
     await fetchUserCalibrationRunData();
     isLoading.value = false;
@@ -470,7 +466,12 @@ const startForecastRun = async () => {
     if (getStatusResponse?._data?.status) {
       forecastJobStatus.value = getStatusResponse._data.status;
       coldStartJobStatus.value = getStatusResponse._data?.cold_start?.status ?? undefined;
-      failureMessages.value = getStatusResponse._data?.failure_messages ?? undefined;
+      if (getStatusResponse._data?.failure_messages) {
+        failureMessages.value = getStatusResponse._data.failure_messages.flatMap(failure_message => [
+          ...(failure_message.message ? [failure_message.message] : []),
+          ...(failure_message.errors ?? [])
+        ]);
+      }
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: getStatusResponse?._data?.message ?? `Error when running forecast job`, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
@@ -494,7 +495,12 @@ const cancelForecastRun = async () => {
 
     if (cancelForecastJobResponse?._data?.status) {
       forecastJobStatus.value = cancelForecastJobResponse._data.status;
-      failureMessages.value = cancelForecastJobResponse._data.failure_messages ?? undefined;
+      if (cancelForecastJobResponse._data?.failure_messages) {
+        failureMessages.value = cancelForecastJobResponse._data.failure_messages.flatMap(failure_message => [
+          ...(failure_message.message ? [failure_message.message] : []),
+          ...(failure_message.errors ?? [])
+        ]);
+      }
 
       if (forecastJobStatus.value !== 'Cancelled') {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Forecast status not set to Cancelled after clicking CANCEL', life: ToastTimeout.timeoutError };
@@ -554,6 +560,7 @@ onUnmounted(() => {
   logListOptions.value = [];
   forecastJobStatus.value = undefined;
   coldStartJobStatus.value = undefined;
+  failureMessages.value = undefined;
   resetUserLogRefs();
 })
 </script>

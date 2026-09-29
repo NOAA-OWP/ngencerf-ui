@@ -1,18 +1,25 @@
 name: ngencerf-ui
 
+# Every value below is read from the environment. Defaults live in ./.env
+# (loaded automatically by Compose); variables set in the shell override them.
 services:
   ngencerf-app:
-    image: ghcr.io/ngwpc/ngencerf-ui:${NGENCERF_UI_TAG:-latest}
+    # Always built locally (pull_policy: build), never pulled. Set
+    # NGENCERF_UI_IMAGE_NAME to tag the build for a registry.
+    image: ${NGENCERF_UI_IMAGE_NAME:-ngencerf-ui:local}
     pull_policy: build
     build:
       context: .
       args:
-        # Local: pw_platform_host unset -> empty -> app uses its default base URL.
-        # Parallel Works: set pw_platform_host (+ basepath) to bake the real API URL.
-        NGENCERF_BASE_URL: ${pw_platform_host:+https://${pw_platform_host}${basepath}/api/}
+        # Build-time and runtime working directory inside the image (see Dockerfile).
+        WORKDIR_PATH: ${WORKDIR_PATH:-/var/www/ngencerf/nuxt-app}
+        # Port baked into the image's ENV PORT and EXPOSE (see Dockerfile).
+        NGENCERF_UI_CONTAINER_PORT: ${NGENCERF_UI_CONTAINER_PORT:-3000}
     ports:
-      - "${ngencerf_port:-3000}:3000"
+      - "${NGENCERF_UI_HOST_PORT:-3000}:${NGENCERF_UI_CONTAINER_PORT:-3000}"
     environment:
-      - NUXT_HOST=0.0.0.0
-      - NUXT_PORT=3000
-      - NUXT_APP_BASE_URL=${basepath:-}/
+      NUXT_HOST: "0.0.0.0"
+      # PORT is what the production server (Nitro) reads; NUXT_PORT keeps
+      # `nuxt dev`/`nuxt preview` consistent with it.
+      PORT: ${NGENCERF_UI_CONTAINER_PORT:-3000}
+      NUXT_PORT: ${NGENCERF_UI_CONTAINER_PORT:-3000}

@@ -219,7 +219,6 @@ import { useUserDataStore } from "@/stores/common/UserDataStore"
 import { useHindcastStore } from '@/stores/hindcast/HindcastStore';
 import { generalStore } from '~/stores/common/GeneralStore';
 
-import { hilightTab } from '@/composables/TabHilight';
 import { useDialog } from 'primevue/usedialog';
 
 import MessagesGroup from "../Common/MessagesGroup.vue";
@@ -314,9 +313,6 @@ onMounted(async () => {
     // scroll to top of the page
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }
-
-    // highlight the tab when selected
-    hilightTab(HindcastTabs.tab_setupHindcast);
 
     nextTick(async () => {
         calibrationJobId.value = calibrationRunForHindcast.value?.calibration_run_id;

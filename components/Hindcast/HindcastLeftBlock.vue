@@ -3,30 +3,32 @@
   <div>
     <Tabs @tabNumber="tabChanged" ref="navRef" :call-tab-validator="validateCurrentTab" />
     <div class="shrink-0">
-      <span v-if="activeTab === 1">
-        <PreviousCalibrationRuns :call-go-to-tab="currentTabNavGo"/>
-      </span>
-      <span v-else-if="activeTab === 2">
-        <HindcastRunsTab :call-go-to-tab="currentTabNavGo"/>
-      </span>
-      <span v-else-if="activeTab === 3">
-        <SetupHindcastTab ref="tabRef" :call-go-to-tab="currentTabNavGo"/>
-      </span>
-      <span v-else-if="activeTab === 4">
-        <HindcastRunStatusTab ref="tabRef" :call-go-to-tab="currentTabNavGo"/>
-      </span>
-      <span v-else-if="activeTab === 5">
-        <HindcastResultsTab/>
-      </span>
-      <span v-if="activeTab === 6">
-        <VerificationRunsTab :call-go-to-tab="currentTabNavGo"/>
-      </span>
-      <span v-else-if="activeTab === 7">
-        <VerificationRunStatusTab ref="tabRef" :call-go-to-tab="currentTabNavGo"/>
-      </span>
-      <span v-else-if="activeTab === 8">
-        <VerificationResultsTab/>
-      </span>
+      <KeepAlive>
+        <span v-if="activeTab === 1">
+          <PreviousCalibrationRuns :call-go-to-tab="currentTabNavGo"/>
+        </span>
+        <span v-else-if="activeTab === 2">
+          <HindcastRunsTab :call-go-to-tab="currentTabNavGo"/>
+        </span>
+        <span v-else-if="activeTab === 3">
+          <SetupHindcastTab ref="tabRef" :call-go-to-tab="currentTabNavGo"/>
+        </span>
+        <span v-else-if="activeTab === 4">
+          <HindcastRunStatusTab ref="tabRef" :call-go-to-tab="currentTabNavGo"/>
+        </span>
+        <span v-else-if="activeTab === 5">
+          <HindcastResultsTab/>
+        </span>
+        <span v-else-if="activeTab === 6">
+          <VerificationRunsTab :call-go-to-tab="currentTabNavGo"/>
+        </span>
+        <span v-else-if="activeTab === 7">
+          <VerificationRunStatusTab ref="tabRef" :call-go-to-tab="currentTabNavGo"/>
+        </span>
+        <span v-else-if="activeTab === 8">
+          <VerificationResultsTab/>
+        </span>
+      </KeepAlive>
     </div>
   </div>
 </template>
@@ -41,13 +43,23 @@ const verificationStore = useVerificationStore();
 
 import Tabs from '@/components/Common/Tabs.vue'
 import PreviousCalibrationRuns from "./PreviousCalibrationRuns.vue"
-import HindcastRunsTab from "./HindcastRunsTab.vue"
-import SetupHindcastTab from './SetupHindcastTab.vue';
-import HindcastRunStatusTab from './HindcastRunStatusTab.vue';
-import HindcastResultsTab from './HindcastResultsTab.vue';
-import VerificationRunsTab from "./VerificationRunsTab.vue"
-import VerificationRunStatusTab from "./VerificationRunStatusTab.vue"
-import VerificationResultsTab from "./VerificationResultsTab.vue"
+
+const hindcastRunsTabLoader = () => import('./HindcastRunsTab.vue');
+const setupHindcastTabLoader = () => import('./SetupHindcastTab.vue');
+const hindcastRunStatusTabLoader = () => import('./HindcastRunStatusTab.vue');
+const hindcastResultsTabLoader = () => import('./HindcastResultsTab.vue');
+const verificationRunsTabLoader = () => import('./VerificationRunsTab.vue');
+const verificationRunStatusTabLoader = () => import('./VerificationRunStatusTab.vue');
+const verificationResultsTabLoader = () => import('./VerificationResultsTab.vue');
+
+const { asyncTabComponent } = useAsyncTabComponent();
+const HindcastRunsTab = asyncTabComponent(hindcastRunsTabLoader);
+const SetupHindcastTab = asyncTabComponent(setupHindcastTabLoader);
+const HindcastRunStatusTab = asyncTabComponent(hindcastRunStatusTabLoader);
+const HindcastResultsTab = asyncTabComponent(hindcastResultsTabLoader);
+const VerificationRunsTab = asyncTabComponent(verificationRunsTabLoader);
+const VerificationRunStatusTab = asyncTabComponent(verificationRunStatusTabLoader);
+const VerificationResultsTab = asyncTabComponent(verificationResultsTabLoader);
 
 const { tabRef, navRef } = storeToRefs(generalStore());
 const { getHindcastTabIndex, setHindcastTabIndex, validateCurrentTab, currentTabNavGo, showCurrentTabNavDialog } = generalStore();
@@ -68,6 +80,13 @@ const tabChanged = (tabNum: number) => {
 
 onUnmounted(() => {
   hindcastJobId.value = undefined;
-  verificationJobId.value = undefined;
+  verificationJobId.value = undefined
+  hindcastRunsTabLoader();
+  setupHindcastTabLoader();
+  hindcastRunStatusTabLoader();
+  hindcastResultsTabLoader();
+  verificationRunsTabLoader();
+  verificationRunStatusTabLoader();
+ verificationResultsTabLoader();
 })
 </script>

@@ -69,7 +69,12 @@ export const useEvaluationRunStatusStore = defineStore('EvaluationRunStatusStore
     queryIterationValidationRunStatus().then( response => {
       displayValidationId.value = validation_run_id;
       validationStatus.value = response?._data.status;
-      failureMessages.value = response?._data?.failure_messages;
+      if (response._data?.failure_messages) {
+        failureMessages.value = response._data.failure_messages.flatMap(failure_message => [
+          ...(failure_message.message ? [failure_message.message] : []),
+          ...(failure_message.errors ?? [])
+        ]);
+      }
       evaluateDisplayIterationNumber.value = response?._data?.iteration_num;
       startTime.value = response?._data?.submit_date.toString();
       if ( validationStatus.value.toLocaleUpperCase() !== "RUNNING" ) {

@@ -79,7 +79,7 @@
           <div v-if="failureMessages && failureMessages.length > 0">
             <span class="font-bold">{{ failureMessages.length > 1 ? 'Messages' : 'Message' }}: </span>
             <span v-for="failure_message in failureMessages">
-              {{ failure_message.message }}<br/>
+              {{ failure_message }}<br/>
             </span>
           </div>
         </div>
@@ -107,7 +107,6 @@ import LogDisplay from "../Common/LogDisplay.vue";
 
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
-import { hilightTab } from '@/composables/TabHilight';
 import { useDialog } from 'primevue/usedialog';
 import { storeToRefs } from "pinia";
 
@@ -174,7 +173,6 @@ const props = defineProps({
 const isMounted = ref(false);
 
 onMounted(async() => {
-  hilightTab(HindcastTabs.tab_verificationRunStatus);
   isMounted.value = true;
 
   clearInterval(verificationStatusCheckingInterval.value);
@@ -226,7 +224,12 @@ const startVerificationJob = async () => {
       
       verificationJobId.value = response._data.verification_run_id;
       verificationJobStatus.value = response._data.status;
-      failureMessages.value = response._data.failure_messages ?? undefined;
+      if (response._data?.failure_messages) {
+        failureMessages.value = response._data.failure_messages.flatMap(failure_message => [
+          ...(failure_message.message ? [failure_message.message] : []),
+          ...(failure_message.errors ?? [])
+        ]);
+      }
 
       if (response?._data?.submit_date) {
         submitTimeDate.value = new Date(response?._data?.submit_date);
@@ -254,7 +257,12 @@ const startVerificationJob = async () => {
       getVerificationStatus().then((status_response) => {
         if (status_response?._data?.status) {
           verificationJobStatus.value = status_response._data.status;
-          failureMessages.value = status_response._data?.failure_messages ?? undefined;
+          if (status_response._data?.failure_messages) {
+            failureMessages.value = status_response._data.failure_messages.flatMap(failure_message => [
+              ...(failure_message.message ? [failure_message.message] : []),
+              ...(failure_message.errors ?? [])
+            ]);
+          }
         } else {
           const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: status_response?._data?.message ?? `Error when running verification job`, life: ToastTimeout.timeoutError };
           toast.add(tMsg); addToastRecord(tMsg);
@@ -279,7 +287,12 @@ const stopVerificationJob = async () => {
 
     if (cancelVerificationJobResponse?._data?.status) {
       verificationJobStatus.value = cancelVerificationJobResponse._data.status;
-      failureMessages.value = cancelVerificationJobResponse._data.failure_messages ?? undefined;
+      if (cancelVerificationJobResponse._data?.failure_messages) {
+        failureMessages.value = cancelVerificationJobResponse._data.failure_messages.flatMap(failure_message => [
+          ...(failure_message.message ? [failure_message.message] : []),
+          ...(failure_message.errors ?? [])
+        ]);
+      }
 
       if (verificationJobStatus.value !== 'Cancelled') {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Verification status not set to Cancelled after clicking CANCEL', life: ToastTimeout.timeoutError };

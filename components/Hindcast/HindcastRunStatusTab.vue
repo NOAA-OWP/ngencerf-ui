@@ -117,7 +117,7 @@
               <div v-if="failureMessages && failureMessages.length > 0">
                 <span class="font-bold">{{ failureMessages.length > 1 ? 'Messages' : 'Message' }}: </span>
                 <span v-for="failure_message in failureMessages">
-                  {{ failure_message.message }}<br/>
+                  {{ failure_message }}<br/>
                 </span>
               </div>
             </div>
@@ -235,7 +235,6 @@ import { useUserDataStore } from '@/stores/common/UserDataStore';
 import { useHindcastStore } from '@/stores/hindcast/HindcastStore';
 import { useLogStore } from '@/stores/common/LogStore';
 
-import { hilightTab } from '@/composables/TabHilight';
 import { useDialog } from 'primevue/usedialog';
 import { isValidDate } from '@/utils/CommonHelpers';
 import { calculateElapsedTime } from '@/utils/TimeHelpers';
@@ -313,9 +312,6 @@ onMounted(async () => {
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
-  // highlight the tab when selected
-  hilightTab(HindcastTabs.tab_hindcastRunStatus);
-
   clearInterval(hindcastJobStatusIntervalId.value);
   clearInterval(elapsedTimeIntervalId.value);
   hindcastJobStatusIntervalId.value = undefined;
@@ -323,7 +319,7 @@ onMounted(async () => {
   
   // get calibration job data if we don't already have it
   calibrationJobId.value = calibrationRunForHindcast?.value?.calibration_run_id;
-  if (!userCalibrationRunData.value) {
+  if (!userCalibrationRunData.value || userCalibrationRunData?.value?.calibration_run_id !== calibrationJobId.value) {
     isLoading.value = true;
     await fetchUserCalibrationRunData();
     isLoading.value = false;
@@ -494,7 +490,12 @@ const startHindcastRun = async () => {
     if (getStatusResponse?._data?.status) {
       hindcastJobStatus.value = getStatusResponse._data.status;
       coldStartJobStatus.value = getStatusResponse._data?.cold_start?.status ?? undefined;
-      failureMessages.value = getStatusResponse._data?.failure_messages ?? undefined;
+      if (getStatusResponse._data?.failure_messages) {
+        failureMessages.value = getStatusResponse._data.failure_messages.flatMap(failure_message => [
+          ...(failure_message.message ? [failure_message.message] : []),
+          ...(failure_message.errors ?? [])
+        ]);
+      }
     } else {
       const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: getStatusResponse?._data?.message ?? `Error when running hindcast job`, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
@@ -519,7 +520,12 @@ const cancelHindcastRun = async () => {
 
     if (cancelHindcastJobResponse?._data?.status) {
       hindcastJobStatus.value = cancelHindcastJobResponse._data.status;
-      failureMessages.value = cancelHindcastJobResponse._data.failure_messages ?? undefined;
+      if (cancelHindcastJobResponse._data?.failure_messages) {
+        failureMessages.value = cancelHindcastJobResponse._data.failure_messages.flatMap(failure_message => [
+          ...(failure_message.message ? [failure_message.message] : []),
+          ...(failure_message.errors ?? [])
+        ]);
+      }
 
       if (hindcastJobStatus.value !== 'Cancelled') {
         const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Error', detail: 'Hindcast status not set to Cancelled after clicking CANCEL', life: ToastTimeout.timeoutError };
@@ -575,9 +581,11 @@ onUnmounted(() => {
   isMounted.value = false;
   runButtonDisabled.value = true;
   cancelButtonDisabled.value = true;
+  hardResetHindcastStore();
   logListOptions.value = [];
   hindcastJobStatus.value = undefined;
   coldStartJobStatus.value = undefined;
+  failureMessages.value = undefined;
   resetUserLogRefs();
 })
 </script>
