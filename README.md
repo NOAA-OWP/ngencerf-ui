@@ -20,12 +20,15 @@ A [Nuxt 4](https://nuxt.com/) (Vue 3) application for the ngencerf platform.
 
 ## 1. Bring up the UI
 
-The UI talks to `ngencerf-server`. Point it at your server with `NGENCERF_BASE_URL` (defaults to
-`http://localhost:8000` when unset):
+The UI talks to `ngencerf-server`. When running on your machine, point it at your server with
+`NGENCERF_BASE_URL` (defaults to `http://localhost:8000/api` when unset; the value includes the `/api` path):
 
 ```bash
-export NGENCERF_BASE_URL=http://your-ngencerf-server:8000
+export NGENCERF_BASE_URL=http://your-ngencerf-server:8000/api
 ```
+
+The Docker image bakes in the default; override it per container at run time
+(`docker run -e NUXT_PUBLIC_NGENCERF_BASE_URL=...`) or at build time (`docker build --build-arg NGENCERF_BASE_URL=...`).
 
 You can run it directly on your machine or in Docker.
 
@@ -71,27 +74,29 @@ npm run start
 
 ### In Docker
 
-One [`Dockerfile`](Dockerfile) and one [`compose.yaml`](compose.yaml) cover both the standard and Parallel
-Works cases.
+One [`Dockerfile`](Dockerfile) and one [`compose.yaml`](compose.yaml). All settings come from environment
+variables, with defaults in [`.env`](.env) (loaded automatically by Compose; nothing in it is secret):
 
-**Standard** (`http://localhost:3000`):
+| Variable | Default | Purpose |
+|---|---|---|
+| `NGENCERF_UI_IMAGE_NAME` | `ngencerf-ui:local` | Tag for the locally built image (set to a registry path to publish it) |
+| `NGENCERF_UI_HOST_PORT` | `3000` | Port published on the host |
+| `NGENCERF_UI_CONTAINER_PORT` | `3000` | Port the server listens on inside the container (`PORT`, `EXPOSE`) |
+| `WORKDIR_PATH` | `/var/www/ngencerf/nuxt-app` | Working directory inside the image |
+
+Build and run (`http://localhost:3000`):
 
 ```bash
 docker compose up --build
 ```
 
-**Parallel Works** (custom host, base path, and port) — export the variables, then run the *same* command:
+Override any variable in the shell — shell values take precedence over `.env`:
 
 ```bash
-export pw_platform_host=your-host.example.com
-export basepath=/ngencerf-ui
-export ngencerf_port=8080
-docker compose up --build
+NGENCERF_UI_HOST_PORT=8080 NGENCERF_UI_CONTAINER_PORT=8080 docker compose up --build
 ```
 
-This bakes `NGENCERF_BASE_URL=https://$pw_platform_host$basepath/api/` into the image, serves the app under
-`$basepath/`, and publishes it on `$ngencerf_port`. With none of those variables set, the same file builds
-the plain local image.
+The image always builds locally (`pull_policy: build`); nothing is pulled from a registry.
 
 To stop the container, press `Ctrl+C` (or `docker compose down` if you ran it detached). To open a shell
 inside the running container for troubleshooting, run `docker compose exec ngencerf-app bash`.
@@ -136,8 +141,10 @@ The Node and npm versions are pinned in four places — keep them in sync:
 
 - [`.nvmrc`](.nvmrc)
 - [`package.json`](package.json) — `engines.node`
-- [`Dockerfile`](Dockerfile) — `NODE_VERSION`, `NPM_VERSION`
-- [`.github/workflows/cicd.yml`](.github/workflows/cicd.yml) — `NODE_VERSION`
+- [`Dockerfile`](Dockerfile) — `NODE_VERSION`, `NPM_VERSION`, and `NODE_IMAGE_DIGEST` (the base image is pinned
+  by digest; refresh it with `docker buildx imagetools inspect node:<version>-bookworm-slim`)
+- [`.github/workflows/cicd.yml`](.github/workflows/cicd.yml) — `NODE_VERSION` and `BASE_IMAGE_DEFAULT` (same node tag and
+  digest as the Dockerfile; CI passes it as `BASE_IMAGE`, so published images build from this copy)
 
 Prefer a Node **LTS** release. After bumping, re-verify from clean as in step 3, and rebuild the Docker
-image (`docker compose build`) since the container installs its own Node.
+image (`docker compose build`) so it picks up the new Node base image.

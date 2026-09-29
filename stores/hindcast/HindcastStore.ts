@@ -134,7 +134,6 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
    * @return {void}
    */
   const getHindcastJobs = async (): Promise<any> => {
-    hindcastRuns.value = [];
     let requestBody = {
       limit: hindcastRunListPageSize.value,
       offset: (hindcastRunListCurrentPage.value - 1) * hindcastRunListPageSize.value,
@@ -248,7 +247,12 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
         hindcastConfigurationName.value = getStatusResponse?._data?.configuration;
         hindcastJobStatus.value = getStatusResponse?._data?.status;
         coldStartJobStatus.value = getStatusResponse?._data?.cold_start_run?.status;
-        failureMessages.value = getStatusResponse?._data?.failure_messages;
+        if (getStatusResponse._data?.failure_messages) {
+          failureMessages.value = getStatusResponse._data.failure_messages.flatMap(failure_message => [
+            ...(failure_message.message ? [failure_message.message] : []),
+            ...(failure_message.errors ?? [])
+          ]);
+        }
 
         if (!cycleDate.value && getStatusResponse?._data?.cycle_date) {
           cycleDate.value = getStatusResponse._data.cycle_date;
@@ -462,7 +466,6 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
    * Query get_calibration_jobs_for_hindcast endpoint
    */
   const getCalibrationJobsForHindcast = async (): Promise<any> => {
-    calibrationRunsForHindcast.value = [];
     let requestBody = {
       limit: calibrationRunsForHindcastListPageSize.value,
       offset: (calibrationRunsForHindcastListCurrentPage.value - 1) * calibrationRunsForHindcastListPageSize.value,
@@ -752,17 +755,10 @@ export const useHindcastStore = defineStore('HindcastStore', () => {
    * Hard Reset Hindcast Store
    */
   const hardResetHindcastStore = (): void => {
-    hindcastJobId.value = undefined;
-    coldStartDate.value = undefined;
-    cycleDate.value = undefined;
-    coldStartJobId.value = undefined;
-    intervalCycle.value = undefined;
-    numIterations.value = undefined;
     hindcastJobStatus.value = "";
     coldStartJobStatus.value = "";
     elapsedTime.value = undefined;
     submitTime.value = undefined;
-    hindcastPlot.value = undefined;
 
     if (elapsedTimeIntervalId.value) {
       clearInterval(elapsedTimeIntervalId.value);

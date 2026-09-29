@@ -178,7 +178,7 @@
               <div id="UploadParams" class="inline-block ml-3 mt-3" @click="addCalibrationTuningParameter">
                 <Button class="ngenButtonDiv-alt" aria-label="Add Selected Calibratable Parameter Button"
                   title="Add Selected Calibratable Parameter Button"
-                  :disabled="!isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</Button>
+                  :disabled="!selectedParameter || !isFormulationDataSaved() || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Add</Button>
               </div>
             </div>
           </div>
@@ -187,7 +187,7 @@
             <Button class="c-blue font-normal underline absolute bottom-[-5px] right-3 text-lg"
               @click="clearUserSelectedCalibrationTuningParameters()" aria-label="Clear Calibratable Parameters"
               title="Clear Calibratable Parameters"
-              :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear</Button>
+              :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)">Clear Table</Button>
           </div>
         </div>
       </div>
@@ -277,7 +277,7 @@
           <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
             <div class="col-span-1 mr-6 h-8" @click="saveTuningData()">
               <Button class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button"
-                :disabled="isLoading || tuningStore_data_loading">
+                :disabled="isLoading">
                 Save
               </Button>
             </div>
@@ -290,7 +290,7 @@
           <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
             <div class="col-span-1 mr-3">
               <Button v-if="tuningDataHasChanged || calibratableParametersHaveChanged" class="ngenButtonDiv-yellow" title="Revert All Changes"
-                @click="restoreTab()" aria-label="Revert All Changes" :disabled="isLoading || tuningStore_data_loading">Revert</Button>
+                @click="restoreTab()" aria-label="Revert All Changes" :disabled="isLoading">Revert</Button>
             </div>
           </span>
           <span v-else>
@@ -299,18 +299,18 @@
           <div class="col-span-4">&nbsp;</div>
           <div class="col-span-1">
             <Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
-              aria-label="Previous Tab Button" @click="goPrevTab()" :disabled="isLoading || tuningStore_data_loading">Prev</Button>
+              aria-label="Previous Tab Button" @click="goPrevTab()" :disabled="isLoading">Prev</Button>
           </div>
           <div class="col-span-1 mr-4">
             <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
-              @click="goNextTab()" :disabled="isLoading || tuningStore_data_loading">Next</Button>
+              @click="goNextTab()" :disabled="isLoading">Next</Button>
           </div>
         </div>
       </div>
     </div>
   </div>
   <DynamicDialog />
-  <div class="waitgif" v-if="isLoading || tuningStore_data_loading">
+  <div class="waitgif" v-if="isLoading">
     <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
   </div>
 </template>
@@ -339,7 +339,6 @@ import { makeProtectedApiCall } from '@/composables/UserAuth';
 import { useBackendConfig } from "@/composables/UseBackendConfig";
 import { ifEDSErrorsExist } from "@/utils/TuningControlsHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
-import { hilightTab } from '@/composables/TabHilight';
 
 import FileUploadDialog from "../Common/FileUploadDialog.vue";
 
@@ -548,10 +547,6 @@ onMounted(async () => {
     const tMsg: ToastMessageOptions = { severity: 'warn', summary: 'No Calibration Job ID', detail: 'No calibration job ID found. Please go back to the Calibration Runs tab and select a job.', life: ToastTimeout.timeoutWarn };
     toast.add(tMsg); addToastRecord(tMsg);
   }
-  
-  nextTick(() => {
-    hilightTab(CalibrationTabs.tab_tuningControls);
-  });
 
   isLoading.value = false;
 });
@@ -607,6 +602,10 @@ const handleCalSimStartUpdate = (value: any) => {
   if (!value) return;
   calSimStartTime.value = DateTime.fromJSDate(normalizeToUtcMidnight(value), { zone: 'utc' });
 };
+
+watch(() => tuningStore_data_loading.value, (loading_status) => {
+  isLoading.value = loading_status;
+});
 
 watch([calSimStartTime, warmupDuration, calibrationDuration, validationWindowGap, validationWindow, validationDuration], (newValues, oldValues) => {
   if (
@@ -859,25 +858,31 @@ async function saveUserTuningParamsFiles(formData: FormData) {
  * Add selected calibration tuning parameter to the table when Add / Update button is clicked
  */
 const addCalibrationTuningParameter = () => {
-  const parameter = calibrationTuningParameters?.value?.find(param => param.output === selectedParameter.value);
-  const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.find(param => param.name === parameter.name);
+  if (selectedParameter.value) {
+    const parameter = calibrationTuningParameters?.value?.find(param => param.output === selectedParameter.value);
+    const isParameterAlreadyInTable = userSelectedCalibrationTuningParameters?.value?.find(param => param.name === parameter.name);
 
-  // add parameter to table if it is not already in the table
-  if (!isParameterAlreadyInTable && parameter) {
-    userSelectedCalibrationTuningParameters?.value?.push({
-      name: parameter.name,
-      minimum: parameter.minimum,
-      maximum: parameter.maximum,
-      initial_value: parameter.initial_value,
-      module: parameter.module,
-    });
+    // add parameter to table if it is not already in the table
+    if (isParameterAlreadyInTable) {
+      const tMsg: ToastMessageOptions = { severity: 'info', summary: 'Parameter already added', detail: selectedParameter.value + ' has already been added.', life: ToastTimeout.timeoutError };
+      toast.add(tMsg); addToastRecord(tMsg);
+      selectedParameter.value = undefined;
+    } else if (parameter) {
+      userSelectedCalibrationTuningParameters?.value?.push({
+        name: parameter.name,
+        minimum: parameter.minimum,
+        maximum: parameter.maximum,
+        initial_value: parameter.initial_value,
+        module: parameter.module,
+      });
+
+      // note that calibratable parameters have changed
+      calibratableParametersHaveChanged.value = true;
+
+      // scroll to the bottom of the page and table
+      scrollToBottom();
+    }
   }
-
-  // note that calibratable parameters have changed
-  calibratableParametersHaveChanged.value = true;
-
-  // scroll to the bottom of the page and table
-  scrollToBottom();
 };
 
 /**

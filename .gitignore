@@ -19,8 +19,7 @@ logs
 .fleet
 .idea
 
-# Local env files
-.env
+# Local env overrides (.env itself is committed: compose defaults, no secrets)
 .env.*
 !.env.example
 

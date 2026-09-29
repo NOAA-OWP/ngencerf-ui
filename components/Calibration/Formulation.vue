@@ -165,7 +165,6 @@ import { useTuningStore } from "@/stores/calibration/TuningStore";
 
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 
-import { hilightTab } from '@/composables/TabHilight';
 import { isCalibrationJobStatusSavedOrReady, arraysEqual } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
 
@@ -270,7 +269,6 @@ onMounted(async() => {
     }
     await setUserSelection();
     nextTick(() => {
-      hilightTab(CalibrationTabs.tab_formulation);
       toast.removeAllGroups();
       mainLeftAreaElement = document.getElementById("MainLeftDataArea") as HTMLElement;
       if (mainLeftAreaElement) { mainLeftAreaElement.scrollTo(0, 0); }

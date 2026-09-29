@@ -6,7 +6,7 @@
         <InputText id="jobNameInput" v-model="jobNameInput" class="inline-block w-64 p-1 ml-1"
           aria-label="Input Job Name" title="Input Job Name" required
           @keypress="checkValidCharacters($event)"
-          :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputText>
+          :disabled="isLoading || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></InputText>
       </div>
       <div class="mb-2 hr mt-3"></div>
       <div class="grid grid-rows-6 gap-6">
@@ -18,7 +18,7 @@
                 <Select id="Domain" v-model="selectedDomainValue" :options="getDomainOptionsList" optionLabel="display_name"
                   optionValue="name" placeholder=" ... " aria-label="Domain Select" title="Domain Select"
                   @change="onDomainSelectionChange"
-                  :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
+                  :disabled="isLoading || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
               </div>
             </div>
 
@@ -27,14 +27,14 @@
               <Select id="Gage" v-model="selectedGageValue" filter :options="getGageOptionsList" optionLabel="name"
                 optionValue="description" placeholder=" ... " :virtualScrollerOptions="{ itemSize: 50 }"
                 @change="onGageSelectionChange" @focus="focusSelectInput" aria-label="Gage Select" title="Gage Select"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
+                :disabled="isLoading || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"></Select>
             </div>
 
             <div class="col-span-1" v-if="displayForcingOptionsList?.length > 0">
               <label for="Forcing" class="required-label">Forcing Source</label><br />
               <Select id="Forcing" v-model="selectedForcingValue" :options="displayForcingOptionsList" 
                 optionLabel="display_name" optionValue="name" class="user-select" @change="uploadForcingDlgOpen($event)"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status) || displayForcingOptionsList?.length === 1"
+                :disabled="isLoading || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status) || displayForcingOptionsList?.length === 1"
                 aria-label="Forcing Source Select" title="Forcing Source Select"></Select>
             </div>
           </div>
@@ -46,7 +46,7 @@
               <label for="Observational" class="required-label">Observational Data</label><br />
               <Select id="Observational" v-model="selectedObservationalValue" :options="getObservationalOptionsList"
                 optionLabel="name" optionValue="name" class="user-select" @change="uploadObservationalDlgOpen($event)"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                :disabled="isLoading || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 aria-label="Observational Data Select" title="Observational Data Select"></Select>
             </div>
 
@@ -54,7 +54,7 @@
               <label for="Geopackage" class="required-label">GeoPackage</label><br />
               <Select v-model="selectedGeopackageValue" :options="getGeopackageOptionsList" optionLabel="name"
                 optionValue="name" class="user-select" @change="uploadGeopackageDlgOpen($event)"
-                :disabled="!isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
+                :disabled="isLoading || !isCalibrationJobStatusSavedOrReady(userCalibrationRunData?.status)"
                 aria-label="GeoPackage Data Select" title="GeoPackage Data Select"></Select>
             </div>
           </div>
@@ -177,7 +177,6 @@ import FileUploadDialog from "../Common/FileUploadDialog.vue";
 
 import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
-import { hilightTab } from '@/composables/TabHilight';
 import {
   useProcessCalibrationGageSavedResponse, useApiErrorResponsePreprocess,
   useApiResponseToastSeverityCode, useApiResponseToastSeverityLife
@@ -265,7 +264,6 @@ onMounted(async() => {
     await loadGageTabStaticData();
   }
   nextTick(() => {
-    hilightTab(CalibrationTabs.tab_headwaterBasinGage);
     toast.removeAllGroups();
     let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
     if (ele) { ele.scrollTo(0, 0); }

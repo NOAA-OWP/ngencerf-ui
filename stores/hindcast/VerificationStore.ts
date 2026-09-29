@@ -64,7 +64,6 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
    * @return {void}
    */
   const getVerificationJobs = async (): Promise<any> => {
-    verificationJobs.value = [];
     let requestBody = {
       limit: verificationRunListPageSize.value,
       offset: (verificationRunListCurrentPage.value - 1) * verificationRunListPageSize.value,
@@ -291,7 +290,12 @@ export const useVerificationStore = defineStore('VerificationStore', () => {
       if ( response._data.status ) {
         selectedVerificationJob.value = response._data;
         verificationJobStatus.value = response._data.status;
-        failureMessages.value = response._data.failure_messages;
+        if (response._data?.failure_messages) {
+          failureMessages.value = response._data.failure_messages.flatMap(failure_message => [
+            ...(failure_message.message ? [failure_message.message] : []),
+            ...(failure_message.errors ?? [])
+          ]);
+        }
         if (response._data.submit_date) {
           submitTimeDate.value = new Date(response._data.submit_date);
           if (isValidDate(submitTimeDate.value)) {

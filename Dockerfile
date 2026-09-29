@@ -2,7 +2,7 @@
 
 ############################################################################
 # Change/Verify these values when adopting this Dockerfile into another org:
-#   IMAGE_NAMESPACE
+#   IMAGE_NAMESPACE, WORKDIR_PATH, NGENCERF_UI_CONTAINER_PORT
 ############################################################################
 
 # Ownership / branding overrides
@@ -17,8 +17,15 @@ ARG IMAGE_NAMESPACE=ngwpc
 #
 # Pin NODE_VERSION for reproducible builds. Update deliberately when adopting
 # a newer supported Node.js release.
+#
+# The base is also pinned by digest so it cannot change underneath the same
+# tag. The digest is what gets pulled; the tag stays for readability. It is the
+# multi-arch index digest, so builds still resolve the right platform. Refresh
+# NODE_VERSION and NODE_IMAGE_DIGEST together:
+#   docker buildx imagetools inspect node:<version>-bookworm-slim
 ARG NODE_VERSION=24.16.0
-ARG BASE_IMAGE=node:${NODE_VERSION}-bookworm-slim
+ARG NODE_IMAGE_DIGEST=sha256:2c87ef9bd3c6a3bd4b472b4bec2ce9d16354b0c574f736c476489d09f560a203
+ARG BASE_IMAGE=node:${NODE_VERSION}-bookworm-slim@${NODE_IMAGE_DIGEST}
 
 ############################################################################
 # Application image
@@ -77,8 +84,9 @@ RUN set -eux; \
     npm cache clean --force
 
 # Create and set working directory
-RUN mkdir --parents /var/www/ngencerf/nuxt-app
-WORKDIR /var/www/ngencerf/nuxt-app
+ARG WORKDIR_PATH=/var/www/ngencerf/nuxt-app
+RUN mkdir --parents "${WORKDIR_PATH}"
+WORKDIR "${WORKDIR_PATH}"
 
 # Install Node dependencies
 COPY package*.json ./
@@ -114,20 +122,25 @@ RUN set -eux; \
       > "${GIT_INFO_PATH}"; \
     rm --recursive --force .git
 
-# TODO: Determine whether this override is still needed for AWS deployments.
-# Override the NGENCERF URL to facilitate Parallel Works session sharing.
-# When this argument is not provided, NGENCERF_BASE_URL is set to an empty
-# string; nuxt.config.ts must treat that as a request to use its default URL.
+# Optional build-time API base URL baked into the bundle. When not provided it
+# is empty and nuxt.config.ts falls back to its default. AWS overrides it at run
+# time instead, via NUXT_PUBLIC_NGENCERF_BASE_URL (Nuxt runtime config).
 ARG NGENCERF_BASE_URL
 ENV NGENCERF_BASE_URL="${NGENCERF_BASE_URL}"
 
 RUN set -eux; \
     npm run build
 
+# Port the server listens on. The production server (Nitro, `npm run start`)
+# reads PORT; NUXT_PORT is only honored by `nuxt dev`/`nuxt preview`. Both are
+# set from one value so dev and prod agree. Override at build time
+# (--build-arg NGENCERF_UI_CONTAINER_PORT=...) or at run time (-e PORT=...).
+ARG NGENCERF_UI_CONTAINER_PORT=3000
 ENV NUXT_HOST=0.0.0.0
-ENV NUXT_PORT=3000
+ENV NUXT_PORT=${NGENCERF_UI_CONTAINER_PORT} \
+    PORT=${NGENCERF_UI_CONTAINER_PORT}
 
 ENTRYPOINT ["npm"]
 CMD ["run", "start"]
 
-EXPOSE 3000
+EXPOSE ${NGENCERF_UI_CONTAINER_PORT}

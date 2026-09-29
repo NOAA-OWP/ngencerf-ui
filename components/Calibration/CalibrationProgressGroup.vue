@@ -4,67 +4,78 @@
       <tr>
         <td><i v-if="userCalibrationRunData?.job_name && userCalibrationRunData?.gage?.gage_id"
             :class="(userCalibrationRunData?.job_name && userCalibrationRunData?.gage?.gage_id) ? 'checkMark' : ''" class="pi pi-check font-bold"></i></td>
-        <td data-tab="2" title="Headwater Basin Gage" aria-label="Headwater Basin Gage" @click="tabClicked">
+        <td data-tab="2" title="Headwater Basin Gage" aria-label="Headwater Basin Gage" 
+          @click="tabClicked" :class="isLoading ? 'disabled' : ''">
           Headwater Basin Gage</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.external_data_status?.forcing"
             :class="userCalibrationRunData?.external_data_status?.forcing ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td data-tab="2" title="Forcing" aria-label="Forcing" @click="tabClicked">Forcing Source</td>
+        <td data-tab="2" title="Forcing" aria-label="Forcing" 
+          @click="tabClicked" :class="isLoading ? 'disabled' : ''">Forcing Source</td>
       </tr>
       <tr v-if="getObservationalOptionsList?.length > 1">
         <td><i v-if="userCalibrationRunData?.external_data_status?.observational"
             :class="userCalibrationRunData?.external_data_status?.observational ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td data-tab="2" title="Observational" aria-label="Observational" @click="tabClicked">Observational</td>
+        <td data-tab="2" title="Observational" aria-label="Observational" 
+          @click="tabClicked" :class="isLoading ? 'disabled' : ''">Observational</td>
       </tr>
       <tr v-if="getGeopackageOptionsList?.length > 1">
         <td><i v-if="userCalibrationRunData?.external_data_status?.geopackage"
             :class="userCalibrationRunData?.external_data_status?.geopackage ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td data-tab="2" title="Geopackage" aria-label="Geopackage" @click="tabClicked">Geopackage</td>
+        <td data-tab="2" title="Geopackage" aria-label="Geopackage" 
+          @click="tabClicked" :class="isLoading ? 'disabled' : ''">Geopackage</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.job_name && userCalibrationRunData?.modules.length && formulationIsCalibratable"
             :class="userCalibrationRunData?.job_name && userCalibrationRunData?.modules.length && formulationIsCalibratable ? 'checkMark' : ''"
             class="pi pi-check font-bold"></i></td>
-        <td data-tab="3" title="Formulation" aria-label="Formulation" @click="tabClicked">Formulation</td>
+        <td data-tab="3" title="Formulation" aria-label="Formulation" 
+          @click="tabClicked" :class="isLoading ? 'disabled' : ''">Formulation</td>
       </tr>
       <tr>
         <td><i v-if="checkStartEndTimeValues()" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="4" title="Start and Duration Times" aria-label="Start and Duration Times" @click="tabClicked">
+        <td data-tab="4" title="Start and Duration Times" aria-label="Start and Duration Times" 
+          @click="tabClicked" :class="isLoading ? 'disabled' : ''">
           Start and Duration Times</td>
       </tr>
       <tr>
         <td><i v-if="(checkStartEndTimeValues() || userCalibrationRunData?.parameters_selected) && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
         <td data-tab="4" title="Output Variable to Calibrate" aria-label="Output Variable to Calibrate"
-          @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">Output Variable to Calibrate</td>
+          @click="tabClicked" :class="isLoading || userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">Output Variable to Calibrate</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.parameters_selected && tuningParametersAreValid && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="4" title="Tuning Parameters" aria-label="Tuning Parameters" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">Tuning Parameters
+        <td data-tab="4" title="Tuning Parameters" aria-label="Tuning Parameters" 
+          @click="tabClicked" :class="isLoading || userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">Tuning Parameters
         </td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.optimization && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="5" title="Optimization Algorithm" aria-label="Optimization Algorithm" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
+        <td data-tab="5" title="Optimization Algorithm" aria-label="Optimization Algorithm" 
+          @click="tabClicked" :class="isLoading || userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
           Optimization Algorithm</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.objective_function && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="5" title="Objective Function" aria-label="Objective Function" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
+        <td data-tab="5" title="Objective Function" aria-label="Objective Function" 
+          @click="tabClicked" :class="isLoading || userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
           Objective Function</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.stop_criteria && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i></td>
-        <td data-tab="5" title="Calibration Stop Criteria" aria-label="Calibration Stop Criteria" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
+        <td data-tab="5" title="Calibration Stop Criteria" aria-label="Calibration Stop Criteria" 
+          @click="tabClicked" :class="isLoading || userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
           Calibration Stop Criteria</td>
       </tr>
       <tr>
         <td><i v-if="userCalibrationRunData?.save_plot_iteration_frequency && !userCalibrationRunData?.modules?.includes('LSTM')" class="pi pi-check font-bold checkMark"></i>
         </td>
-        <td data-tab="5" title="Metrics and Plot Interval" aria-label="Metrics and Plot Interval" @click="tabClicked" :class="userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
+        <td data-tab="5" title="Metrics and Plot Interval" aria-label="Metrics and Plot Interval" 
+          @click="tabClicked" :class="isLoading || userCalibrationRunData?.modules?.includes('LSTM') ? 'disabled' : ''">
           Metrics / Plot Interval</td>
       </tr>
     </tbody>
@@ -83,14 +94,14 @@ import { useToast } from 'primevue/usetoast';
 import type { ToastMessageOptions } from "primevue/toast";
 import { ToastTimeout } from "@/composables/NgencerfEnums";
 
-const { getCalibrationTabIndex, getMenuIndex } = generalStore();
+const { getCalibrationTabIndex, validateCurrentTab, currentTabNavGo, showCurrentTabNavDialog } = generalStore();
+const { isLoading } = storeToRefs(generalStore());
 const { userCalibrationRunData } = storeToRefs(useUserDataStore());
 const { getGeopackageOptionsList, getObservationalOptionsList } = storeToRefs(useGageStore());
 const { selectedModuleValues, formulationIsCalibratable, moduleProperties } = storeToRefs(useFormulationStore());
 const { loadFormulationTabData, setUserSelection } = useFormulationStore();
 const { tuningParametersAreValid } = storeToRefs(useTuningStore());
 const { validateTuningParameters } = useTuningStore();
-const { addToastRecord, validateCurrentTab, currentTabNavGo, showCurrentTabNavDialog } = generalStore();
 const toast = useToast();
 
 const emit = defineEmits(["tabNumber"]);

@@ -24,7 +24,8 @@
           <JobFilterDialog id="JobFilterDialog" job-type="Hindcast" :disable-all="false" 
             :show-modules="false" :show-archived="false"
             :totalSize="hindcastRunListTotalSize" :totalPages="hindcastRunListTotalPages"
-            v-model:currentPage="hindcastRunListCurrentPage"
+            v-model:currentPage="hindcastRunListCurrentPage" 
+            v-model:selectedJobs="selectedHindcastJobAsArray" :running-job-in-list="runningJobInList"
             @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
             @UpdateGageList="updateGageList()" ref="jobFilterRef" />
 
@@ -45,7 +46,7 @@
           <DataTable id="HindcastRuns" :value="hindcastRuns" 
             scrollable scroll-height="400px" table-style="min-width: 50rem"
             v-model:sortField="hindcastRunListSort.field" v-model:sortOrder="hindcastRunListSort.direction"
-            v-model:selection="selectedHindcastJob" selectionMode="single" :rowStyle="rowStyle"
+            v-model:selection="selectedHindcastJob" selectionMode="single" :metaKeySelection="false" :rowStyle="rowStyle"
             @rowSelect="onHindcastRowSelect" @rowUnselect="onHindcastRowUnSelect" @rowContextmenu="onRowContextMenu"
             @row-dblclick="onRowDblClick($event)" class="boxed">
             <Column :pt="ptColumn" field="hindcast_run_id" sortable>
@@ -189,7 +190,6 @@ import { generalStore } from "@/stores/common/GeneralStore";
 import { useUserDataStore } from "@/stores/common/UserDataStore";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
-import { hilightTab } from '@/composables/TabHilight';
 
 import type { DataTableRowClickEvent } from "primevue/datatable";
 import MessagesGroup from "@/components/Common/MessagesGroup.vue";
@@ -212,7 +212,9 @@ const {
   hindcastRunListEndRow,
   hindcastRunListSort,
   selectedHindcastJob,
-  hindcastJobStatus
+  hindcastJobStatus,
+  intervalCycle,
+  numIterations
 } = storeToRefs(HindcastStore);
 
 const {
@@ -296,20 +298,22 @@ const onRowDblClick = (event: any) => {
 
 onMounted(async () => {
   isLoading.value = true;
+  hindcastRuns.value = [];
   hindcastJobId.value = undefined;
   calibrationRunForHindcast.value = undefined;
   userCalibrationRunData.value = undefined;
   selectedHindcastJob.value = undefined;
   hindcastJobStatus.value = undefined; 
   hindcastRunListCurrentPage.value = 1;
+  intervalCycle.value = undefined;
+  numIterations.value = undefined;
 
   //reset Run/Status store in case we have running intervals
   hardResetHindcastStore();
 
   //reset any previously selected verification data
   resetSelectedVerificationJobData();
-
-  hilightTab(HindcastTabs.tab_hindcastRuns);
+  
   let ele = document.getElementById("MainLeftDataArea") as HTMLElement;
   if (ele) { ele.scrollTo(0, 0); }
 
@@ -334,6 +338,20 @@ onMounted(async () => {
 const updateGageList = async() => {
   uiGageList.value = await fetchHindcastGageList();
 }
+
+const selectedHindcastJobAsArray = computed(() => {
+  if (selectedHindcastJob.value) {
+    return [selectedHindcastJob.value];
+  }
+  return [];
+})
+
+const runningJobInList = computed(() => {
+  if (hindcastRuns.value?.length) {
+    return hindcastRuns.value.some(run => run.hindcast_status.includes('Submitted') || run.hindcast_status.includes('Running'));
+  }
+  return false;
+})
 
 const onHindcastRowSelect = async (event: DataTableRowClickEvent) => {
   const rowData = event.data as HindcastJob;
@@ -476,6 +494,7 @@ const toggleMessagesGroup = () => {
  */
 const refreshJobList = async () => {
   isLoading.value = true;
+  selectedHindcastJob.value = undefined;
   await getHindcastJobs();
   isLoading.value = false;
 }

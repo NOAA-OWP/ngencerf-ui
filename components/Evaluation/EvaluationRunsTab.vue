@@ -42,7 +42,7 @@
           <ContextMenu :pt="{ root: { id: ' vr-context-menu' } }" class="bg-white" ref="vrContextMenu"
             :model="cmValidationRun"></ContextMenu>
           <DataTable id="validation-list" :value="displayCalibrationValidationRunList" scrollable scroll-height="400px"
-            sortField="validation_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="single"
+            sortField="validation_run_id" :sortOrder="-1" table-style="min-width: 50rem" selectionMode="single" :metaKeySelection="false"
             v-model:selection="selectedCalibrationValidationRun" :rowStyle="rowStyle"
             @rowContextmenu="onRowVrContextMenu" @rowSelect="onEvalValidationRowSelect"
             @row-dblclick="onRowVrDblClick($event)" @rowUnselect="onEvalValidationRowUnSelect" class="boxed">
@@ -86,7 +86,7 @@
             :model="cmCompareRun"></ContextMenu>
           <DataTable id="compare-list" :value="userEvaluationRunListDataByGage" scrollable scroll-height="400px"
             sortField="calibration_run_id" :sortOrder="-1" table-style="min-width: 50rem" 
-            selectionMode="multiple" :metaKeySelection="true" @rowContextmenu="onRowCpContextMenu"
+            selectionMode="multiple" :metaKeySelection="false" @rowContextmenu="onRowCpContextMenu"
             v-model:selection="selectedCalibrationCompareRuns" :rowStyle="rowStyle" class="boxed">
             <Column :pt="ptCompareColumns" v-for="(col, colIndex) in gageevaluationRunListHeaders" :key="colIndex"
               :header="col.header" :field="col.field" sortable>
@@ -133,7 +133,7 @@
           
           <DataTable id="EvalRunTable" table-style="min-width: 50rem" scrollable scroll-height="400px"
             :value="userEvaluationRunListData" :rowStyle="rowStyle" dataKey="calibration_run_id" 
-            v-model:selection="selectedCalibrationRuns" selectionMode="multiple" :metaKeySelection="true" 
+            v-model:selection="selectedCalibrationRuns" selectionMode="multiple" :metaKeySelection="false" 
             v-model:contextMenuSelection="contextMenuSelection" contextMenu @rowContextmenu="onRowContextMenu"
             v-model:sortField="evaluationRunListSort.field" v-model:sortOrder="evaluationRunListSort.direction"
             @rowSelect="onEvalCalibrationRowSelect" @rowUnselect="onEvalCalibrationRowUnSelect"
@@ -334,7 +334,6 @@ import JobFilterDialog from "@/components/Common/JobFilterDialog.vue"
 import Paging from "../Common/Paging.vue";
 
 import { formatISOStringOrDateToYYYYMMDDHHMM } from '@/utils/TimeHelpers';
-import { hilightTab } from '@/composables/TabHilight';
 import { EvaluationTabs } from "@/composables/NgencerfEnums";
 
 const { 
@@ -472,7 +471,6 @@ const selectedCalibrationValidationRun = ref<CalibrationValidationJobData>();
 const jobName = "Job Name";
 
 onMounted(async() => {
-  hilightTab(EvaluationTabs.tab_calibrationRuns);
   includeArchivedJobs.value = false;
   resetFilters();
 
@@ -569,6 +567,7 @@ const refreshJobList = async () => {
   isLoading.value = true;
   // changing filters clears previous selections
   selectedCalibrationRuns.value = undefined;
+  calibrationJobId.value = undefined;
   await fetchUserValidatedCalibrationJobsListData();
   visibleCalibrationRunIds.value = userEvaluationRunListData.value.map(job => job.calibration_run_id);
   if (evaluationRunListTotalPages.value > 1) {

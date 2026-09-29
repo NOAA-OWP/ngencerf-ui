@@ -15,7 +15,7 @@
         <div>
           <h1 class="mt-10 mb-6 text-3xl font-bold inline-block">Calibration Jobs</h1>
           <Button class="ngenButtonDiv ml-8" @click="createNewCalibration" aria-label="New Calibration Job"
-            title="New Calibration Job">New</Button>
+            title="New Calibration Job" :disabled="isLoading">New</Button>
           <br />
           <p class="prompt-txt mb-2" style="margin-top:-10px;">
             Double click on a row to open, or right click for more options. Click "New" button for a fresh setup.
@@ -27,8 +27,8 @@
           <div id="CalTable" class="w-max mx-auto">
             <JobFilterDialog id="JobFilterDialog" 
               :totalSize="calibrationRunListTotalSize" :totalPages="calibrationRunListTotalPages"
-              v-model:currentPage="calibrationRunListCurrentPage" 
-              @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()" 
+              v-model:currentPage="calibrationRunListCurrentPage" :running-job-in-list="runningJobInList"
+              @RefreshJobList="refreshJobList()" @ResetFilters="resetFilters()"
               :showBulkActions="showBulkActions" v-model:selected-jobs="selectedCalibrationRuns" 
               :all-job-ids="allCalibrationRunIds" :visible-job-ids="visibleCalibrationRunIds"
               :delete-jobs="deleteCalibrationRun" :archive-jobs="archiveCalibrationRun" :lock-jobs="lockCalibrationRun"
@@ -52,7 +52,7 @@
             <DataTable id="Datatable" :value="userCalibrationJobsListData" 
               scrollable scroll-height="400px" table-style="min-width: 50rem; z-index: 1" scrollY="true"
               v-model:sortField="calibrationRunListSort.field" v-model:sortOrder="calibrationRunListSort.direction"
-              v-model:selection="selectedCalibrationRuns" selectionMode="multiple" :metaKeySelection="true" dataKey="calibration_run_id" 
+              v-model:selection="selectedCalibrationRuns" selectionMode="multiple" :metaKeySelection="false" dataKey="calibration_run_id" 
               v-model:contextMenuSelection="contextMenuSelection" contextMenu @rowContextmenu="onRowContextMenu"
               @row-dblclick="onRowDblClick($event)" :rowStyle="rowStyle" >
 
@@ -306,8 +306,6 @@ const {
   getCalibrationJobZip 
 } = useCalibrationJobStore();
 
-import { hilightTab } from '@/composables/TabHilight';
-
 const props = defineProps({
   callGoToTab: {
     type: Function,
@@ -422,8 +420,6 @@ const buildContextMenu = computed(() => {
 
 onMounted(async () => {
   if (getMenuIndex() === 1) { // Prevents calling get_calibration_jobs if we are not on the Calibration menu
-    hilightTab(CalibrationTabs.tab_calibrationRuns);
-
     resetFilters();
 
     selectedBulkJobAction.value = 0;
@@ -483,6 +479,13 @@ const onRowContextMenu = (event: any) => {
 const updateGageList = async() => {
   uiGageList.value = await fetchGageList();
 }
+
+const runningJobInList = computed(() => {
+  if (userCalibrationJobsListData.value?.length) {
+    return userCalibrationJobsListData.value.some(run => run.status.includes('Submitted') || run.status.includes('Running'));
+  }
+  return false;
+})
 
 const showBulkActions = computed(() => {
   // let JobFilterDialogue know based on our job list what bulk actions to allow
@@ -570,13 +573,14 @@ const onRowDblClick = (e: any) => {
     })
     return;
   }
-  openSelectedCalibrationRun(data)
+  openSelectedCalibrationRun(data);
 }
 
-const openSelectedCalibrationRun = async () => {
+const openSelectedCalibrationRun = async (data: any) => {
+  calibrationJobId.value = data ? data.value?.calibration_run_id : selectedCalibrationRuns.value[0]?.calibration_run_id;
   isLoading.value = true;
-  calibrationJobId.value = selectedCalibrationRuns.value[0]?.calibration_run_id;
-  queryUserCalibrationRunData().then(queryResponse => {
+  try {
+    const queryResponse = await queryUserCalibrationRunData();
     if (queryResponse?.status === 200) {
       userCalibrationRunData.value = queryResponse?._data;
       if (props.callGoToTab) {
@@ -608,8 +612,13 @@ const openSelectedCalibrationRun = async () => {
       const tMsg: ToastMessageOptions = { severity: "error", summary: 'Load Calibration Job Failed.', detail: tDetail, life: ToastTimeout.timeoutError };
       toast.add(tMsg); addToastRecord(tMsg);
     }
-  });
-  isLoading.value = false;
+  } catch (error) {
+    let tDetail = "Unable to Retrieve Calibration Job Data";
+    const tMsg: ToastMessageOptions = { severity: "error", summary: 'Load Calibration Job Failed.', detail: tDetail, life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
+  } finally {
+    isLoading.value = false;
+  }
 }
 
 const viewCalibrationDetails = async () => {
@@ -689,21 +698,25 @@ const createNewCalibration = async () => {
   });
 }
 
-const cloneSelectedCalibrationRun = () => {
+const cloneSelectedCalibrationRun = async() => {
   isLoading.value = true;
   const selectedRunId = selectedCalibrationRuns.value[0]?.calibration_run_id;
-  cloneCalibrationRun(selectedRunId).then(async (response) => {
+  try {
+    const response = await cloneCalibrationRun(selectedRunId);
     if (response.status === 200) {
       await fetchUserCalibrationJobsListData();
-      isLoading.value = false;
     } else {
-      isLoading.value = false;
       useApiErrorResponsePreprocess(response).forEach(message => {
         const tMsg: ToastMessageOptions = { severity: useApiResponseToastSeverityCode(response?.status), summary: 'Clone Calibration Job ' + selectedRunId + 'Failed.', detail: message, life: useApiResponseToastSeverityLife(response?.status) };
         toast.add(tMsg); addToastRecord(tMsg);
       });
     }
-  });
+  } catch (error) {
+    const tMsg: ToastMessageOptions = { severity: 'error', summary: 'Clone Calibration Job ' + selectedRunId + 'Failed.', life: ToastTimeout.timeoutError };
+    toast.add(tMsg); addToastRecord(tMsg);
+  } finally {
+    isLoading.value = false;
+  }
   selectedCalibrationRuns.value = undefined;
 };
 
@@ -762,7 +775,6 @@ watch(calibrationDownloadJobID, () => {
     calibrationDownloadJobID.value = null;
   }
 });
-
 </script>
 
 <style lang="scss" scoped>

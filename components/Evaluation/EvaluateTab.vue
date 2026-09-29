@@ -331,8 +331,6 @@ import { useUserDataStore } from '@/stores/common/UserDataStore';
 import MessagesGroup from "../Common/MessagesGroup.vue";
 import Paging from "../Common/Paging.vue";
 
-import { hilightTab } from '@/composables/TabHilight';
-
 import * as Plot from "@observablehq/plot";
 import * as d3 from 'd3';
 
@@ -490,8 +488,6 @@ const plotGraphSliderHelpText = [
 onMounted(() => {
   isEvaluationLoading.value = true;
   nextTick(async () => {
-    hilightTab(EvaluationTabs.tab_evaluate);
-
     // make sure page loads with no plots/tables selected
     resetUserPlotRefs([]);
 

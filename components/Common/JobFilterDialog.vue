@@ -124,7 +124,7 @@
         </div>
       </div>
 
-      <div v-show="showBulkActions && totalSize > 1">
+      <div v-show="props.showBulkActions?.length > 0 && totalSize > 1">
         <hr class="border-t-2 border-gray-300 my-4">
         <div class="flex gap-2">
           <div :style="`opacity: ${props.selectedJobs.length === 0 ? '50%' : '100%'}`">
@@ -180,6 +180,15 @@
             :title="actionTypeDisplay + 'selected jobs'">Cancel</Button>       
         </div>
       </div>
+    </div>
+    
+    <div v-if="props.runningJobInList" class="text-center" style="color: green;">
+      <span v-if="props.selectedJobs.length > 0">
+        Auto-refresh paused while jobs selected — click "Refresh List" to update.
+      </span>
+      <span v-else>
+        Auto-refreshes every {{ refreshTime }} seconds while jobs are running.
+      </span>
     </div>
   </div>
 </template>
@@ -278,6 +287,7 @@ interface Props {
   selectedJobs?: any[];
   allJobIds?: number[];
   visibleJobIds?: number[];
+  runningJobInList?: boolean;
   disableAll?: boolean;
   totalSize?: number;
   totalPages?: number;
@@ -300,6 +310,7 @@ const props = withDefaults(defineProps<Props>(), {
   selectedJobs: () => [],
   allJobIds: () => [],
   visibleJobIds: () => [],
+  runningJobInList: false,
   disableAll: false,
   totalSize: 0,
   totalPages: 1,
@@ -415,6 +426,29 @@ const refreshJobList = () => {
   // when changing any filter, reset current page to 1
   emit('update:currentPage', 1);
   emit("RefreshJobList");
+  createRefreshInterval();
+}
+
+const refreshTime = 30;
+const refreshInterval = ref<ReturnType<typeof setInterval>>();
+const deferRefresh = ref<boolean>(false);
+
+const createRefreshInterval = () => {
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value);
+  }
+  refreshInterval.value = setInterval(() => {
+    if (props.runningJobInList) {
+      if (props.selectedJobs.length === 0) {
+        refreshJobList();
+      } else {
+        deferRefresh.value = true;
+      }
+    } else if (refreshInterval.value) {
+      clearInterval(refreshInterval.value);
+      refreshInterval.value = undefined;
+    }
+  }, refreshTime * 1000);
 }
 
 const selectedJobs = ref<any[]>([]);
@@ -452,6 +486,10 @@ const deselectallJobIds = () => {
 
 watch(selectedJobs, (jobs) => {
   emit('update:selectedJobs', jobs)
+  if (selectedJobs.value.length === 0 && deferRefresh.value) {
+    deferRefresh.value = false;
+    refreshJobList();
+  }
 })
 
 const selectedJobIds = computed(() => {
@@ -512,7 +550,7 @@ const updateGageList = () => {
 
 const showMultiOps = ref<boolean>(false);
 const disableAll = computed(() => {
-  return props.disableAll || showMultiOps.value;
+  return props.disableAll || isLoading.value || showMultiOps.value;
 })
 
 const actionType = ref<number>()
@@ -768,6 +806,8 @@ onMounted(() => {
     nextTick(async () => {
       refreshJobList();
       preFilterList.value = {};
+      // if there is a running job in the list, refresh it every 30 seconds
+      createRefreshInterval();
     });
   }
 })
@@ -775,6 +815,10 @@ onMounted(() => {
 onUnmounted(() => {
   resetFilters(false);
   clearGageList();
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value);
+    refreshInterval.value = undefined;
+  }
 })
 
 </script>

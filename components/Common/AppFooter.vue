@@ -5,11 +5,11 @@
     </div>
     <div class="grid grid-rows-1 gap-1">
       <div class="row-span-1 footerColor text-sm">
-        <div id="FooterData" class="version">
+        <div v-if="serverInfo?.ngenCerf_version" id="FooterData" class="version">
           <span @mouseenter="showServerInfo" @mouseleave="hideServerInfo">Version:
             {{ serverInfo?.ngenCerf_version }}</span>
         </div>
-        <div class="copyright">Copyright {{ serverInfo?.ngenCerf_copyright}}</div>
+        <div v-if="serverInfo?.ngenCerf_copyright" class="copyright">Copyright {{ serverInfo?.ngenCerf_copyright }}</div>
       </div>
     </div>
   </div>

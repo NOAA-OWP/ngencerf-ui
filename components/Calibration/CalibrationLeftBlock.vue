@@ -4,25 +4,26 @@
     <Tabs @tabNumber="tabChanged" ref="navRef" :call-tab-validator="validateCurrentTab" 
       :call-tab-restore="restoreCurrentTab"/>
     
-    <div v-if="activeTab === 1">
-      <CalibrationCalibrationRunsTab :call-go-to-tab="currentTabNavGo"/>
-    </div> 
-    <div v-else-if="activeTab === 2">
-      <CalibrationHeadwaterBasinGage ref="tabRef" :call-go-to-tab="currentTabNavGo" :call-nav-dialog="showCurrentTabNavDialog"/>
-    </div>
-    <div v-else-if="activeTab === 3">
-      <CalibrationFormulation ref="tabRef" :call-go-to-tab="currentTabNavGo" :call-nav-dialog="showCurrentTabNavDialog"/>
-    </div>
-    <div v-else-if="activeTab === 4">
-      <CalibrationTuningControls ref="tabRef" :call-go-to-tab="currentTabNavGo" :call-nav-dialog="showCurrentTabNavDialog"/>
-    </div>
-    <div v-else-if="activeTab === 5">
-      <CalibrationOptimizationMetrics ref="tabRef" :call-go-to-tab="currentTabNavGo" :call-nav-dialog="showCurrentTabNavDialog"/>
-    </div>
-    <div v-else-if="activeTab === 6">
-      <CalibrationRunStatus/>
-    </div>
-    
+    <KeepAlive>
+      <div v-if="activeTab === 1">
+        <CalibrationCalibrationRunsTab :call-go-to-tab="currentTabNavGo"/>
+      </div> 
+      <div v-else-if="activeTab === 2">
+        <CalibrationHeadwaterBasinGage ref="tabRef" :call-go-to-tab="currentTabNavGo" :call-nav-dialog="showCurrentTabNavDialog"/>
+      </div>
+      <div v-else-if="activeTab === 3">
+        <CalibrationFormulation ref="tabRef" :call-go-to-tab="currentTabNavGo" :call-nav-dialog="showCurrentTabNavDialog"/>
+      </div>
+      <div v-else-if="activeTab === 4">
+        <CalibrationTuningControls ref="tabRef" :call-go-to-tab="currentTabNavGo" :call-nav-dialog="showCurrentTabNavDialog"/>
+      </div>
+      <div v-else-if="activeTab === 5">
+        <CalibrationOptimizationMetrics ref="tabRef" :call-go-to-tab="currentTabNavGo" :call-nav-dialog="showCurrentTabNavDialog"/>
+      </div>
+      <div v-else-if="activeTab === 6">
+        <CalibrationRunStatus/>
+      </div>
+    </KeepAlive>
   </div>
 
 </template>
@@ -32,13 +33,20 @@
 import { generalStore } from "@/stores/common/GeneralStore";
 
 import Tabs from '@/components/Common/Tabs.vue'
-import CalibrationHeadwaterBasinGage from '@/components/Calibration/HeadwaterBasinGage.vue';
-import CalibrationFormulation from '@/components/Calibration/Formulation.vue';
-import CalibrationTuningControls from '@/components/Calibration/TuningControls.vue';
-import CalibrationOptimizationMetrics from '@/components/Calibration/OptimizationMetrics.vue';
-import CalibrationRunStatus from '@/components/Calibration/RunStatus.vue';
 import CalibrationCalibrationRunsTab from '@/components/Calibration/PreviousCalibrationRuns.vue';
-import { ThemeUtils } from "@primeuix/styled";
+
+const headwaterBasinGageLoader = () => import('./HeadwaterBasinGage.vue');
+const formulationLoader = () => import('./Formulation.vue');
+const tuningControlsLoader = () => import('./TuningControls.vue');
+const optimizationMetricsLoader = () => import('./OptimizationMetrics.vue');
+const runStatusLoader = () => import('./RunStatus.vue');
+
+const { asyncTabComponent } = useAsyncTabComponent();
+const CalibrationHeadwaterBasinGage = asyncTabComponent(headwaterBasinGageLoader);
+const CalibrationFormulation = asyncTabComponent(formulationLoader);
+const CalibrationTuningControls = asyncTabComponent(tuningControlsLoader);
+const CalibrationOptimizationMetrics = asyncTabComponent(optimizationMetricsLoader);
+const CalibrationRunStatus = asyncTabComponent(runStatusLoader);
 
 const { tabRef, navRef } = storeToRefs(generalStore());
 const { getCalibrationTabIndex, setCalibrationTabIndex, validateCurrentTab, restoreCurrentTab, currentTabNavGo, showCurrentTabNavDialog} = generalStore();
@@ -53,4 +61,13 @@ const tabChanged = (tabNum: number) => {
     setCalibrationTabIndex(tabNum);
   }
 };
+
+onMounted(() => {
+  // Start downloading the other tab chunks in the background.
+  headwaterBasinGageLoader();
+  formulationLoader();
+  tuningControlsLoader();
+  optimizationMetricsLoader();
+  runStatusLoader();
+});
 </script>

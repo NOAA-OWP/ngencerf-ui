@@ -175,7 +175,7 @@
         <div class="col-span-1 mr-6 h-8">
           <Button v-if="!userCalibrationRunData?.modules?.includes('LSTM')" 
             class="font-normal ngenButtonDiv-green" title="Save" aria-label="Save Button"
-            @click="saveOptMetData()" :disabled="isLoading || optimizationStore_data_loading">
+            @click="saveOptMetData()" :disabled="isLoading">
             Save
           </Button>
         </div>
@@ -188,22 +188,22 @@
       <span v-if="userCalibrationRunData && isCalibrationJobStatusSavedOrReady(userCalibrationRunData.status)">
         <div class="col-span-1">
           <Button v-if="optMetDataHasChanged && !userCalibrationRunData?.modules?.includes('LSTM')" class="ngenButtonDiv-yellow" title="Revert All Changes"
-            @click="restoreTab()" aria-label="Revert All Changes" :disabled="isLoading || optimizationStore_data_loading">Revert</Button>
+            @click="restoreTab()" aria-label="Revert All Changes" :disabled="isLoading">Revert</Button>
         </div>
       </span>
       <div class="col-span-4">&nbsp;</div>
       <div class="col-span-1">
         <Button class="ngenButtonDiv ml-6 font-normal h-8 float-right" title="Previous Tab Button"
-          aria-label="Previous Tab Button" @click="goPrevTab()" :disabled="isLoading || optimizationStore_data_loading">Prev</Button>
+          aria-label="Previous Tab Button" @click="goPrevTab()" :disabled="isLoading">Prev</Button>
       </div>
       <div class="col-span-1 mr-4">
         <Button class="ngenButtonDiv ml-6 font-normal h-8" title="Next Tab Button" aria-label="Next Tab Button"
-          @click="goNextTab()" :disabled="isLoading || optimizationStore_data_loading">Next</Button>
+          @click="goNextTab()" :disabled="isLoading">Next</Button>
       </div>
 
     </div>
 
-    <div class="waitgif" v-if="isLoading || optimizationStore_data_loading">
+    <div class="waitgif" v-if="isLoading">
       <img alt="Please wait..." src="@/assets/styles/img/wait.gif" />
     </div>
   </div>
@@ -225,7 +225,6 @@ import { generalStore } from "~/stores/common/GeneralStore";
 import MoveNextPrevDialog from "../Common/MoveNextPrevDialog.vue";
 
 import { formatDateForRunOnString } from "@/utils/TimeHelpers";
-import { hilightTab } from '@/composables/TabHilight';
 import { isCalibrationJobStatusSavedOrReady } from "@/utils/CommonHelpers";
 
 const dialog = useDialog();
@@ -307,10 +306,6 @@ onMounted(async() => {
     showMetricThresholdEvent.value = true;
     uiThresholdEvent.value = userCalibrationRunData.value?.threshold_event;
   }
-
-  nextTick(() => {
-    hilightTab(CalibrationTabs.tab_optimizationMetrics);
-  });
 
   isLoading.value = false;
 })
@@ -401,6 +396,7 @@ const optimizationSelectChange = () => {
  * make sure we manage the display base on user input AFTER data loading has completed 
  */
 watch(() => optimizationStore_data_loading.value, (loading_status) => {
+  isLoading.value = loading_status;
   if (selectedMetric?.value?.categorical === true) {
     showObjectiveFunctionThresholdCategorical.value = true;
     cbCategoricalDisabled.value = true;
